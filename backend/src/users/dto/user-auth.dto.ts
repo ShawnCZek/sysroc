@@ -1,4 +1,4 @@
-import { Field, ObjectType } from 'type-graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { UserDto } from './user.dto';
 import { UserTempDto } from './user-temp.dto';
 import { PermissionStateDto } from './permission-state.dto';

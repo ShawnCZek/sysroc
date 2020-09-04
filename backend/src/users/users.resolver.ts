@@ -97,7 +97,7 @@ export class UsersResolver {
       throw new UnauthorizedException('You cannot create a user account with the role.');
     }
 
-    return await this.usersService.create(input);
+    return this.usersService.create(input);
   }
 
   @Mutation(() => UserAuthDto)

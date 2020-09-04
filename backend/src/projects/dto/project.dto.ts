@@ -1,7 +1,7 @@
-import { Field, ID, ObjectType } from 'type-graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { UserDto } from '../../users/dto/user.dto';
 import { TaskDto } from '../../tasks/dto/task.dto';
-import {ClassificationDto} from '../../classification/dto/classification.dto';
+import { ClassificationDto } from '../../classification/dto/classification.dto';
 
 @ObjectType()
 export class ProjectDto {

@@ -1,8 +1,8 @@
-import { Field, ID, ObjectType } from 'type-graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/entities/users.entity';
 import { Task } from '../../tasks/entities/tasks.entity';
-import {Classification} from '../../classification/entities/classification.entity';
+import { Classification } from '../../classification/entities/classification.entity';
 
 @Entity()
 @ObjectType()

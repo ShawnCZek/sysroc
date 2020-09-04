@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from 'type-graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Group } from '../../groups/entities/groups.entity';
 import { RoleDto } from '../../roles/dto/role.dto';
 import { ProjectDto } from '../../projects/dto/project.dto';
