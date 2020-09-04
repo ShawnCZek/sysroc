@@ -1,6 +1,7 @@
-# compiled output
+# Compiled Output
 /dist
 /node_modules
+/schema.gql
 
 # Logs
 logs
@@ -17,7 +18,7 @@ lerna-debug.log*
 /coverage
 /.nyc_output
 
-# IDEs and editors
+# IDEs and Editors
 /.idea
 .project
 .classpath
