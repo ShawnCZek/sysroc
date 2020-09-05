@@ -1,4 +1,11 @@
-import { HttpService, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpService,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { UsersFilter } from './filters/users.filter';
@@ -19,6 +26,7 @@ import { GroupsService } from '../groups/groups.service';
 import { CreateGroupDto } from '../groups/dto/create-group.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AllUsersFilter } from './filters/all-users.filter';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class UsersService {
@@ -68,7 +76,7 @@ export class UsersService {
     filter = JSON.parse(JSON.stringify(filter));
 
     const user = await this.userRepository
-      .findOne(filter, { relations: ['roles', 'groups'] });
+      .findOne(filter, { relations: ['roles', 'roles.permissions', 'groups', 'projects'] });
 
     if (!user) {
       throw new Error(`User not found!`);
@@ -139,11 +147,7 @@ export class UsersService {
 
     await this.userRepository.save(newUser);
 
-    return await this.userRepository
-      .createQueryBuilder('user')
-      .whereInIds(newUser.id)
-      .leftJoinAndSelect('user.roles', 'roles')
-      .getOne();
+    return await this.userRepository.findOne(newUser.id, { relations: ['roles', 'roles.permissions', 'groups'] });
   }
 
   async create(
@@ -180,6 +184,8 @@ export class UsersService {
     const passwordRaw = createUserDto.password ? createUserDto.password : crypto.randomBytes(16).toString('hex');
     const password = await this.hashPassword(passwordRaw);
 
+    console.log(`Password to be sent in email: ${passwordRaw}`);
+
     const createUser = {
       email: createUserDto.email,
       adEmail: createUserDto.adEmail ? createUserDto.adEmail : createUserDto.email,
@@ -198,12 +204,7 @@ export class UsersService {
     await this.addRoles(createdUser, createUserDto.roleSlugs);
     await this.userRepository.save(createdUser);
 
-    return await this.userRepository
-      .createQueryBuilder('user')
-      .whereInIds(createdUser.id)
-      .leftJoinAndSelect('user.roles', 'roles')
-      .leftJoinAndSelect('user.groups', 'groups')
-      .getOne();
+    return await this.userRepository.findOne(createdUser.id, { relations: ['roles', 'roles.permissions', 'groups'] });
   }
 
   async update(
@@ -234,6 +235,35 @@ export class UsersService {
       .getOne();
   }
 
+  async updateProfile(
+    user: UserDto,
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<void> {
+    const updateUser: any = { name: updateProfileDto.name };
+
+    if (updateProfileDto.email) {
+      updateUser.email = updateProfileDto.email;
+    }
+
+    if (updateProfileDto.oldPassword && updateProfileDto.password && updateProfileDto.passwordAgain) {
+      const valid = await bcrypt.compare(updateProfileDto.oldPassword, user.password);
+      if (!valid) {
+        throw new UnauthorizedException('The current password does not match.');
+      }
+      if (updateProfileDto.password !== updateProfileDto.passwordAgain) {
+        throw new Error('The new password has not been confirmed.');
+      }
+
+      updateUser.password = await this.hashPassword(updateProfileDto.password);
+    }
+
+    try {
+      await this.userRepository.update(user.id, updateUser);
+    } catch {
+      throw new ConflictException('This email is already in use!');
+    }
+  }
+
   async hashPassword(password: string): Promise<string> {
     return await bcrypt.hash(password, 10);
   }
@@ -246,13 +276,7 @@ export class UsersService {
       return false;
     }
 
-    let roles = userDto.roles;
-    if (typeof roles[0] === 'string') {
-      const user = await this.findOne({ id: userDto.id });
-      roles = user.roles;
-    }
-
-    for (const role of roles) {
+    for (const role of userDto.roles) {
       if (await this.rolesService.hasPermissions(role as Role, ...permissionSlugs)) {
         return true;
       }

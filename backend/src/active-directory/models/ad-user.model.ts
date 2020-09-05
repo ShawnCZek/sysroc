@@ -1,4 +1,4 @@
-import { ObjectType, Field } from 'type-graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class ADUser {

@@ -26,17 +26,47 @@ export class ProjectsService {
     const project = this.projectRepository.create(createProjectDto);
     project.user = await this.userRepository.findOne({ id: user.id });
     project.createdAt = new Date();
-    return this.projectRepository.save(project);
+    const res = await this.projectRepository.save(project);
+    return this.projectRepository.findOne(res.id, { relations: ['user', 'supervisor'] });
   }
 
   async getMany(filter: ProjectsFilter): Promise<ProjectDto[]> {
-    return this.projectRepository.find({ ...filter, relations: ['user', 'supervisor'] });
+    const query = this.projectRepository.createQueryBuilder('project')
+      .innerJoinAndSelect('project.user', 'user')
+      .leftJoinAndSelect('project.supervisor', 'supervisor')
+      .leftJoinAndSelect('project.tasks', 'tasks')
+      .orderBy({ 'tasks.createdAt': 'ASC' });
+
+    if (filter.user) {
+      query.andWhere('project.user.id = :id', { id: filter.user });
+    }
+
+    if (filter.name && filter.name !== '') {
+      query.andWhere('project.name like :name', { name: `%${filter.name}%` });
+    }
+
+    if (filter.authors && filter.authors.length > 0) {
+      query.andWhere('user.id IN (:...userIds)', { userIds: filter.authors });
+    }
+
+    if (filter.supervisors && filter.supervisors.length > 0) {
+      query.andWhere('supervisor.id IN (:...supervisorIds)', { supervisorIds: filter.supervisors });
+    }
+
+    return query.getMany();
   }
 
-  async deleteOne(projectId: number): Promise<ProjectDto> {
-    const project = await this.projectRepository.findOne({ id: projectId });
+  async deleteOne(
+    projectId: number,
+    user: UserDto,
+  ): Promise<ProjectDto> {
+    const project = await this.projectRepository.findOne({ id: projectId }, { relations: ['user', 'supervisor'] });
     if (!project) {
       throw new NotFoundException(`Project couldn't be found.`);
+    }
+
+    if (project.user.id !== user.id && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
+      throw new UnauthorizedException(`Missing permissions for deleting this project`);
     }
 
     const res = await this.projectRepository.delete({ id: projectId });
@@ -49,32 +79,15 @@ export class ProjectsService {
 
   async getOne(projectId: number): Promise<ProjectDto> {
     return this.projectRepository
-        .createQueryBuilder('project')
-        .where('project.id = :id', {id: projectId})
-        .innerJoinAndSelect(
-          'project.user',
-          'user'
-        )
-        .leftJoinAndSelect(
-          'project.supervisor',
-          'supervisor'
-        )
-        .leftJoinAndSelect(
-            'project.tasks',
-            'tasks'
-        )
-        .leftJoinAndSelect(
-            'project.classifications',
-            'classifications'
-        )
-        .leftJoinAndSelect(
-            'classifications.user',
-            'teacher'
-        )
-        .orderBy({
-          'tasks.createdAt': 'ASC'
-        })
-        .getOne();
+      .createQueryBuilder('project')
+      .where('project.id = :id', { id: projectId })
+      .innerJoinAndSelect('project.user', 'user')
+      .leftJoinAndSelect('project.supervisor', 'supervisor')
+      .leftJoinAndSelect('project.tasks', 'tasks')
+      .leftJoinAndSelect('project.classifications', 'classifications')
+      .leftJoinAndSelect('classifications.user', 'teacher')
+      .orderBy({ 'tasks.createdAt': 'ASC' })
+      .getOne();
   }
 
   async updateOne(

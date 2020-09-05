@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {useProjectQuery, useMeQuery, ClassificationDto} from '../generated/graphql';
+import { ClassificationDto, useMeQuery, useProjectQuery } from '../generated/graphql';
 import { RouteComponentProps, useHistory } from 'react-router';
 import { Fab, Typography } from '@material-ui/core';
 import styled from 'styled-components';
@@ -9,7 +9,7 @@ import { CreateTaskModal } from '../components/Task/CreateTaskModal';
 import moment from 'moment';
 import { ITask } from '../components/Task/Task';
 import { UpdateTaskModal } from '../components/Task/UpdateTaskModal';
-import {ProjectClassificationOverview} from "../components/Project/ProjectClassificationOverview";
+import { ProjectClassificationOverview } from '../components/Project/ProjectClassificationOverview';
 import { ClaimProjectFab } from '../components/Project/ClaimProjectFab';
 import { hasPermissions } from '../auth/hasPermissions';
 
@@ -127,29 +127,39 @@ export const SingleProject: React.FC<Props> = props => {
             color="primary"
             variant="extended"
             onClick={() => {
-              history.push(`/projects`);
+              history.goBack();
             }}
           >
             Back
           </Fab>
-          <Fab
-            color="secondary"
-            variant="extended"
-            onClick={() => {
-              handleModalOpen();
-            }}
-          >
-            Edit
-          </Fab>
-          <Fab
-              color="primary"
-              variant="extended"
-              onClick={() => {
-                setClassOverviewOpen(true);
-              }}
-          >
-            Classification
-          </Fab>
+          {(canManageProject || data?.project?.user?.id === meData?.me?.user?.id) ? (
+            <>
+              <Fab
+                color="secondary"
+                variant="extended"
+                onClick={() => {
+                  handleModalOpen();
+                }}
+              >
+                Edit
+              </Fab>
+
+              <Fab
+                color="primary"
+                variant="extended"
+                onClick={() => {
+                  setClassOverviewOpen(true);
+                }}
+              >
+                Classification
+              </Fab>
+            </>
+          ) : (
+            <>
+              <div />
+              <div />
+            </>
+          )}
           { data && (
             <ClaimProjectFab
               projectId={parseInt(data.project.id)}
@@ -163,15 +173,17 @@ export const SingleProject: React.FC<Props> = props => {
         <Project>
           <Typography variant="h4">{data.project.name}</Typography>
           <Typography variant="h5">{data.project.description}</Typography>
-          <div className="add-task-btn">
-            <Fab
-              color="secondary"
-              variant="extended"
-              onClick={handleCreateTaskOpen}
-            >
-              Add Task
-            </Fab>
-          </div>
+          {(canManageProject || data?.project?.user?.id === meData?.me?.user?.id) &&
+            <div className="add-task-btn">
+              <Fab
+                color="secondary"
+                variant="extended"
+                onClick={handleCreateTaskOpen}
+              >
+                Add Task
+              </Fab>
+            </div>
+          }
           {data.project.tasks ? (
             <TaskLists>
               {Object.keys(tasksByMonth).map(key => (

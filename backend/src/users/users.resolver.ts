@@ -27,6 +27,7 @@ import { ADResponse } from '../active-directory/models/ad-response.model';
 import { RoleDto } from '../roles/dto/role.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AllUsersFilter } from './filters/all-users.filter';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Resolver()
 export class UsersResolver {
@@ -59,7 +60,7 @@ export class UsersResolver {
 
   @Query(() => UserAuthDto, { nullable: true })
   @UseGuards(GqlAuthGuard)
-  async me(@CurrentUser() user: UserDto) {
+  async me(@CurrentUser() user: User) {
     const permissions = await this.usersService.getPermissionStates(user);
 
     return {
@@ -96,7 +97,7 @@ export class UsersResolver {
       throw new UnauthorizedException('You cannot create a user account with the role.');
     }
 
-    return await this.usersService.create(input);
+    return this.usersService.create(input);
   }
 
   @Mutation(() => UserAuthDto)
@@ -145,14 +146,14 @@ export class UsersResolver {
     });
 
     const token = await this.authService.createToken(
-      registeredUser.email,
+      registeredUser.adEmail,
       registeredUser.id,
     );
 
     await this.redisClient.del(registerToken);
 
     const refreshToken = await this.authService.createRefreshToken(
-      registeredUser.email,
+      registeredUser.adEmail,
       registeredUser.id,
     );
 
@@ -182,6 +183,7 @@ export class UsersResolver {
     } catch {
       // Nothing has to be done here
     }
+
     if (user) {
       const valid = await bcrypt.compare(auth.password, user.password);
       if (!valid) {
@@ -190,9 +192,9 @@ export class UsersResolver {
 
       const permissions = await this.usersService.getPermissionStates(user);
 
-      const token = await this.authService.createToken(user.email, user.id);
+      const token = await this.authService.createToken(user.adEmail, user.id);
       const refreshToken = await this.authService.createRefreshToken(
-        user.email,
+        user.adEmail,
         user.id,
       );
 
@@ -311,6 +313,19 @@ export class UsersResolver {
     }
 
     return await this.usersService.update(userDto, input);
+  }
+
+  @Mutation(() => UserAuthDto)
+  @UseGuards(GqlAuthGuard)
+  async updateProfile(
+    @CurrentUser() user: User,
+    @Args('input') input: UpdateProfileDto,
+  ) {
+    await this.usersService.updateProfile(user, input);
+
+    const permissions = await this.usersService.getPermissionStates(user);
+
+    return { user, permissions };
   }
 
   @Mutation(() => Boolean)
