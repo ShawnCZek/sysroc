@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useDeleteProjectMutation, useMeQuery, useProjectsQuery } from '../../generated/graphql';
 import Paper from '@material-ui/core/Paper';
+import moment from 'moment';
+import styled from 'styled-components';
 import { Fab } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
 import { DeleteProjectAlert } from './DeleteProjectAlert';
 import { useHistory } from 'react-router';
 import { Item } from '../Layout/Item';
 import { List } from '../Layout/List';
-import styled from 'styled-components';
 import { UserLink } from '../UserLink';
 import { ProjectFilters, ProjectsFilter } from './ProjectsFilter';
 import { hasPermissions } from '../../auth/hasPermissions';
@@ -99,6 +100,9 @@ export const ProjectsList: React.FC<Props> = ({
                 <div>Description</div>
               </Item>
               <Item>
+                <div>Created</div>
+              </Item>
+              <Item>
                 <div>Action</div>
               </Item>
             </div>
@@ -123,6 +127,9 @@ export const ProjectsList: React.FC<Props> = ({
                   </Item>
                   <Item className="description">
                     <div>{project.description.slice(0, 100)}{!project.description || project.description.length > 100 ? '...' : ''}</div>
+                  </Item>
+                  <Item>
+                    <div>{moment(project.createdAt).format('Do MMMM YYYY HH:mm')}</div>
                   </Item>
                   <Item className="actions">
                     <Fab

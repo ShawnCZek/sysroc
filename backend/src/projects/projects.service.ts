@@ -25,6 +25,7 @@ export class ProjectsService {
   ): Promise<ProjectDto> {
     const project = this.projectRepository.create(createProjectDto);
     project.user = await this.userRepository.findOne({ id: user.id });
+    project.createdAt = new Date();
     const res = await this.projectRepository.save(project);
     return this.projectRepository.findOne(res.id, { relations: ['user', 'supervisor'] });
   }

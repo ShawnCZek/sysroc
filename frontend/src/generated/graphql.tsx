@@ -229,6 +229,7 @@ export type Project = {
   supervisor: User,
   tasks: Array<Task>,
   classifications: Array<Classification>,
+  createdAt: Scalars['DateTime'],
 };
 
 export type ProjectDto = {
@@ -240,6 +241,7 @@ export type ProjectDto = {
   supervisor?: Maybe<UserDto>,
   tasks: Array<TaskDto>,
   classifications: Array<ClassificationDto>,
+  createdAt: Scalars['DateTime'],
 };
 
 export type ProjectsFilter = {
@@ -732,7 +734,7 @@ export type ProjectQuery = (
   { __typename?: 'Query' }
   & { project: (
     { __typename?: 'ProjectDto' }
-    & Pick<ProjectDto, 'id' | 'name' | 'description'>
+    & Pick<ProjectDto, 'id' | 'name' | 'description' | 'createdAt'>
     & { tasks: Array<(
       { __typename?: 'TaskDto' }
       & Pick<TaskDto, 'id' | 'name' | 'description' | 'createdAt' | 'dueDate' | 'completed'>
@@ -765,7 +767,7 @@ export type ProjectsQuery = (
   { __typename?: 'Query' }
   & { projects: Array<(
     { __typename?: 'ProjectDto' }
-    & Pick<ProjectDto, 'id' | 'name' | 'description'>
+    & Pick<ProjectDto, 'id' | 'name' | 'description' | 'createdAt'>
     & { user: (
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
@@ -1626,6 +1628,7 @@ export const ProjectDocument = gql`
     id
     name
     description
+    createdAt
     tasks {
       id
       name
@@ -1687,6 +1690,7 @@ export const ProjectsDocument = gql`
     id
     name
     description
+    createdAt
     user {
       id
       name

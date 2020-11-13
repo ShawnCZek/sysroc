@@ -1,5 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/entities/users.entity';
 import { Task } from '../../tasks/entities/tasks.entity';
 import { Classification } from '../../classification/entities/classification.entity';
@@ -34,4 +34,8 @@ export class Project {
   @OneToMany(type => Classification, classification => classification.project)
   @Field(type => [Classification])
   classifications: Classification[];
+
+  @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
+  @Field(type => Date)
+  createdAt: Date;
 }
