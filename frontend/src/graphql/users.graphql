@@ -3,6 +3,7 @@ query Users(
   $email: String
   $adEmail: String
   $roles: [Float!]
+  $rolesSlug: [String!]
   $groups: [Float!]
 ) {
   users(
@@ -11,6 +12,7 @@ query Users(
       email: $email
       adEmail: $adEmail
       roles: $roles
+      rolesSlug: $rolesSlug
       groups: $groups
     }
   ) {

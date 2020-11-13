@@ -34,20 +34,18 @@ export class ProjectsService {
       .innerJoinAndSelect('project.user', 'user')
       .leftJoinAndSelect('project.supervisor', 'supervisor')
       .leftJoinAndSelect('project.tasks', 'tasks')
-      .orderBy({ 'tasks.createdAt': 'ASC' });
+      .addOrderBy('tasks.createdAt');
 
     if (filter.user) {
       query.andWhere('project.user.id = :id', { id: filter.user });
     }
-
     if (filter.name && filter.name !== '') {
-      query.andWhere('project.name like :name', { name: `%${filter.name}%` });
+      query.andWhere('LOWER(project.name) like :name', { name: `%${filter.name}%` });
     }
 
     if (filter.authors && filter.authors.length > 0) {
       query.andWhere('user.id IN (:...userIds)', { userIds: filter.authors });
     }
-
     if (filter.supervisors && filter.supervisors.length > 0) {
       query.andWhere('supervisor.id IN (:...supervisorIds)', { supervisorIds: filter.supervisors });
     }

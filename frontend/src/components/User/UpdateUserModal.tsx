@@ -1,11 +1,9 @@
 import React from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
-import { UsersDocument, useUpdateUserMutation } from '../../generated/graphql';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { useUpdateUserMutation } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
 import { UpdateUserForm } from './UpdateUserForm';
-import { getUserFilters, setDefaultUserFilters, triggerUserFiltersChange } from '../../filters/users';
-import { useApolloClient } from '@apollo/react-hooks';
 
 function getModalStyle() {
   const top = 50;
@@ -45,8 +43,6 @@ interface Props {
   };
 }
 
-const GET_USERS = UsersDocument;
-
 export const UpdateUserModal: React.FC<Props> = ({
   open,
   handleClose,
@@ -55,42 +51,12 @@ export const UpdateUserModal: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
-  const { cache: apolloClient } = useApolloClient();
 
   const [modalStyle] = React.useState(getModalStyle);
 
-  const [updateUser, { error }] = useUpdateUserMutation({
-    async update(cache, result) {
-      try {
-        setDefaultUserFilters();
-
-        const { users }: any = cache.readQuery({
-          query: GET_USERS,
-          variables: getUserFilters(),
-        });
-
-        await apolloClient.reset();
-
-        const index = users.findIndex(
-          (user: any) => user.id === result.data?.updateUser.id
-        );
-
-        users[index] = result.data?.updateUser;
-
-        cache.writeQuery({
-          query: GET_USERS,
-          variables: getUserFilters(),
-          data: {
-            users,
-          }
-        });
-
-        triggerUserFiltersChange();
-      } catch (error) {
-        if (error instanceof Error) {
-          enqueueSnackbar(error.message, { variant: 'error' });
-        }
-      }
+  const [updateUser, { error, client }] = useUpdateUserMutation({
+    async update() {
+      client?.resetStore();
     }
   });
 

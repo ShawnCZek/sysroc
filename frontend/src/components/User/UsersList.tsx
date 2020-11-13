@@ -2,73 +2,36 @@ import React, { useState } from 'react';
 import Paper from '@material-ui/core/Paper';
 import { Item } from '../Layout/Item';
 import { List } from '../Layout/List';
-import { useDeleteUserMutation, useMeExtendedQuery, UsersDocument, useUsersQuery } from '../../generated/graphql';
+import { useDeleteUserMutation, useMeExtendedQuery, useUsersQuery } from '../../generated/graphql';
 import { Fab } from '@material-ui/core';
 import { UpdateUserModal } from './UpdateUserModal';
 import { hasPermissions } from '../../auth/hasPermissions';
 import { UserFilters, UsersFilter } from './UsersFilter';
-import {
-  getUserFilters,
-  registerUserFiltersListener,
-  setDefaultUserFilters,
-  setUserFilters,
-  triggerUserFiltersChange
-} from '../../filters/users';
 import { DeleteUserDialog } from './DeleteUserDialog';
-import { useApolloClient } from '@apollo/react-hooks';
 import { useSnackbar } from 'notistack';
 import { UserLink } from '../UserLink';
 
-const GET_USERS = UsersDocument;
-
-interface Props {}
-
-export const UsersList: React.FC<Props> = () => {
+export const UsersList: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const { cache: apolloClient } = useApolloClient();
 
-  const [loaded, setLoaded] = useState(false);
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [deleteUserModalOpen, setDeleteUserModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [userData, setUserData] = useState<any>(null);
-  const [filters, setFilters] = useState<UserFilters>(getUserFilters());
-  const [revision, setRevision] = useState(0);
+  const [filters, setFilters] = useState<UserFilters>({ name: '', email: '', adEmail: '', groups: [], roles: [] });
 
   const { data: me, loading: meLoading } = useMeExtendedQuery();
   const { data, loading } = useUsersQuery({ variables: filters });
 
-  const [deleteUser] = useDeleteUserMutation({
+  const [deleteUser, { client }] = useDeleteUserMutation({
     async update(cache, result) {
       if (!result.data?.deleteUser) {
         enqueueSnackbar('An error occurred while deleting the user.', { variant: 'error' });
         return;
       }
 
-      setDefaultUserFilters();
-
-      const { users }: any = cache.readQuery({
-        query: GET_USERS,
-        variables: getUserFilters(),
-      });
-
-      await apolloClient.reset();
-
-      const updatedUsers = users.filter((user: { id: string }) => user.id !== result.data?.deleteUser.id);
-
-      cache.writeQuery({
-        query: GET_USERS,
-        variables: getUserFilters(),
-        data: {
-          users: updatedUsers,
-        }
-      });
-
-      if (data) {
-        data.users = updatedUsers;
-      }
-
-      triggerUserFiltersChange();
+      enqueueSnackbar('User deleted!', { variant: 'success' });
+      client?.resetStore();
     }
   });
 
@@ -77,43 +40,23 @@ export const UsersList: React.FC<Props> = () => {
   const canDeleteUsers = me && me.me && hasPermissions(me.me, 'users.delete');
   const isAdmin = me && me.me && me.me.user && me.me.user.roles && me.me.user.roles.some(role => role.admin);
 
-  const handleCloseUserModal = () => {
-    setUserModalOpen(false);
-  };
+  const handleCloseUserModal = () => setUserModalOpen(false);
+  const handleOpenUserModal = () => setUserModalOpen(true);
 
-  const handleOpenUserModal = () => {
-    setUserModalOpen(true);
-  };
-
-  const handleCloseDeleteUserDialog = () => {
-    setDeleteUserModalOpen(false);
-  };
-
-  const handleOpenDeleteUserDialog = () => {
-    setDeleteUserModalOpen(true);
-  };
+  const handleCloseDeleteUserDialog = () => setDeleteUserModalOpen(false);
+  const handleOpenDeleteUserDialog = () => setDeleteUserModalOpen(true);
 
   const handleSubmitDeleteUserDialog = async (userId: number) => {
     await deleteUser({ variables: { id: userId } });
-    enqueueSnackbar('User deleted!', { variant: 'success' });
   };
 
   if (loading || meLoading) return <span>Loading...</span>;
-
-  if (!loaded) {
-    registerUserFiltersListener((data: UserFilters) => {
-      setFilters(data);
-      setRevision(revision + 1);
-    });
-    setLoaded(true);
-  }
 
   return (
     <div>
       <UsersFilter
         defaultValues={filters}
         onSubmit={(filter: UserFilters) => {
-          setUserFilters(filter);
           setFilters(filter);
         }}
       />

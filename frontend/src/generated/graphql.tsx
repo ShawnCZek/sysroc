@@ -26,6 +26,7 @@ export type AllUsersFilter = {
   adEmail?: Maybe<Scalars['String']>,
   name?: Maybe<Scalars['String']>,
   roles?: Maybe<Array<Scalars['Float']>>,
+  rolesSlug?: Maybe<Array<Scalars['String']>>,
   groups?: Maybe<Array<Scalars['Float']>>,
 };
 
@@ -1011,6 +1012,7 @@ export type UsersQueryVariables = {
   email?: Maybe<Scalars['String']>,
   adEmail?: Maybe<Scalars['String']>,
   roles?: Maybe<Array<Scalars['Float']>>,
+  rolesSlug?: Maybe<Array<Scalars['String']>>,
   groups?: Maybe<Array<Scalars['Float']>>
 };
 
@@ -2206,8 +2208,8 @@ export type UserQueryHookResult = ReturnType<typeof useUserQuery>;
 export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
 export type UserQueryResult = ApolloReactCommon.QueryResult<UserQuery, UserQueryVariables>;
 export const UsersDocument = gql`
-    query Users($name: String, $email: String, $adEmail: String, $roles: [Float!], $groups: [Float!]) {
-  users(filter: {name: $name, email: $email, adEmail: $adEmail, roles: $roles, groups: $groups}) {
+    query Users($name: String, $email: String, $adEmail: String, $roles: [Float!], $rolesSlug: [String!], $groups: [Float!]) {
+  users(filter: {name: $name, email: $email, adEmail: $adEmail, roles: $roles, rolesSlug: $rolesSlug, groups: $groups}) {
     id
     name
     email
@@ -2242,6 +2244,7 @@ export const UsersDocument = gql`
  *      email: // value for 'email'
  *      adEmail: // value for 'adEmail'
  *      roles: // value for 'roles'
+ *      rolesSlug: // value for 'rolesSlug'
  *      groups: // value for 'groups'
  *   },
  * });

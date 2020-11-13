@@ -4,14 +4,12 @@ import Paper from '@material-ui/core/Paper';
 import { Fab } from '@material-ui/core';
 import { useSnackbar } from 'notistack';
 import { DeleteProjectAlert } from './DeleteProjectAlert';
-import { GET_PROJECTS } from './NewProjectModal';
 import { useHistory } from 'react-router';
 import { Item } from '../Layout/Item';
 import { List } from '../Layout/List';
 import styled from 'styled-components';
 import { UserLink } from '../UserLink';
 import { ProjectFilters, ProjectsFilter } from './ProjectsFilter';
-import { getProjectFilters, registerProjectFiltersListener, setProjectFilters } from '../../filters/projects';
 import { hasPermissions } from '../../auth/hasPermissions';
 
 const PaperStyles = styled.div`
@@ -30,55 +28,34 @@ const PaperStyles = styled.div`
 
 interface Props {
   userId?: string;
-  displayAuthor?: boolean;
+  displayAuthor: boolean;
 }
 
 export const ProjectsList: React.FC<Props> = ({
   userId,
   displayAuthor,
 }) => {
-  displayAuthor = displayAuthor === undefined ? true : displayAuthor;
+  const { enqueueSnackbar } = useSnackbar();
+  const history = useHistory();
 
-  const [loaded, setLoaded] = useState(false);
-  const [revision, setRevision] = useState(0);
-  const [filters, setFilters] = useState<ProjectFilters>(getProjectFilters());
+  const [filters, setFilters] = useState<ProjectFilters>({ name: '', authors: [], supervisors: [] });
+  const [deleteProjectAlert, setDeleteProjectAlert] = useState(false);
+  const [projectId, setProjectId] = useState<number | null>(null);
 
   const { data: meData } = useMeQuery();
+  if (!displayAuthor) filters.authors = [parseInt(meData?.me?.user?.id ?? '0')];
   const { data, loading } = useProjectsQuery({ variables: { userId, ...filters } });
-  const [deleteProject, { error }] = useDeleteProjectMutation({
-    update(cache, result) {
-      const { projects }: any = cache.readQuery({
-        query: GET_PROJECTS,
-        variables: { name: '' },
-      });
-      cache.writeQuery({
-        query: GET_PROJECTS,
-        variables: { name: '' },
-        data: {
-          projects: projects.filter((project: { id: string }) => {
-            if (result.data) {
-              return project.id !== result.data.deleteProject.id;
-            }
-            return false;
-          })
-        }
-      });
+
+  const [deleteProject, { error, client }] = useDeleteProjectMutation({
+    update() {
+      client?.resetStore();
     }
   });
-  const { enqueueSnackbar } = useSnackbar();
-  const [open, setOpen] = useState(false);
-  const [projectId, setProjectId] = useState<number | null>(null);
-  const history = useHistory();
 
   const canDeleteProject = meData?.me && hasPermissions(meData.me, 'projects.manage');
 
-  const handleAlertOpen = () => {
-    setOpen(true);
-  };
-
-  const handleAlertClose = () => {
-    setOpen(false);
-  };
+  const handleAlertOpen = () => setDeleteProjectAlert(true);
+  const handleDeleteAlertClose = () => setDeleteProjectAlert(false);
 
   if (error) {
     enqueueSnackbar(error.message, { variant: 'error' });
@@ -93,20 +70,15 @@ export const ProjectsList: React.FC<Props> = ({
 
   if (loading) return <span>Loading...</span>;
 
-  if (!loaded) {
-    registerProjectFiltersListener((data: ProjectFilters) => {
-      setFilters(data);
-      setRevision(revision + 1);
-    });
-    setLoaded(true);
-  }
-
   return (
     <div>
-      <ProjectsFilter defaultValues={filters} onSubmit={(filter) => {
-        setProjectFilters(filter);
-        setFilters(filter);
-      }}/>
+      <ProjectsFilter
+        defaultValues={filters}
+        filterAuthor={displayAuthor}
+        onSubmit={(filter) => {
+          setFilters(filter);
+        }}
+      />
       <h2>Projects List</h2>
       <Paper>
         <PaperStyles>
@@ -181,8 +153,8 @@ export const ProjectsList: React.FC<Props> = ({
         </PaperStyles>
       </Paper>
       <DeleteProjectAlert
-        open={open}
-        handleClose={handleAlertClose}
+        open={deleteProjectAlert}
+        handleClose={handleDeleteAlertClose}
         handleDeleteProject={handleDeleteProject}
         projectId={projectId}
       />

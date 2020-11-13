@@ -46,23 +46,30 @@ export class UsersService {
     const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.roles', 'roles')
-      .leftJoinAndSelect('user.groups', 'groups');
+      .leftJoinAndSelect('user.groups', 'groups')
+      .addOrderBy('user.name')
+      .addOrderBy('groups.name', 'DESC');
 
-    const whereLike = (key: string) => {
-      if (filter[key]) {
-        return query.where(`LOWER(user.${key}) LIKE :${key}`, { [key]: `%${filter[key].toLowerCase()}%` });
-      }
-      return query;
-    };
-
-    whereLike('name');
-    whereLike('email');
-    whereLike('adEmail');
+    if (filter.name) {
+      query.where('LOWER(user.name) LIKE :name', { name: `%${filter.name}%` });
+    }
+    if (filter.email) {
+      query.where('LOWER(user.email) LIKE :email', { email: `%${filter.email}%` });
+    }
+    if (filter.adEmail) {
+      query.where('LOWER(user.adEmail) LIKE :adEmail', { adEmail: `%${filter.adEmail}%` });
+    }
 
     let users = await query.getMany();
 
+    // We cannot use the query here, otherwise, the results would be limited as well.
+    // That means that if the user had more groups and one was filtered, the user in
+    // the table would be seen as they have only one group
     if (filter.roles && filter.roles.length > 0) {
       users = users.filter(user => user.roles.some(role => filter.roles.includes(role.id)));
+    }
+    if (filter.rolesSlug && filter.rolesSlug.length > 0) {
+      users = users.filter(user => user.roles.some(role => filter.rolesSlug.includes(role.slug)));
     }
     if (filter.groups && filter.groups.length > 0) {
       users = users.filter(user => user.groups.some(group => filter.groups.includes(group.id)));

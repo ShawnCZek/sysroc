@@ -14,6 +14,9 @@ export class AllUsersFilter {
   @Field(type => [Number], { nullable: true })
   roles?: number[];
 
+  @Field(type => [String], { nullable: true })
+  rolesSlug?: string[];
+
   @Field(type => [Number], { nullable: true })
   groups?: number[];
 }
