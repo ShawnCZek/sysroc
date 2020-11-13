@@ -1,25 +1,25 @@
-import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { ApolloError } from "apollo-client";
-import { Field, Form, Formik } from "formik";
-import { Button, Typography } from "@material-ui/core";
-import { Error } from "../Error";
-import { MyField } from "../MyField";
-import { ProjectAutocomplete } from "../Project/ProjectAutocomplete";
-import { ProjectDto } from "../../generated/graphql";
+import React, { useState } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import { ApolloError } from 'apollo-client';
+import { Field, Form, Formik } from 'formik';
+import { Button, Typography } from '@material-ui/core';
+import { Error } from '../Error';
+import { MyField } from '../MyField';
+import { ProjectAutocomplete } from '../Project/ProjectAutocomplete';
+import { ProjectDto } from '../../generated/graphql';
 
 const useStyles = makeStyles({
   form: {
     padding: '2rem',
     margin: '0 auto',
-    marginTop: '1.3rem'
+    marginTop: '1.3rem',
   },
   button: {
-    marginTop: '1rem'
+    marginTop: '1rem',
   },
   formTitle: {
-    marginBottom: '0.8rem'
-  }
+    marginBottom: '0.8rem',
+  },
 });
 
 interface Values {
@@ -36,24 +36,24 @@ interface Props {
 
 export const NewClassificationForm: React.FC<Props> = ({ onSubmit, error, userId }) => {
   const classes = useStyles();
-  const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>("");
-  const [projectError, setProjectError] = useState("");
+  const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>('');
+  const [projectError, setProjectError] = useState('');
 
   const handleAutocompleteChange = (project: ProjectDto | null) => {
     setSelectedProjectId(project?.id);
-    setProjectError("");
+    setProjectError('');
   };
 
   return (
     <Formik
-      initialValues={{ mark: 1, note: '', project: "" }}
+      initialValues={{ mark: 1, note: '', project: '' }}
       onSubmit={values => {
-        if (selectedProjectId === "" || !selectedProjectId) {
-          setProjectError("Please select project!");
+        if (selectedProjectId === '' || !selectedProjectId) {
+          setProjectError('Please select project!');
           return;
         }
 
-        setProjectError("");
+        setProjectError('');
         onSubmit({ ...values, project: selectedProjectId });
       }}
     >
@@ -84,7 +84,7 @@ export const NewClassificationForm: React.FC<Props> = ({ onSubmit, error, userId
             >
               {() => (
                 <div style={{ marginTop: 10 }}>
-                  {projectError && <div style={{ color: "red" }}>{projectError}</div>}
+                  {projectError && <div style={{ color: 'red' }}>{projectError}</div>}
                   <ProjectAutocomplete userId={userId} handleChange={handleAutocompleteChange}/>
                 </div>
               )}
@@ -113,5 +113,5 @@ export const NewClassificationForm: React.FC<Props> = ({ onSubmit, error, userId
         </Form>
       )}
     </Formik>
-  )
-}
+  );
+};

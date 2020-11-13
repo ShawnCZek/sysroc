@@ -1,12 +1,12 @@
-import React from "react";
-import MomentUtils from "@date-io/moment";
-import moment, { Moment } from "moment";
-import { Button, makeStyles, TextField } from "@material-ui/core";
-import { useProjectsQuery, useUsersQuery } from "../../generated/graphql";
-import { Form, Formik } from "formik";
-import { Autocomplete } from "@material-ui/lab";
-import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
-import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
+import React from 'react';
+import MomentUtils from '@date-io/moment';
+import moment, { Moment } from 'moment';
+import { Button, makeStyles, TextField } from '@material-ui/core';
+import { useProjectsQuery, useUsersQuery } from '../../generated/graphql';
+import { Form, Formik } from 'formik';
+import { Autocomplete } from '@material-ui/lab';
+import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
+import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 
 const useStyles = makeStyles({
   form: {
@@ -22,7 +22,7 @@ const useStyles = makeStyles({
   },
   autoCompleteField: {
     width: '100%',
-  }
+  },
 });
 
 export interface ClassificationFilters {
@@ -85,7 +85,7 @@ export const ClassificationFilter: React.FC<Props> = ({ defaultValues, onSubmit 
             projects,
             users,
             fromDate: fromDate?.toDate() ?? defaultValues.fromDate,
-            toDate: toDate?.toDate() ?? defaultValues.toDate
+            toDate: toDate?.toDate() ?? defaultValues.toDate,
           });
         }}
       >
@@ -154,5 +154,5 @@ export const ClassificationFilter: React.FC<Props> = ({ defaultValues, onSubmit 
         </Form>
       </Formik>
     </MuiPickersUtilsProvider>
-  )
+  );
 };

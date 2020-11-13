@@ -38,7 +38,7 @@ export const ClassificationList: React.FC<Props> = ({ userId }) => {
 
       enqueueSnackbar('Classification deleted!', { variant: 'success' });
       client?.resetStore();
-    }
+    },
   });
 
   const [deleteClassificationDialogOpen, setDeleteClassificationDialogOpen] = useState(false);
@@ -96,7 +96,7 @@ export const ClassificationList: React.FC<Props> = ({ userId }) => {
                 <div>{classification.project.name}</div>
               </Item>
               <Item>
-                <div><UserLink id={classification.user.id} name={classification.user.name} /></div>
+                <div><UserLink id={classification.user.id} name={classification.user.name}/></div>
               </Item>
               <Item>
                 <div>{moment(classification.createdAt).format('DD. MM. YYYY, dddd')}</div>
@@ -112,7 +112,7 @@ export const ClassificationList: React.FC<Props> = ({ userId }) => {
                         setClassificationData({
                           mark: classification.mark,
                           note: classification.note,
-                          project: classification.project.id
+                          project: classification.project.id,
                         });
                         handleUpdateModalOpen();
                       }}

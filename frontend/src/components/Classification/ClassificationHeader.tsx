@@ -28,38 +28,38 @@ const ClassificationHeaderStyles = styled.div`
 `;
 
 const useStyles = makeStyles(theme => ({
-    root: {
-        '& > *': {
-            margin: theme.spacing(1)
-        }
+  root: {
+    '& > *': {
+      margin: theme.spacing(1),
     },
-    extendedIcon: {
-        marginRight: theme.spacing(1)
-    }
+  },
+  extendedIcon: {
+    marginRight: theme.spacing(1),
+  },
 }));
 
 interface Props {
-    handleOpen: () => void;
+  handleOpen: () => void;
 }
 
 export const ClassificationHeader: React.FC<Props> = ({ handleOpen }) => {
-    const classes = useStyles();
-    const { data, loading } = useMeQuery();
+  const classes = useStyles();
+  const { data, loading } = useMeQuery();
 
-    return (
-        <ClassificationHeaderStyles>
-            <div className="header">
-                <h2>Classification</h2>
-                <p>Review or add new marks!</p>
-            </div>
-            { !loading && data && data.me && hasPermissions(data.me, 'classification.create') &&
-            <div className="new-project">
-                <Fab color="primary" variant="extended" onClick={handleOpen}>
-                    <AddCircleIcon className={classes.extendedIcon}/>
-                    Add mark
-                </Fab>
-            </div>
-            }
-        </ClassificationHeaderStyles>
-    );
+  return (
+    <ClassificationHeaderStyles>
+      <div className="header">
+        <h2>Classification</h2>
+        <p>Review or add new marks!</p>
+      </div>
+      {!loading && data && data.me && hasPermissions(data.me, 'classification.create') &&
+      <div className="new-project">
+          <Fab color="primary" variant="extended" onClick={handleOpen}>
+              <AddCircleIcon className={classes.extendedIcon}/>
+              Add mark
+          </Fab>
+      </div>
+      }
+    </ClassificationHeaderStyles>
+  );
 };
