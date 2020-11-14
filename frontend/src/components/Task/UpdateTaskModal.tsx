@@ -1,10 +1,9 @@
 import React from 'react';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import { UpdateTaskForm } from './UpdateTaskForm';
-import { useTaskQuery, useUpdateTaskMutation } from '../../generated/graphql';
+import { ProjectTasksDocument, useTaskQuery, useUpdateTaskMutation } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
-import { GET_PROJECT } from '../Project/UpdateProjectModal';
 
 function getModalStyle() {
   const top = 50;
@@ -30,6 +29,8 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+const GET_PROJECT = ProjectTasksDocument;
+
 interface Props {
   open: boolean;
   handleClose: () => void;
@@ -41,7 +42,7 @@ export const UpdateTaskModal: React.FC<Props> = ({
   open,
   handleClose,
   task,
-  projectId
+  projectId,
 }) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
@@ -54,8 +55,6 @@ export const UpdateTaskModal: React.FC<Props> = ({
           query: GET_PROJECT,
           variables: { id: projectId }
         });
-
-        console.log(result.data?.updateTask);
 
         const index = project.tasks.findIndex(
           (task: any) => task.id === result.data?.updateTask.id
@@ -70,6 +69,9 @@ export const UpdateTaskModal: React.FC<Props> = ({
             project: project
           }
         });
+
+        enqueueSnackbar('Task updated!', { variant: 'success' });
+        handleClose();
       } catch (error) {
         if (error instanceof Error) {
           enqueueSnackbar(error.message, { variant: 'error' });
@@ -78,7 +80,7 @@ export const UpdateTaskModal: React.FC<Props> = ({
     }
   });
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return null;
 
   return (
     <Modal
@@ -94,15 +96,9 @@ export const UpdateTaskModal: React.FC<Props> = ({
             error={error}
             task={data.task}
             onSubmit={async ({ name, description, dueDate }) => {
-              console.log('Task ID', task);
-              const res = await updateTask({
+              await updateTask({
                 variables: { name, description, dueDate, id: task }
               });
-
-              if (res.data) {
-                enqueueSnackbar('Task updated!', { variant: 'success' });
-                handleClose();
-              }
             }}
           />
         )}

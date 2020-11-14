@@ -1,10 +1,9 @@
 import React from 'react';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { CreateTaskForm } from './CreateTaskForm';
-import { useCreateTaskMutation } from '../../generated/graphql';
+import { ProjectTasksDocument, useCreateTaskMutation } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
-import { GET_PROJECT } from '../Project/UpdateProjectModal';
 
 function getModalStyle() {
   const top = 50;
@@ -29,6 +28,8 @@ const useStyles = makeStyles((theme: Theme) =>
     }
   })
 );
+
+const GET_PROJECT = ProjectTasksDocument;
 
 interface Props {
   open: boolean;
@@ -75,15 +76,9 @@ export const CreateTaskModal: React.FC<Props> = ({
         <CreateTaskForm
           error={error}
           onSubmit={async ({ name, description, dueDate }) => {
-            const res = await createTask({
+            await createTask({
               variables: { name, dueDate, description, project }
             });
-            if (res.data) {
-              enqueueSnackbar('Task successfully created!', {
-                variant: 'success'
-              });
-              handleClose();
-            }
           }}
         />
       </div>

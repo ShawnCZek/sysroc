@@ -755,6 +755,23 @@ export type ProjectQuery = (
   ) }
 );
 
+export type ProjectTasksQueryVariables = {
+  id?: Maybe<Scalars['Float']>
+};
+
+
+export type ProjectTasksQuery = (
+  { __typename?: 'Query' }
+  & { project: (
+    { __typename?: 'ProjectDto' }
+    & Pick<ProjectDto, 'id' | 'name' | 'description'>
+    & { tasks: Array<(
+      { __typename?: 'TaskDto' }
+      & Pick<TaskDto, 'id' | 'name' | 'description' | 'createdAt' | 'dueDate' | 'completed'>
+    )> }
+  ) }
+);
+
 export type ProjectsQueryVariables = {
   userId?: Maybe<Scalars['String']>,
   name?: Maybe<Scalars['String']>,
@@ -1684,6 +1701,49 @@ export function useProjectLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHook
 export type ProjectQueryHookResult = ReturnType<typeof useProjectQuery>;
 export type ProjectLazyQueryHookResult = ReturnType<typeof useProjectLazyQuery>;
 export type ProjectQueryResult = ApolloReactCommon.QueryResult<ProjectQuery, ProjectQueryVariables>;
+export const ProjectTasksDocument = gql`
+    query ProjectTasks($id: Float) {
+  project(filter: {id: $id}) {
+    id
+    name
+    description
+    tasks {
+      id
+      name
+      description
+      createdAt
+      dueDate
+      completed
+    }
+  }
+}
+    `;
+
+/**
+ * __useProjectTasksQuery__
+ *
+ * To run a query within a React component, call `useProjectTasksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProjectTasksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useProjectTasksQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useProjectTasksQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<ProjectTasksQuery, ProjectTasksQueryVariables>) {
+        return ApolloReactHooks.useQuery<ProjectTasksQuery, ProjectTasksQueryVariables>(ProjectTasksDocument, baseOptions);
+      }
+export function useProjectTasksLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<ProjectTasksQuery, ProjectTasksQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<ProjectTasksQuery, ProjectTasksQueryVariables>(ProjectTasksDocument, baseOptions);
+        }
+export type ProjectTasksQueryHookResult = ReturnType<typeof useProjectTasksQuery>;
+export type ProjectTasksLazyQueryHookResult = ReturnType<typeof useProjectTasksLazyQuery>;
+export type ProjectTasksQueryResult = ApolloReactCommon.QueryResult<ProjectTasksQuery, ProjectTasksQueryVariables>;
 export const ProjectsDocument = gql`
     query Projects($userId: String, $name: String, $authors: [Float!], $supervisors: [Float!]) {
   projects(filter: {user: $userId, name: $name, authors: $authors, supervisors: $supervisors}) {

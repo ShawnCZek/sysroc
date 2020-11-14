@@ -9,14 +9,14 @@ import ClearIcon from '@material-ui/icons/Clear';
 import grey from '@material-ui/core/colors/grey';
 import {
   ProjectQuery,
+  ProjectTasksDocument,
   TaskDto,
   useDeleteTaskMutation,
   useMeQuery,
   useProjectQuery,
-  useToggleTaskStatusMutation
+  useToggleTaskStatusMutation,
 } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
-import { GET_PROJECT } from '../Project/UpdateProjectModal';
 import { hasPermissions } from '../../auth/hasPermissions';
 
 const TaskStyles = styled.div`
@@ -78,6 +78,8 @@ const TaskStyles = styled.div`
   }
 `;
 
+const GET_PROJECT = ProjectTasksDocument;
+
 export interface ITask {
   id: number;
   name: string;
@@ -98,11 +100,11 @@ export const Task: React.FC<Props> = ({
   task,
   project,
   handleUpdateModalOpen,
-  selectTask
+  selectTask,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { data: dataMe, loading: loadingMe } = useMeQuery();
-  const { data: dataProject } = useProjectQuery({ variables: { id: project } });
+  const { data: dataProject, loading: loadingProject } = useProjectQuery({ variables: { id: project } });
   const [deleteTask, { error }] = useDeleteTaskMutation({
     update(cache, result) {
       try {
@@ -123,6 +125,8 @@ export const Task: React.FC<Props> = ({
             }
           }
         });
+
+        enqueueSnackbar('Task deleted.', { variant: 'success' });
       } catch (error) {
         if (error instanceof Error) {
           enqueueSnackbar(error.message, { variant: 'error' });
@@ -132,13 +136,12 @@ export const Task: React.FC<Props> = ({
   });
 
   const [toggleTaskStatus, { error: statusError }] = useToggleTaskStatusMutation({
-    update(cache, result) {
+    update(cache) {
       try {
         const cacheRes: ProjectQuery | null = cache.readQuery({
           query: GET_PROJECT,
           variables: { id: project }
         });
-
 
         if (cacheRes && cacheRes.project) {
           cache.writeQuery({
@@ -158,6 +161,9 @@ export const Task: React.FC<Props> = ({
             }
           });
         }
+
+        const msg = task.completed ? 'To Do' : 'Completed';
+        enqueueSnackbar(`Task marked as ${msg}`, { variant: 'success' });
       } catch (error) {
         if (error instanceof Error) {
           enqueueSnackbar(error.message, { variant: 'error' });
@@ -178,7 +184,7 @@ export const Task: React.FC<Props> = ({
     }
   }, [enqueueSnackbar, error, statusError]);
 
-  if (loadingMe) return <div>Loading...</div>;
+  if (loadingProject || loadingMe) return <div>Loading...</div>;
 
   return (
     <TaskStyles>
@@ -196,12 +202,7 @@ export const Task: React.FC<Props> = ({
         <div className="task-actions">
           {canManageProject &&
             <IconButton onClick={async () => {
-              const res = await toggleTaskStatus({ variables: { id: task.id, completed: !task.completed } });
-
-              if (res.data) {
-                const msg = task.completed ? 'To Do' : 'Completed';
-                enqueueSnackbar(`Task marked as ${msg}`, { variant: 'success' });
-              }
+              await toggleTaskStatus({ variables: { id: task.id, completed: !task.completed } });
             }}>
               {task.completed ? <ClearIcon/> : <CheckIcon/>}
             </IconButton>
@@ -216,11 +217,7 @@ export const Task: React.FC<Props> = ({
           </IconButton>
           <IconButton
             onClick={async () => {
-              const res = await deleteTask({ variables: { id: task.id } });
-
-              if (res.data) {
-                enqueueSnackbar('Task deleted.', { variant: 'success' });
-              }
+              await deleteTask({ variables: { id: task.id } });
             }}
           >
             <DeleteIcon />

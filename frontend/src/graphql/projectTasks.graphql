@@ -1,0 +1,15 @@
+query ProjectTasks($id: Float) {
+  project(filter: { id: $id }) {
+    id
+    name
+    description
+    tasks {
+      id
+      name
+      description
+      createdAt
+      dueDate
+      completed
+    }
+  }
+}

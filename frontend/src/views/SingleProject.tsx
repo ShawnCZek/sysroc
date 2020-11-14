@@ -1,12 +1,12 @@
+import moment from 'moment';
+import styled from 'styled-components';
 import React, { useState } from 'react';
 import { ClassificationDto, useMeQuery, useProjectQuery } from '../generated/graphql';
 import { RouteComponentProps, useHistory } from 'react-router';
 import { Fab, Typography } from '@material-ui/core';
-import styled from 'styled-components';
 import { UpdateProjectModal } from '../components/Project/UpdateProjectModal';
 import { TasksList } from '../components/Task/TasksList';
 import { CreateTaskModal } from '../components/Task/CreateTaskModal';
-import moment from 'moment';
 import { ITask } from '../components/Task/Task';
 import { UpdateTaskModal } from '../components/Task/UpdateTaskModal';
 import { ProjectClassificationOverview } from '../components/Project/ProjectClassificationOverview';
@@ -67,45 +67,34 @@ interface Props
   }> {}
 
 export const SingleProject: React.FC<Props> = props => {
+  const history = useHistory();
+
   const [modalOpen, setModalOpen] = useState(false);
   const [classOverviewOpen, setClassOverviewOpen] = useState(false);
   const [upTaskModalOpen, setUpTaskModalOpen] = useState(false);
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<number>(0);
+
   const { data: meData, loading: meLoading } = useMeQuery();
   const { data, loading } = useProjectQuery({
     variables: { id: parseInt(props.match.params.projectId) }
   });
-  const history = useHistory();
+
   const canManageProject = meData?.me && hasPermissions(meData.me, "projects.manage");
 
-  const handleModalOpen = () => {
-    setModalOpen(true);
-  };
+  const handleModalOpen = () => setModalOpen(true);
+  const handleModalClose = () => setModalOpen(false);
 
-  const handleModalClose = () => {
-    setModalOpen(false);
-  };
+  const handleCreateTaskOpen = () => setCreateTaskOpen(true);
+  const handleCreateTaskClose = () => setCreateTaskOpen(false);
 
-  const handleCreateTaskOpen = () => {
-    setCreateTaskOpen(true);
-  };
-
-  const handleCreateTaskClose = () => {
-    setCreateTaskOpen(false);
-  };
-
-  const handleUpTaskModalOpen = () => {
-    setUpTaskModalOpen(true);
-  };
-
+  const handleUpTaskModalOpen = () => setUpTaskModalOpen(true);
   const handleUpTaskModalClose = () => {
     setUpTaskModalOpen(false);
+    setSelectedTaskId(0);
   };
 
-  const handleClassOverviewClose = () => {
-    setClassOverviewOpen(false);
-  };
+  const handleClassOverviewClose = () => setClassOverviewOpen(false);
 
   const tasksByMonth: { [key: string]: ITask[] } = {};
   for (const task of data?.project.tasks ?? []) {
@@ -232,12 +221,14 @@ export const SingleProject: React.FC<Props> = props => {
         handleClose={handleCreateTaskClose}
         project={parseInt(data?.project.id ?? '0')}
       />
-      <UpdateTaskModal
-        open={upTaskModalOpen}
-        handleClose={handleUpTaskModalClose}
-        task={selectedTaskId ?? 0}
-        projectId={parseInt(data?.project.id ?? '0')}
-      />
+      {selectedTaskId !== 0 &&
+        <UpdateTaskModal
+          open={upTaskModalOpen}
+          handleClose={handleUpTaskModalClose}
+          task={selectedTaskId}
+          projectId={parseInt(data?.project.id ?? '0')}
+        />
+      }
     </>
   );
 };

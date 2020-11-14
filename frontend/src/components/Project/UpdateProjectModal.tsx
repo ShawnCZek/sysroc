@@ -2,9 +2,8 @@ import React from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import { UpdateProjectForm } from './UpdateProjectForm';
-import { useUpdateProjectMutation } from '../../generated/graphql';
+import { ProjectTasksDocument, useUpdateProjectMutation } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
-import gql from 'graphql-tag';
 
 function getModalStyle() {
   const top = 50;
@@ -32,23 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const GET_PROJECT = gql`
-  query Project($id: Float) {
-    project(filter: { id: $id }) {
-      id
-      name
-      description
-      tasks {
-        id
-        name
-        description
-        createdAt
-        dueDate
-        completed
-      }
-    }
-  }
-`;
+const GET_PROJECT = ProjectTasksDocument;
 
 interface Props {
   open: boolean;

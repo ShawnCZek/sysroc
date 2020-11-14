@@ -1,6 +1,5 @@
 import React from 'react';
 import { useClaimProjectMutation, useMeQuery } from '../../generated/graphql';
-import { GET_PROJECT } from './UpdateProjectModal';
 import { useSnackbar } from 'notistack';
 import { hasPermissions } from '../../auth/hasPermissions';
 import { Fab } from '@material-ui/core';
@@ -20,34 +19,11 @@ export const ClaimProjectFab: React.FC<Props> = ({
   const { data: meData, loading } = useMeQuery();
   const canClaimProject = meData?.me && hasPermissions(meData.me, 'projects.claim');
 
-  const [claimProject] = useClaimProjectMutation({
-    async update(cache, result) {
-      try {
-        const { project }: any = cache.readQuery({
-          query: GET_PROJECT,
-          variables: { id: projectId }
-        });
-
-        const index = project.tasks.findIndex(
-          (task: any) => task.id === projectId
-        );
-
-        project.tasks[index] = result.data?.claimProject;
-
-        cache.writeQuery({
-          query: GET_PROJECT,
-          variables: { id: projectId },
-          data: {
-            project: project
-          }
-        });
-        const message = hasSupervisor ? 'unclaimed' : 'claimed';
-        enqueueSnackbar(`Project successfully ${message}!`, {variant: 'success'});
-      } catch (error) {
-        if (error instanceof Error) {
-          enqueueSnackbar(error.message, { variant: 'error' });
-        }
-      }
+  const [claimProject, { client }] = useClaimProjectMutation({
+    update() {
+      const message = hasSupervisor ? 'unclaimed' : 'claimed';
+      enqueueSnackbar(`Project successfully ${message}!`, {variant: 'success'});
+      client?.resetStore();
     }
   });
 

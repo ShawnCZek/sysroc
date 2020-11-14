@@ -51,7 +51,7 @@ export const UpdateClassificationModal: React.FC<Props> = ({
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const [modalStyle] = React.useState(getModalStyle);
-  const [updateClassification, { error, loading }] = useUpdateClassificationMutation();
+  const [updateClassification] = useUpdateClassificationMutation();
 
   return (
     <Modal
