@@ -1,7 +1,7 @@
 import React from 'react';
-import { useMeExtendedQuery, useRolesQuery } from '../../generated/graphql';
-import { hasPermissions } from '../../auth/hasPermissions';
+import { useRolesQuery } from '../../generated/graphql';
 import { Checkbox, FormControlLabel, FormGroup } from '@material-ui/core';
+import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 
 interface Props {
   admin: boolean;
@@ -17,10 +17,9 @@ export const UserRoles: React.FC<Props> = ({
   const [roles, setRoles] = React.useState(userRoles ? userRoles : ['guest']);
 
   const { data: rolesData, loading: rolesLoading } = useRolesQuery({ variables: { admin } });
-  const { data: me, loading: meLoading } = useMeExtendedQuery();
 
-  const canManageTeachers = me && me.me && hasPermissions(me.me, 'users.teachers.manage');
-  const canManageStudents = me && me.me && hasPermissions(me.me, 'users.students.manage');
+  const canManageTeachers = useHasPermissions('users.teachers.manage');
+  const canManageStudents = useHasPermissions('users.students.manage');
 
   const handleRoleChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     let newRoles: string[];
@@ -35,7 +34,7 @@ export const UserRoles: React.FC<Props> = ({
     onRolesStateChange(newRoles);
   };
 
-  if (rolesLoading || meLoading) return <span>Loading...</span>;
+  if (rolesLoading) return <span>Loading...</span>;
 
   return (
     <FormGroup>

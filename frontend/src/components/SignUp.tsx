@@ -26,8 +26,8 @@ export const SignUp: React.FC<RouteComponentProps> = ({ history }) => {
                 query: MeDocument,
                 data: {
                   me: {
+                    // @ts-ignore
                     user: data.signup.user,
-                    permissions: data.signup.permissions,
                     __typename: data.signup.__typename
                   }
                 }

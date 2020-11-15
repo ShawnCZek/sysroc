@@ -1,8 +1,8 @@
 import React from 'react';
 import { useClaimProjectMutation, useMeQuery } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
-import { hasPermissions } from '../../auth/hasPermissions';
 import { Fab } from '@material-ui/core';
+import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 
 interface Props {
   projectId: number;
@@ -17,7 +17,7 @@ export const ClaimProjectFab: React.FC<Props> = ({
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { data: meData, loading } = useMeQuery();
-  const canClaimProject = meData?.me && hasPermissions(meData.me, 'projects.claim');
+  const canClaimProject = useHasPermissions('projects.claim');
 
   const [claimProject, { client }] = useClaimProjectMutation({
     update() {

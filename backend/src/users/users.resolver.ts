@@ -1,3 +1,5 @@
+import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -7,13 +9,11 @@ import { GqlAuthGuard } from '../auth/graphql-auth.guard';
 import { ConflictException, HttpService, NotFoundException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserAuthDto } from './dto/user-auth.dto';
 import { AuthService } from '../auth/auth.service';
-import * as bcrypt from 'bcryptjs';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { MyContext } from '../context';
 import { jwtConstants } from '../auth/constants';
 import { RedisService } from 'nestjs-redis';
 import { Redis } from 'ioredis';
-import * as crypto from 'crypto';
 import { ConfigService } from '../config/config.service';
 import { SignUpUserDto } from './dto/sign-up-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
@@ -28,6 +28,7 @@ import { RoleDto } from '../roles/dto/role.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AllUsersFilter } from './filters/all-users.filter';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { PermissionStateDto } from './dto/permission-state.dto';
 
 @Resolver()
 export class UsersResolver {
@@ -60,19 +61,14 @@ export class UsersResolver {
 
   @Query(() => UserAuthDto, { nullable: true })
   @UseGuards(GqlAuthGuard)
-  async me(@CurrentUser() user: User) {
-    const permissions = await this.usersService.getPermissionStates(user);
-
-    return {
-      user,
-      permissions,
-    };
+  me(@CurrentUser() user: User): UserAuthDto {
+    return { user };
   }
 
-  @Query(() => UserAuthDto, { nullable: true })
+  @Query(() => [PermissionStateDto])
   @UseGuards(GqlAuthGuard)
-  async meExtended(@CurrentUser() user: User) {
-    return await this.me(user);
+  myPermissions(@CurrentUser() user: User): PermissionStateDto[] {
+    return this.usersService.getPermissionStates(user);
   }
 
   @Mutation(() => UserDto)
@@ -190,8 +186,6 @@ export class UsersResolver {
         throw new UnauthorizedException('Wrong password or email!');
       }
 
-      const permissions = await this.usersService.getPermissionStates(user);
-
       const token = await this.authService.createToken(user.adEmail, user.id);
       const refreshToken = await this.authService.createRefreshToken(
         user.adEmail,
@@ -206,7 +200,6 @@ export class UsersResolver {
       return {
         accessToken: token,
         user,
-        permissions,
         userTemp: null,
         registerToken: null,
       };
@@ -260,7 +253,6 @@ export class UsersResolver {
     return {
       accessToken: null,
       user: null,
-      permissions: null,
       userTemp: {
         email: auth.email,
         name: response.user.cn,
@@ -320,12 +312,9 @@ export class UsersResolver {
   async updateProfile(
     @CurrentUser() user: User,
     @Args('input') input: UpdateProfileDto,
-  ) {
-    await this.usersService.updateProfile(user, input);
-
-    const permissions = await this.usersService.getPermissionStates(user);
-
-    return { user, permissions };
+  ): Promise<UserAuthDto> {
+    const updatedUser = await this.usersService.updateProfile(user, input);
+    return { user: updatedUser };
   }
 
   @Mutation(() => Boolean)

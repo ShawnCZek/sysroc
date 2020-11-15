@@ -1,15 +1,15 @@
+import moment from 'moment';
 import React, { useState } from 'react';
-import { useClassificationsQuery, useDeleteClassificationMutation, useMeExtendedQuery } from '../../generated/graphql';
+import { useClassificationsQuery, useDeleteClassificationMutation } from '../../generated/graphql';
 import { Item } from '../Layout/Item';
 import { List } from '../Layout/List';
-import moment from 'moment';
 import { ClassificationFilter, ClassificationFilters } from './ClassificationFilter';
 import { Fab, Paper } from '@material-ui/core';
 import { DeleteClassificationDialog } from './DeleteClassificationDialog';
 import { useSnackbar } from 'notistack';
-import { hasPermissions } from '../../auth/hasPermissions';
 import { UpdateClassificationModal } from './UpdateClassificationModal';
 import { UserLink } from '../UserLink';
+import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 
 interface Props {
   userId?: string;
@@ -28,7 +28,6 @@ export const ClassificationList: React.FC<Props> = ({ userId }) => {
   const [classificationData, setClassificationData] = useState<any>(null);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
   const { data, loading } = useClassificationsQuery({ variables: filters });
-  const { data: me, loading: meLoading } = useMeExtendedQuery();
   const [deleteClassification, { client }] = useDeleteClassificationMutation({
     async update(cache, result) {
       if (!result.data?.deleteClassification) {
@@ -44,7 +43,7 @@ export const ClassificationList: React.FC<Props> = ({ userId }) => {
   const [deleteClassificationDialogOpen, setDeleteClassificationDialogOpen] = useState(false);
   const [selectedClassificationId, setSelectedClassificationId] = useState<number | null>(null);
 
-  const canManageClassification = me && me.me && hasPermissions(me.me, 'classification.manage');
+  const canManageClassification = useHasPermissions('classification.manage');
 
   const handleDeleteClassificationDialogClose = () => setDeleteClassificationDialogOpen(false);
   const handleDeleteClassificationDialogSubmit = async (classificationId: number) => {
@@ -54,7 +53,7 @@ export const ClassificationList: React.FC<Props> = ({ userId }) => {
   const handleUpdateModalOpen = () => setUpdateModalOpen(true);
   const handleUpdateModalClose = () => setUpdateModalOpen(false);
 
-  if (loading || meLoading) return <div>Loading...</div>;
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div>

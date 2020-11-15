@@ -3,11 +3,15 @@ mutation SignUp($name: String, $email: String, $password: String) {
     accessToken
     user {
       id
+      name
       email
-    }
-    permissions {
-      slug
-      permitted
+      adEmail
+      roles {
+        id
+        name
+        slug
+        admin
+      }
     }
   }
 }

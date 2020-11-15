@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import Paper from '@material-ui/core/Paper';
 import { Item } from '../Layout/Item';
 import { List } from '../Layout/List';
-import { useDeleteUserMutation, useMeExtendedQuery, useUsersQuery } from '../../generated/graphql';
+import { useDeleteUserMutation, useMeQuery, useUsersQuery } from '../../generated/graphql';
 import { Fab } from '@material-ui/core';
 import { UpdateUserModal } from './UpdateUserModal';
-import { hasPermissions } from '../../auth/hasPermissions';
 import { UserFilters, UsersFilter } from './UsersFilter';
 import { DeleteUserDialog } from './DeleteUserDialog';
 import { useSnackbar } from 'notistack';
 import { UserLink } from '../UserLink';
+import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 
 export const UsersList: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -20,7 +20,7 @@ export const UsersList: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
   const [filters, setFilters] = useState<UserFilters>({ name: '', email: '', adEmail: '', groups: [], roles: [] });
 
-  const { data: me, loading: meLoading } = useMeExtendedQuery();
+  const { data: me, loading: meLoading } = useMeQuery();
   const { data, loading } = useUsersQuery({ variables: filters });
 
   const [deleteUser, { client }] = useDeleteUserMutation({
@@ -35,10 +35,10 @@ export const UsersList: React.FC = () => {
     }
   });
 
-  const canManageTeachers = me && me.me && hasPermissions(me.me, 'users.teachers.manage');
-  const canManageStudents = me && me.me && hasPermissions(me.me, 'users.students.manage');
-  const canDeleteUsers = me && me.me && hasPermissions(me.me, 'users.delete');
-  const isAdmin = me && me.me && me.me.user && me.me.user.roles && me.me.user.roles.some(role => role.admin);
+  const canManageTeachers = useHasPermissions('users.teachers.manage');
+  const canManageStudents = useHasPermissions('users.students.manage');
+  const canDeleteUsers = useHasPermissions('users.delete');
+  const isAdmin = me?.me?.user?.roles && me.me.user.roles.some(role => role.admin);
 
   const handleCloseUserModal = () => setUserModalOpen(false);
   const handleOpenUserModal = () => setUserModalOpen(true);

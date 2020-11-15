@@ -1,6 +1,5 @@
 import React from 'react';
 import clsx from 'clsx';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import List from '@material-ui/core/List';
@@ -11,14 +10,14 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { Header } from './Header';
 import SchoolIcon from '@material-ui/icons/School';
 import HomeIcon from '@material-ui/icons/Home';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import EmojiEventsIcon from '@material-ui/icons/EmojiEvents';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { Header } from './Header';
 import { useHistory } from 'react-router';
-import { useMeQuery } from '../generated/graphql';
-import { hasPermissions } from '../auth/hasPermissions';
+import { useHasPermissions } from '../hooks/hasPermissions.hook';
 
 const drawerWidth = 240;
 
@@ -83,17 +82,15 @@ interface Props {}
 export const PersistentDrawerLeft: React.FC<Props> = props => {
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
   const history = useHistory();
-  const { data, loading } = useMeQuery();
+  const [open, setOpen] = React.useState(false);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+  const canViewProjects = useHasPermissions('projects.view');
+  const canViewUsers = useHasPermissions('users.students.manage', 'users.teachers.manage');
+  const canViewClassification = useHasPermissions('classification.view');
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  const handleDrawerOpen = () => setOpen(true);
+  const handleDrawerClose = () => setOpen(false);
 
   return (
     <div className={classes.root}>
@@ -130,23 +127,20 @@ export const PersistentDrawerLeft: React.FC<Props> = props => {
             </ListItemIcon>
             <ListItemText primary="Home" />
           </ListItem>
-          {!loading &&
-            data &&
-            data.me &&
-            hasPermissions(data.me, 'projects.view') && (
-              <ListItem
-                button
-                onClick={() => {
-                  history.push('/projects');
-                }}
-              >
-                <ListItemIcon>
-                  <SchoolIcon />
-                </ListItemIcon>
-                <ListItemText primary="Projects" />
-              </ListItem>
-            )}
-          { !loading && data && data.me && hasPermissions(data.me, 'users.students.manage', 'users.teachers.manage') &&
+          { canViewProjects &&
+            <ListItem
+              button
+              onClick={() => {
+                history.push('/projects');
+              }}
+            >
+              <ListItemIcon>
+                <SchoolIcon />
+              </ListItemIcon>
+              <ListItemText primary="Projects" />
+            </ListItem>
+          }
+          { canViewUsers &&
             <ListItem
               button
               onClick={() => {
@@ -154,27 +148,24 @@ export const PersistentDrawerLeft: React.FC<Props> = props => {
               }}
             >
               <ListItemIcon>
-                  <AccountCircleIcon />
+                <AccountCircleIcon />
               </ListItemIcon>
               <ListItemText primary="Users" />
             </ListItem>
           }
-          {!loading &&
-          data &&
-          data.me &&
-          hasPermissions(data.me, 'classification.view') && (
-              <ListItem
-                  button
-                  onClick={() => {
-                    history.push('/classification');
-                  }}
-              >
-                <ListItemIcon>
-                  <EmojiEventsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Classification" />
-              </ListItem>
-          )}
+          { canViewClassification &&
+            <ListItem
+              button
+              onClick={() => {
+                history.push('/classification');
+              }}
+            >
+              <ListItemIcon>
+                <EmojiEventsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Classification" />
+            </ListItem>
+          }
         </List>
       </Drawer>
       <main

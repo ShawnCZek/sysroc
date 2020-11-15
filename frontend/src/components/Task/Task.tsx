@@ -17,7 +17,7 @@ import {
   useToggleTaskStatusMutation,
 } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
-import { hasPermissions } from '../../auth/hasPermissions';
+import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 
 const TaskStyles = styled.div`
   padding: 1rem 1.4rem;
@@ -172,7 +172,7 @@ export const Task: React.FC<Props> = ({
     }
   });
 
-  const canManageProject = dataMe?.me && hasPermissions(dataMe.me, "projects.manage");
+  const canManageProject = useHasPermissions('projects.manage');
 
   useEffect(() => {
     if (error) {

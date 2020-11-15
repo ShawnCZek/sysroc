@@ -1,11 +1,11 @@
 import React from 'react';
+import styled from 'styled-components';
 import { Button, makeStyles, Typography } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
 import { MyField } from '../MyField';
 import { ApolloError } from 'apollo-client';
 import { Error } from '../Error';
-import styled from 'styled-components';
-import { useMeExtendedQuery } from '../../generated/graphql';
+import { useMeQuery } from '../../generated/graphql';
 import { ProfileValues } from '../../views/Settings';
 
 const FormBox = styled.div`
@@ -52,15 +52,15 @@ interface Props {
 
 export const SettingsForm: React.FC<Props> = ({ onSubmit, error }) => {
   const classes = useStyles();
-  const { data, loading, refetch } = useMeExtendedQuery();
+  const { data, loading, refetch } = useMeQuery();
 
   if (loading) return <span>Loading...</span>;
 
   return (
     <Formik
       initialValues={{
-        name: data?.me?.user ? data.me.user.name : '',
-        oldEmail: data?.me?.user ? data.me.user.email : '',
+        name: data?.me?.user?.name ?? '',
+        oldEmail: data?.me?.user?.email ?? '',
         email: '',
         oldPassword: '',
         password: '',
@@ -69,11 +69,10 @@ export const SettingsForm: React.FC<Props> = ({ onSubmit, error }) => {
       onSubmit={async (values, { resetForm, setFieldValue }) => {
         await onSubmit(values);
 
-        resetForm();
-
         const refetchData = await refetch();
         const userData = refetchData?.data?.me?.user;
         if (userData) {
+          resetForm();
           setFieldValue('name', userData.name);
           setFieldValue('oldEmail', userData.email);
         }

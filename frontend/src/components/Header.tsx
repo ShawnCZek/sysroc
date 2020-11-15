@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLogoutMutation, useMeExtendedQuery } from '../generated/graphql';
+import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 import { AppBar, Button, IconButton, Menu, MenuItem, Toolbar, Typography } from '@material-ui/core';
 import { setAccessToken } from '../auth/accessToke';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
@@ -47,7 +47,7 @@ export const Header: React.FC<Props> = props => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const { data, loading } = useMeExtendedQuery();
+  const { data, loading } = useMeQuery();
   const [logout, { client }] = useLogoutMutation();
   const history = useHistory();
 

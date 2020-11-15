@@ -1,0 +1,6 @@
+query MyPermissions {
+  myPermissions {
+    slug
+    permitted
+  }
+}

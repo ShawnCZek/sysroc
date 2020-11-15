@@ -7,22 +7,23 @@ import { PersistentDrawerLeft } from '../components/PersisstentDrawerLeft';
 import { Projects } from '../views/Projects';
 import { SingleProject } from '../views/SingleProject';
 import { ProtectedRoute } from '../components/ProtectedRoute';
-import { useMeQuery, UserAuthDto } from '../generated/graphql';
+import { useMeQuery, useMyPermissionsQuery } from '../generated/graphql';
 import { NotAllowed } from '../views/NotAllowed';
 import { Users } from '../views/Users';
-import { hasPermissions } from '../auth/hasPermissions';
 import { Settings } from '../views/Settings';
 import { Classification } from '../views/Classification';
 import { SingleUser } from '../views/SingleUser';
+import { hasPermissions } from '../auth/hasPermissions';
 
 export const Routes: React.FC = () => {
   const { data, loading } = useMeQuery();
+  const { data: permissionData, loading: permissionLoading } = useMyPermissionsQuery();
 
-  const verifyPermissions = (user: UserAuthDto | any, neededPermissions: any[]) => {
-    return hasPermissions(user, ...neededPermissions);
-  };
+  if (loading || permissionLoading) return <div>Loading...</div>;
 
-  if (loading) return <div>Loading...</div>;
+  const projectList = hasPermissions(permissionData?.myPermissions, 'projects.create', 'projects.view', 'projects.manage');
+  const userList = hasPermissions(permissionData?.myPermissions, 'users.students.manage', 'users.teachers.manage');
+  const classificationList = hasPermissions(permissionData?.myPermissions, 'classification.view');
 
   return (
     <BrowserRouter>
@@ -35,11 +36,7 @@ export const Routes: React.FC = () => {
             <Route exact path="/notallowed" component={NotAllowed} />
             <ProtectedRoute
               isAuthenticated={!!data?.me}
-              isAllowed={verifyPermissions(data?.me, [
-                'projects.create',
-                'projects.view',
-                'projects.manage'
-              ])}
+              isAllowed={projectList}
               restrictedPath={'/notallowed'}
               authenticationPath={'/signin'}
               exact
@@ -48,11 +45,7 @@ export const Routes: React.FC = () => {
             />
             <ProtectedRoute
               isAuthenticated={!!data?.me}
-              isAllowed={verifyPermissions(data?.me, [
-                'projects.create',
-                'projects.view',
-                'projects.manage'
-              ])}
+              isAllowed={projectList}
               restrictedPath={'/notallowed'}
               authenticationPath={'/signin'}
               exact
@@ -61,10 +54,7 @@ export const Routes: React.FC = () => {
             />
             <ProtectedRoute
               isAuthenticated={!!data?.me}
-              isAllowed={verifyPermissions(data?.me, [
-                'users.students.manage',
-                'users.teachers.manage'
-              ])}
+              isAllowed={userList}
               restrictedPath={'/notallowed'}
               authenticationPath={'/signin'}
               exact
@@ -91,9 +81,7 @@ export const Routes: React.FC = () => {
             />
             <ProtectedRoute
               isAuthenticated={!!data?.me}
-              isAllowed={verifyPermissions(data?.me, [
-                'classification.view'
-              ])}
+              isAllowed={classificationList}
               restrictedPath={'/notallowed'}
               authenticationPath={'/signin'}
               exact

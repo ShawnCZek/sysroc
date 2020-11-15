@@ -94,10 +94,10 @@ export class RolesService {
     return role;
   }
 
-  async hasPermissions(
+  hasPermissions(
     role: Role,
     ...permissionSlugs: string[]
-  ): Promise<boolean> {
+  ): boolean {
     if (role.admin) {
       return true;
     }

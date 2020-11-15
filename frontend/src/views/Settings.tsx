@@ -1,10 +1,8 @@
 import React from 'react';
-import { MeDocument, MeQuery, useMeExtendedQuery, useUpdateProfileMutation } from '../generated/graphql';
+import { MeDocument, MeQuery, useMeQuery, useUpdateProfileMutation } from '../generated/graphql';
 import { SettingsHeader } from '../components/Settings/SettingsHeader';
 import { SettingsForm } from '../components/Settings/SettingsForm';
 import { useSnackbar } from 'notistack';
-
-interface Props {}
 
 export interface ProfileValues {
   name: string;
@@ -14,10 +12,10 @@ export interface ProfileValues {
   passwordAgain?: string;
 }
 
-export const Settings: React.FC<Props> = () => {
+export const Settings: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const { loading } = useMeExtendedQuery();
+  const { loading } = useMeQuery();
   const [updateProfile, { error }] = useUpdateProfileMutation({
     update(cache, result) {
       try {

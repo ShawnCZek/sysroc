@@ -4,9 +4,8 @@ import { Field, Form, Formik } from 'formik';
 import { MyField } from '../MyField';
 import { ApolloError } from 'apollo-client';
 import { Error } from '../Error';
-import { hasPermissions } from '../../auth/hasPermissions';
-import { useMeQuery } from '../../generated/graphql';
 import { Supervisor } from './Supervisor';
+import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 
 const useStyles = makeStyles({
   form: {
@@ -49,12 +48,9 @@ export const UpdateProjectForm: React.FC<Props> = ({
   data
 }) => {
   const classes = useStyles();
-  const { data: meData, loading } = useMeQuery();
-  const canManageProjectSupervisor = meData?.me && hasPermissions(meData.me, 'projects.claim.manage');
+  const canManageProjectSupervisor = useHasPermissions('projects.claim.manage');
 
   let supervisor: number | null = null;
-
-  if (loading) return <span>Loading...</span>;
 
   return (
     <Formik
@@ -93,7 +89,7 @@ export const UpdateProjectForm: React.FC<Props> = ({
               rowsMax={8}
             />
           </div>
-          {canManageProjectSupervisor &&
+          { canManageProjectSupervisor &&
             <Supervisor
               defaultValue={data.supervisor?.name}
               onSupervisorStateChange={id => supervisor = id}

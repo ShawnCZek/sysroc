@@ -2,11 +2,15 @@ query Me {
   me {
     user {
       id
+      name
       email
-    }
-    permissions {
-      slug
-      permitted
+      adEmail
+      roles {
+        id
+        name
+        slug
+        admin
+      }
     }
   }
 }

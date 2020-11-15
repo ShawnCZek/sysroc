@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Fab, makeStyles } from '@material-ui/core';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-import { useMeQuery } from '../../generated/graphql';
-import { hasPermissions } from '../../auth/hasPermissions';
+import { Fab, makeStyles } from '@material-ui/core';
+import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 
 const ClassificationHeaderStyles = styled.div`
   display: grid;
@@ -44,7 +43,7 @@ interface Props {
 
 export const ClassificationHeader: React.FC<Props> = ({ handleOpen }) => {
   const classes = useStyles();
-  const { data, loading } = useMeQuery();
+  const canCreateClassification = useHasPermissions('classification.create');
 
   return (
     <ClassificationHeaderStyles>
@@ -52,13 +51,13 @@ export const ClassificationHeader: React.FC<Props> = ({ handleOpen }) => {
         <h2>Classification</h2>
         <p>Review or add new marks!</p>
       </div>
-      {!loading && data && data.me && hasPermissions(data.me, 'classification.create') &&
-      <div className="new-project">
+      { canCreateClassification &&
+        <div className="new-project">
           <Fab color="primary" variant="extended" onClick={handleOpen}>
-              <AddCircleIcon className={classes.extendedIcon}/>
-              Add mark
+            <AddCircleIcon className={classes.extendedIcon}/>
+            Add mark
           </Fab>
-      </div>
+        </div>
       }
     </ClassificationHeaderStyles>
   );

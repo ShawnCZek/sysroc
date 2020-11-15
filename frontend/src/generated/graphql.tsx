@@ -259,7 +259,7 @@ export type Query = {
   user: UserDto,
   users: Array<UserDto>,
   me?: Maybe<UserAuthDto>,
-  meExtended?: Maybe<UserAuthDto>,
+  myPermissions: Array<PermissionStateDto>,
   roles: Array<RoleDto>,
   projects: Array<ProjectDto>,
   project: ProjectDto,
@@ -420,7 +420,6 @@ export type UserAuthDto = {
    __typename?: 'UserAuthDto',
   accessToken?: Maybe<Scalars['String']>,
   user?: Maybe<UserDto>,
-  permissions?: Maybe<Array<PermissionStateDto>>,
   userTemp?: Maybe<UserTempDto>,
   registerToken?: Maybe<Scalars['String']>,
 };
@@ -696,32 +695,23 @@ export type MeQuery = (
     { __typename?: 'UserAuthDto' }
     & { user: Maybe<(
       { __typename?: 'UserDto' }
-      & Pick<UserDto, 'id' | 'email'>
-    )>, permissions: Maybe<Array<(
-      { __typename?: 'PermissionStateDto' }
-      & Pick<PermissionStateDto, 'slug' | 'permitted'>
-    )>> }
-  )> }
-);
-
-export type MeExtendedQueryVariables = {};
-
-
-export type MeExtendedQuery = (
-  { __typename?: 'Query' }
-  & { me: Maybe<(
-    { __typename?: 'UserAuthDto' }
-    & { user: Maybe<(
-      { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
       & { roles: Array<(
         { __typename?: 'RoleDto' }
         & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin'>
       )> }
-    )>, permissions: Maybe<Array<(
-      { __typename?: 'PermissionStateDto' }
-      & Pick<PermissionStateDto, 'slug' | 'permitted'>
-    )>> }
+    )> }
+  )> }
+);
+
+export type MyPermissionsQueryVariables = {};
+
+
+export type MyPermissionsQuery = (
+  { __typename?: 'Query' }
+  & { myPermissions: Array<(
+    { __typename?: 'PermissionStateDto' }
+    & Pick<PermissionStateDto, 'slug' | 'permitted'>
   )> }
 );
 
@@ -826,11 +816,12 @@ export type SignInMutation = (
     & Pick<UserAuthDto, 'accessToken' | 'registerToken'>
     & { user: Maybe<(
       { __typename?: 'UserDto' }
-      & Pick<UserDto, 'id' | 'email'>
-    )>, permissions: Maybe<Array<(
-      { __typename?: 'PermissionStateDto' }
-      & Pick<PermissionStateDto, 'slug' | 'permitted'>
-    )>>, userTemp: Maybe<(
+      & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
+      & { roles: Array<(
+        { __typename?: 'RoleDto' }
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin'>
+      )> }
+    )>, userTemp: Maybe<(
       { __typename?: 'UserTempDto' }
       & Pick<UserTempDto, 'name' | 'email'>
     )> }
@@ -851,11 +842,12 @@ export type SignUpMutation = (
     & Pick<UserAuthDto, 'accessToken'>
     & { user: Maybe<(
       { __typename?: 'UserDto' }
-      & Pick<UserDto, 'id' | 'email'>
-    )>, permissions: Maybe<Array<(
-      { __typename?: 'PermissionStateDto' }
-      & Pick<PermissionStateDto, 'slug' | 'permitted'>
-    )>> }
+      & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
+      & { roles: Array<(
+        { __typename?: 'RoleDto' }
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin'>
+      )> }
+    )> }
   ) }
 );
 
@@ -928,11 +920,12 @@ export type UpdateProfileMutation = (
     { __typename?: 'UserAuthDto' }
     & { user: Maybe<(
       { __typename?: 'UserDto' }
-      & Pick<UserDto, 'id' | 'email'>
-    )>, permissions: Maybe<Array<(
-      { __typename?: 'PermissionStateDto' }
-      & Pick<PermissionStateDto, 'slug' | 'permitted'>
-    )>> }
+      & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
+      & { roles: Array<(
+        { __typename?: 'RoleDto' }
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin'>
+      )> }
+    )> }
   ) }
 );
 
@@ -1558,11 +1551,15 @@ export const MeDocument = gql`
   me {
     user {
       id
+      name
       email
-    }
-    permissions {
-      slug
-      permitted
+      adEmail
+      roles {
+        id
+        name
+        slug
+        admin
+      }
     }
   }
 }
@@ -1592,53 +1589,39 @@ export function useMeLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptio
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = ApolloReactCommon.QueryResult<MeQuery, MeQueryVariables>;
-export const MeExtendedDocument = gql`
-    query MeExtended {
-  me {
-    user {
-      id
-      name
-      email
-      adEmail
-      roles {
-        id
-        name
-        slug
-        admin
-      }
-    }
-    permissions {
-      slug
-      permitted
-    }
+export const MyPermissionsDocument = gql`
+    query MyPermissions {
+  myPermissions {
+    slug
+    permitted
   }
 }
     `;
 
 /**
- * __useMeExtendedQuery__
+ * __useMyPermissionsQuery__
  *
- * To run a query within a React component, call `useMeExtendedQuery` and pass it any options that fit your needs.
- * When your component renders, `useMeExtendedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useMyPermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyPermissionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useMeExtendedQuery({
+ * const { data, loading, error } = useMyPermissionsQuery({
  *   variables: {
  *   },
  * });
  */
-export function useMeExtendedQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<MeExtendedQuery, MeExtendedQueryVariables>) {
-        return ApolloReactHooks.useQuery<MeExtendedQuery, MeExtendedQueryVariables>(MeExtendedDocument, baseOptions);
+export function useMyPermissionsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<MyPermissionsQuery, MyPermissionsQueryVariables>) {
+        return ApolloReactHooks.useQuery<MyPermissionsQuery, MyPermissionsQueryVariables>(MyPermissionsDocument, baseOptions);
       }
-export function useMeExtendedLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<MeExtendedQuery, MeExtendedQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<MeExtendedQuery, MeExtendedQueryVariables>(MeExtendedDocument, baseOptions);
+export function useMyPermissionsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<MyPermissionsQuery, MyPermissionsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<MyPermissionsQuery, MyPermissionsQueryVariables>(MyPermissionsDocument, baseOptions);
         }
-export type MeExtendedQueryHookResult = ReturnType<typeof useMeExtendedQuery>;
-export type MeExtendedLazyQueryHookResult = ReturnType<typeof useMeExtendedLazyQuery>;
-export type MeExtendedQueryResult = ApolloReactCommon.QueryResult<MeExtendedQuery, MeExtendedQueryVariables>;
+export type MyPermissionsQueryHookResult = ReturnType<typeof useMyPermissionsQuery>;
+export type MyPermissionsLazyQueryHookResult = ReturnType<typeof useMyPermissionsLazyQuery>;
+export type MyPermissionsQueryResult = ApolloReactCommon.QueryResult<MyPermissionsQuery, MyPermissionsQueryVariables>;
 export const ProjectDocument = gql`
     query Project($id: Float) {
   project(filter: {id: $id}) {
@@ -1838,11 +1821,15 @@ export const SignInDocument = gql`
     accessToken
     user {
       id
+      name
       email
-    }
-    permissions {
-      slug
-      permitted
+      adEmail
+      roles {
+        id
+        name
+        slug
+        admin
+      }
     }
     userTemp {
       name
@@ -1884,11 +1871,15 @@ export const SignUpDocument = gql`
     accessToken
     user {
       id
+      name
       email
-    }
-    permissions {
-      slug
-      permitted
+      adEmail
+      roles {
+        id
+        name
+        slug
+        admin
+      }
     }
   }
 }
@@ -2047,11 +2038,15 @@ export const UpdateProfileDocument = gql`
   updateProfile(input: {name: $name, email: $email, oldPassword: $oldPassword, password: $password, passwordAgain: $passwordAgain}) {
     user {
       id
+      name
       email
-    }
-    permissions {
-      slug
-      permitted
+      adEmail
+      roles {
+        id
+        name
+        slug
+        admin
+      }
     }
   }
 }

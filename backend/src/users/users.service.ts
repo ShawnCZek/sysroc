@@ -4,7 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  UnauthorizedException
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcryptjs';
@@ -245,7 +245,7 @@ export class UsersService {
   async updateProfile(
     user: UserDto,
     updateProfileDto: UpdateProfileDto,
-  ): Promise<void> {
+  ): Promise<UserDto> {
     const updateUser: any = { name: updateProfileDto.name };
 
     if (updateProfileDto.email) {
@@ -269,22 +269,24 @@ export class UsersService {
     } catch {
       throw new ConflictException('This email is already in use!');
     }
+
+    return this.userRepository.findOne({ id: user.id }, { relations: ['roles'] });
   }
 
   async hashPassword(password: string): Promise<string> {
     return await bcrypt.hash(password, 10);
   }
 
-  async hasPermissions(
+  hasPermissions(
     userDto: UserDto,
     ...permissionSlugs: string[]
-  ): Promise<boolean> {
+  ): boolean {
     if (userDto.roles.length === 0) {
       return false;
     }
 
     for (const role of userDto.roles) {
-      if (await this.rolesService.hasPermissions(role as Role, ...permissionSlugs)) {
+      if (this.rolesService.hasPermissions(role as Role, ...permissionSlugs)) {
         return true;
       }
     }
@@ -296,18 +298,13 @@ export class UsersService {
    *
    * @param userDto
    */
-  async getPermissionStates(userDto: UserDto): Promise<PermissionStateDto[]> {
+  getPermissionStates(userDto: UserDto): PermissionStateDto[] {
     const permissions = [];
-    for (const permission in PERMISSIONS) {
-      if (PERMISSIONS.hasOwnProperty(permission)) {
-        permissions.push({
-          slug: PERMISSIONS[permission],
-          permitted: await this.hasPermissions(
-            userDto,
-            PERMISSIONS[permission],
-          ),
-        });
-      }
+    for (const permission of Object.values(PERMISSIONS)) {
+      permissions.push({
+        slug: permission,
+        permitted: this.hasPermissions(userDto, permission),
+      });
     }
     return permissions;
   }
