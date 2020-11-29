@@ -18,6 +18,7 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Header } from './Header';
 import { useHistory } from 'react-router';
 import { useHasPermissions } from '../hooks/hasPermissions.hook';
+import { PERMISSIONS } from '../generated/permissions';
 
 const drawerWidth = 240;
 
@@ -85,9 +86,9 @@ export const PersistentDrawerLeft: React.FC<Props> = props => {
   const history = useHistory();
   const [open, setOpen] = React.useState(false);
 
-  const canViewProjects = useHasPermissions('projects.view');
-  const canViewUsers = useHasPermissions('users.students.manage', 'users.teachers.manage');
-  const canViewClassification = useHasPermissions('classification.view');
+  const canViewProjects = useHasPermissions(PERMISSIONS.PROJECTS_VIEW);
+  const canViewUsers = useHasPermissions(PERMISSIONS.MANAGE_STUDENT_USERS, PERMISSIONS.MANAGE_TEACHER_USERS);
+  const canViewClassification = useHasPermissions(PERMISSIONS.CLASSIFICATION_VIEW);
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);

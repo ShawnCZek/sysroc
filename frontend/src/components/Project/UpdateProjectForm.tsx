@@ -6,6 +6,7 @@ import { ApolloError } from 'apollo-client';
 import { Error } from '../Error';
 import { Supervisor } from './Supervisor';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
+import { PERMISSIONS } from '../../generated/permissions';
 
 const useStyles = makeStyles({
   form: {
@@ -48,7 +49,7 @@ export const UpdateProjectForm: React.FC<Props> = ({
   data
 }) => {
   const classes = useStyles();
-  const canManageProjectSupervisor = useHasPermissions('projects.claim.manage');
+  const canManageProjectSupervisor = useHasPermissions(PERMISSIONS.PROJECTS_CLAIM_MANAGE);
 
   let supervisor: number | null = null;
 

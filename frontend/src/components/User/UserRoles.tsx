@@ -2,6 +2,8 @@ import React from 'react';
 import { useRolesQuery } from '../../generated/graphql';
 import { Checkbox, FormControlLabel, FormGroup } from '@material-ui/core';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
+import { PERMISSIONS } from '../../generated/permissions';
+import { ROLES } from '../../generated/roles';
 
 interface Props {
   admin: boolean;
@@ -18,8 +20,8 @@ export const UserRoles: React.FC<Props> = ({
 
   const { data: rolesData, loading: rolesLoading } = useRolesQuery({ variables: { admin } });
 
-  const canManageTeachers = useHasPermissions('users.teachers.manage');
-  const canManageStudents = useHasPermissions('users.students.manage');
+  const canManageTeachers = useHasPermissions(PERMISSIONS.MANAGE_TEACHER_USERS);
+  const canManageStudents = useHasPermissions(PERMISSIONS.MANAGE_STUDENT_USERS);
 
   const handleRoleChange = (name: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     let newRoles: string[];
@@ -40,7 +42,7 @@ export const UserRoles: React.FC<Props> = ({
     <FormGroup>
       { rolesData &&
         rolesData.roles &&
-        rolesData.roles.filter(role => (role.slug !== 'teacher' || canManageTeachers) && (role.slug !== 'student' || canManageStudents)).map(role => (
+        rolesData.roles.filter(role => (role.slug !== ROLES.TEACHER || canManageTeachers) && (role.slug !== ROLES.STUDENT || canManageStudents)).map(role => (
         <FormControlLabel
           key={role.id}
           control={

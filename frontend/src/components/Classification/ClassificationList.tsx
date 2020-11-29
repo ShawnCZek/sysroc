@@ -10,6 +10,7 @@ import { useSnackbar } from 'notistack';
 import { UpdateClassificationModal } from './UpdateClassificationModal';
 import { UserLink } from '../UserLink';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
+import { PERMISSIONS } from '../../generated/permissions';
 
 interface Props {
   userId?: string;
@@ -43,7 +44,7 @@ export const ClassificationList: React.FC<Props> = ({ userId }) => {
   const [deleteClassificationDialogOpen, setDeleteClassificationDialogOpen] = useState(false);
   const [selectedClassificationId, setSelectedClassificationId] = useState<number | null>(null);
 
-  const canManageClassification = useHasPermissions('classification.manage');
+  const canManageClassification = useHasPermissions(PERMISSIONS.CLASSIFICATION_MANAGE);
 
   const handleDeleteClassificationDialogClose = () => setDeleteClassificationDialogOpen(false);
   const handleDeleteClassificationDialogSubmit = async (classificationId: number) => {

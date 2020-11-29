@@ -12,6 +12,7 @@ import { List } from '../Layout/List';
 import { UserLink } from '../UserLink';
 import { ProjectFilters, ProjectsFilter } from './ProjectsFilter';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
+import { PERMISSIONS } from '../../generated/permissions';
 
 const PaperStyles = styled.div`
   & > div {
@@ -53,7 +54,7 @@ export const ProjectsList: React.FC<Props> = ({
     }
   });
 
-  const canDeleteProject = useHasPermissions('projects.manage');
+  const canDeleteProject = useHasPermissions(PERMISSIONS.PROJECTS_MANAGE);
 
   const handleAlertOpen = () => setDeleteProjectAlert(true);
   const handleDeleteAlertClose = () => setDeleteProjectAlert(false);

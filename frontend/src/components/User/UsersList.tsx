@@ -10,6 +10,8 @@ import { DeleteUserDialog } from './DeleteUserDialog';
 import { useSnackbar } from 'notistack';
 import { UserLink } from '../UserLink';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
+import { PERMISSIONS } from '../../generated/permissions';
+import { ROLES } from '../../generated/roles';
 
 export const UsersList: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -35,9 +37,9 @@ export const UsersList: React.FC = () => {
     }
   });
 
-  const canManageTeachers = useHasPermissions('users.teachers.manage');
-  const canManageStudents = useHasPermissions('users.students.manage');
-  const canDeleteUsers = useHasPermissions('users.delete');
+  const canManageTeachers = useHasPermissions(PERMISSIONS.MANAGE_TEACHER_USERS);
+  const canManageStudents = useHasPermissions(PERMISSIONS.MANAGE_STUDENT_USERS);
+  const canDeleteUsers = useHasPermissions(PERMISSIONS.DELETE_USERS);
   const isAdmin = me?.me?.user?.roles && me.me.user.roles.some(role => role.admin);
 
   const handleCloseUserModal = () => setUserModalOpen(false);
@@ -103,7 +105,7 @@ export const UsersList: React.FC = () => {
                 <div>{user.roles && user.roles.map(role => role.name).join(', ')}</div>
               </Item>
               <Item className="actions">
-                {!user.roles.some(role => role.admin) && !user.roles.some(role => (role.slug === 'teacher' && !canManageTeachers) || (role.slug === 'student' && !canManageStudents)) &&
+                {!user.roles.some(role => role.admin) && !user.roles.some(role => (role.slug === ROLES.TEACHER && !canManageTeachers) || (role.slug === ROLES.STUDENT && !canManageStudents)) &&
                   <Fab
                     color="primary"
                     variant="extended"
@@ -124,7 +126,7 @@ export const UsersList: React.FC = () => {
                 {canDeleteUsers
                   && user.id !== me?.me?.user?.id
                   && (!user.roles.some(role => role.admin) || isAdmin)
-                  && !user.roles.some(role => (role.slug === 'teacher' && !canManageTeachers) || (role.slug === 'student' && !canManageStudents)) &&
+                  && !user.roles.some(role => (role.slug === ROLES.TEACHER && !canManageTeachers) || (role.slug === ROLES.STUDENT && !canManageStudents)) &&
                   <Fab
                     color="secondary"
                     variant="extended"

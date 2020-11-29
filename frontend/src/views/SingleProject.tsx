@@ -12,6 +12,7 @@ import { UpdateTaskModal } from '../components/Task/UpdateTaskModal';
 import { ProjectClassificationOverview } from '../components/Project/ProjectClassificationOverview';
 import { ClaimProjectFab } from '../components/Project/ClaimProjectFab';
 import { useHasPermissions } from '../hooks/hasPermissions.hook';
+import { PERMISSIONS } from '../generated/permissions';
 
 const ProjectControls = styled.div`
   display: grid;
@@ -80,7 +81,7 @@ export const SingleProject: React.FC<Props> = props => {
     variables: { id: parseInt(props.match.params.projectId) }
   });
 
-  const canManageProject = useHasPermissions('projects.manage');
+  const canManageProject = useHasPermissions(PERMISSIONS.PROJECTS_MANAGE);
 
   const handleModalOpen = () => setModalOpen(true);
   const handleModalClose = () => setModalOpen(false);

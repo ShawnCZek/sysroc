@@ -14,6 +14,7 @@ import { Settings } from '../views/Settings';
 import { Classification } from '../views/Classification';
 import { SingleUser } from '../views/SingleUser';
 import { hasPermissions } from '../auth/hasPermissions';
+import { PERMISSIONS } from '../generated/permissions';
 
 export const Routes: React.FC = () => {
   const { data, loading } = useMeQuery();
@@ -21,9 +22,9 @@ export const Routes: React.FC = () => {
 
   if (loading || permissionLoading) return <div>Loading...</div>;
 
-  const projectList = hasPermissions(permissionData?.myPermissions, 'projects.create', 'projects.view', 'projects.manage');
-  const userList = hasPermissions(permissionData?.myPermissions, 'users.students.manage', 'users.teachers.manage');
-  const classificationList = hasPermissions(permissionData?.myPermissions, 'classification.view');
+  const projectList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.PROJECTS_CREATE, PERMISSIONS.PROJECTS_VIEW, PERMISSIONS.PROJECTS_MANAGE);
+  const userList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.MANAGE_STUDENT_USERS, PERMISSIONS.MANAGE_TEACHER_USERS);
+  const classificationList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.CLASSIFICATION_VIEW);
 
   return (
     <BrowserRouter>

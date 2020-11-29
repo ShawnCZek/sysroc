@@ -55,6 +55,9 @@ export const CreateTaskModal: React.FC<Props> = ({
             project: result.data?.createTask.project
           }
         });
+
+        enqueueSnackbar('Task successfully created!', { variant: 'success' });
+        handleClose();
       } catch (error) {
         if (error instanceof Error) {
           enqueueSnackbar(error.message, { variant: 'error' });

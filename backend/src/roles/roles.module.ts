@@ -5,6 +5,7 @@ import { Role } from './entities/roles.entity';
 import { PERMISSIONS } from '../permissions/permissions';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ROLES } from './roles';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Role]), PermissionsModule],
@@ -21,13 +22,13 @@ export class RolesModule {
   async _seedRoles(): Promise<void> {
     await this.rolesService.createOrUpdate({
       name: 'Super Administrator',
-      slug: 'admin',
+      slug: ROLES.ADMIN,
       admin: true,
       permissionSlugs: [],
     });
     await this.rolesService.createOrUpdate({
       name: 'Teacher',
-      slug: 'teacher',
+      slug: ROLES.TEACHER,
       admin: false,
       permissionSlugs: [
         PERMISSIONS.PROJECTS_MANAGE,
@@ -42,7 +43,7 @@ export class RolesModule {
     });
     await this.rolesService.createOrUpdate({
       name: 'Student',
-      slug: 'student',
+      slug: ROLES.STUDENT,
       admin: false,
       permissionSlugs: [
         PERMISSIONS.PROJECTS_CREATE,
@@ -51,7 +52,7 @@ export class RolesModule {
     });
     await this.rolesService.createOrUpdate({
       name: 'Guest',
-      slug: 'guest',
+      slug: ROLES.GUEST,
       admin: false,
       permissionSlugs: [
         PERMISSIONS.PROJECTS_VIEW,

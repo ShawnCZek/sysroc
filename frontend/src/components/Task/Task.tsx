@@ -18,6 +18,7 @@ import {
 } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
+import { PERMISSIONS } from '../../generated/permissions';
 
 const TaskStyles = styled.div`
   padding: 1rem 1.4rem;
@@ -172,7 +173,7 @@ export const Task: React.FC<Props> = ({
     }
   });
 
-  const canManageProject = useHasPermissions('projects.manage');
+  const canManageProject = useHasPermissions(PERMISSIONS.PROJECTS_MANAGE);
 
   useEffect(() => {
     if (error) {

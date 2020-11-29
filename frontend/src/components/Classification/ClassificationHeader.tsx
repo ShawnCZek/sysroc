@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { Fab, makeStyles } from '@material-ui/core';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
+import { PERMISSIONS } from '../../generated/permissions';
 
 const ClassificationHeaderStyles = styled.div`
   display: grid;
@@ -43,7 +44,7 @@ interface Props {
 
 export const ClassificationHeader: React.FC<Props> = ({ handleOpen }) => {
   const classes = useStyles();
-  const canCreateClassification = useHasPermissions('classification.create');
+  const canCreateClassification = useHasPermissions(PERMISSIONS.CLASSIFICATION_CREATE);
 
   return (
     <ClassificationHeaderStyles>

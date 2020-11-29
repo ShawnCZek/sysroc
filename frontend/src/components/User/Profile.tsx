@@ -4,6 +4,7 @@ import { useUserQuery } from '../../generated/graphql';
 import { Typography } from '@material-ui/core';
 import { ProjectsList } from '../Project/ProjectsList';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
+import { PERMISSIONS } from '../../generated/permissions';
 
 const UserInformation = styled.div`
   & p {
@@ -26,8 +27,8 @@ export const Profile: React.FC<Props> = ({
 }) => {
   const { data, loading } = useUserQuery({ variables: { id: userId } });
 
-  const canViewEmail = useHasPermissions('users.students.manage', 'users.teachers.manage');
-  const canViewProjects = useHasPermissions('projects.view');
+  const canViewEmail = useHasPermissions(PERMISSIONS.MANAGE_STUDENT_USERS, PERMISSIONS.MANAGE_TEACHER_USERS);
+  const canViewProjects = useHasPermissions(PERMISSIONS.PROJECTS_VIEW);
 
   if (loading) return <div>Loading...</div>;
 
