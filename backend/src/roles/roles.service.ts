@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Role } from './entities/roles.entity';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { PermissionsService } from '../permissions/permissions.service';
@@ -6,7 +6,10 @@ import { Permission } from '../permissions/entities/permissions.entity';
 import { RolesFilter } from './filters/role.filter';
 import { RoleDto } from './dto/role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
+import { UpdateRoleDto } from './dto/update-role.dto';
+import { CreateFullRoleDto } from './dto/create-full-role.dto';
+import { CreatePermissionDto } from '../permissions/dto/create-permission.dto';
 
 @Injectable()
 export class RolesService {
@@ -16,9 +19,9 @@ export class RolesService {
   ) {}
 
   async findOne(rolesFilter: RolesFilter): Promise<Role> {
-    const role = await this.roleRepository
-      .findOne({ relations: ['permissions', 'users'], where: rolesFilter });
-
+    // As the filter is a null prototype and TypeORM has issues with such objects, we need to recreate the filter instance
+    const filter = JSON.parse(JSON.stringify(rolesFilter));
+    const role = await this.roleRepository.findOne({ relations: ['permissions', 'users'], where: filter });
     if (!role) {
       throw new Error(`Role not found!`);
     }
@@ -26,65 +29,95 @@ export class RolesService {
     return role;
   }
 
-  async findOneBySlug(
+  findOneBySlug(
     slug: string,
   ): Promise<Role> {
-    return await this.findOne({ slug });
+    return this.findOne({ slug });
   }
 
-  async findAll(rolesFilter: RolesFilter): Promise<RoleDto[]> {
+  findAll(rolesFilter: RolesFilter): Promise<RoleDto[]> {
     // As the filter is a null prototype and TypeORM has issues with such objects, we need to recreate the filter instance
     const filter = JSON.parse(JSON.stringify(rolesFilter));
-    return await this.roleRepository.find({ relations: ['permissions'], where: filter });
+    return this.roleRepository.find({ relations: ['permissions'], where: filter });
   }
 
-  async create(createRoleDto: CreateRoleDto): Promise<Role> {
+  fetchAll(roleSlugs: string[]): Promise<RoleDto[]> {
+    return this.roleRepository.find({
+      relations: ['permissions'],
+      where: { slug: In(roleSlugs) },
+    });
+  }
+
+  create(createRoleDto: CreateRoleDto): Promise<Role> {
+    return this.createFullRole({
+      ...createRoleDto,
+      system: false,
+      slug: createRoleDto.name.replace(/\s+/g, '-').toLowerCase(),
+    });
+  }
+
+  /**
+   * Create a role using all attributes.
+   *
+   * @param createFullRoleDto
+   */
+  async createFullRole(createFullRoleDto: CreateFullRoleDto): Promise<Role> {
     const role = new Role();
-    role.name = createRoleDto.name;
-    role.slug = createRoleDto.slug;
-    role.admin = createRoleDto.admin;
+    role.name = createFullRoleDto.name;
+    role.slug = createFullRoleDto.slug;
+    role.system = createFullRoleDto.system;
+    role.admin = createFullRoleDto.admin;
+    role.teacher = createFullRoleDto.teacher;
+    role.student = createFullRoleDto.student;
     const newRole = await this.roleRepository.save(role);
 
-    return await this.updatePermissions(newRole, createRoleDto.permissionSlugs);
+    return this.updatePermissions(newRole, createFullRoleDto.permissionSlugs);
   }
 
-  async createOrUpdate(createRoleDto: CreateRoleDto): Promise<Role> {
-    const filter = { slug: createRoleDto.slug };
-    const foundRole = await this.roleRepository.findOne(filter);
-    if (!foundRole) {
-      return await this.create(createRoleDto);
+  async createOrUpdate(createFullRoleDto: CreateFullRoleDto): Promise<Role> {
+    try {
+      const foundRole = await this.findOneBySlug(createFullRoleDto.slug);
+      return this.update(foundRole, createFullRoleDto);
+    } catch {
+      return this.createFullRole(createFullRoleDto);
     }
+  }
 
-    await this.roleRepository.update(foundRole.id, {
-      name: createRoleDto.name,
-      admin: createRoleDto.admin,
+  async update(
+    role: Role,
+    updateRole: UpdateRoleDto,
+    overridePermissions: boolean = false,
+  ): Promise<Role> {
+    await this.roleRepository.update(role.id, {
+      name: updateRole.name,
+      admin: updateRole.admin,
+      teacher: updateRole.teacher,
+      student: updateRole.student,
     });
 
-    return await this.updatePermissions(
-      foundRole,
-      createRoleDto.permissionSlugs,
-    );
+    return this.updatePermissions(role, updateRole.permissionSlugs, overridePermissions);
   }
 
   async updatePermissions(
     role: Role,
     permissions: string[],
+    override: boolean = false,
   ): Promise<Role> {
-    const permissionSlugs = permissions.map(permission => ({
-      slug: permission,
-    }));
-    const createdPermissions = await this.permissionsService.createMany(
-      permissionSlugs,
-    );
-
     role = await this.roleRepository
       .createQueryBuilder('role')
       .whereInIds(role.id)
       .leftJoinAndSelect('role.permissions', 'permissions')
       .getOne();
 
+    if (override) {
+      role.permissions = [];
+    }
+
+    const permissionSlugs: CreatePermissionDto[] = permissions.map(permission => ({ slug: permission }));
+    const createdPermissions = await this.permissionsService.createMany(permissionSlugs);
+
     for (const permission of createdPermissions) {
-      if (!(await this.hasPermissions(role, permission.slug))) {
+      if (!this.hasPermissions(role, permission.slug)) {
         role.permissions.push(permission);
       }
     }
@@ -110,27 +143,12 @@ export class RolesService {
     return false;
   }
 
-  /**
-   * Check whether there is an admin role in the list of role slugs.
-   *
-   * @param slugs
-   */
-  async containsAdminRole(slugs: string[]): Promise<boolean> {
-    for (const slug of slugs) {
-      // Since the input can be given from the user, there may be empty values which should be skipped
-      if (!slug) {
-        continue;
-      }
-
-      try {
-        if ((await this.findOneBySlug(slug)).admin) {
-          return true;
-        }
-      } catch {
-        // Nothing has to be done here as the role has not been found
-      }
+  async deleteRole(role: RoleDto): Promise<RoleDto> {
+    const result = await this.roleRepository.delete({ id: role.id });
+    if (result.affected < 1) {
+      throw new InternalServerErrorException('An error occurred while deleting the role.');
     }
 
-    return false;
+    return role;
   }
 }

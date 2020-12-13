@@ -14,13 +14,25 @@ export class Role {
   @Field()
   name: string;
 
-  @Column()
+  @Column({ unique: true })
   @Field()
   slug: string;
 
-  @Column()
+  @Column({ default: false })
+  @Field()
+  system: boolean;
+
+  @Column({ default: false })
   @Field()
   admin: boolean;
+
+  @Column({ default: false })
+  @Field()
+  teacher: boolean;
+
+  @Column({ default: false })
+  @Field()
+  student: boolean;
 
   @ManyToMany(type => Permission, permission => permission.roles, { cascade: true })
   @JoinTable()

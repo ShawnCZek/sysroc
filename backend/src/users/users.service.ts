@@ -27,6 +27,8 @@ import { CreateGroupDto } from '../groups/dto/create-group.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AllUsersFilter } from './filters/all-users.filter';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { RoleDto } from '../roles/dto/role.dto';
+import { ROLES } from '../roles/roles';
 
 @Injectable()
 export class UsersService {
@@ -74,6 +76,23 @@ export class UsersService {
     if (filter.groups && filter.groups.length > 0) {
       users = users.filter(user => user.groups.some(group => filter.groups.includes(group.id)));
     }
+
+    const roleAttributes = ['admin', 'teacher', 'student'];
+    users = users.filter(user => user.roles.some(role => {
+      for (const attribute of roleAttributes) {
+        if (filter[attribute] !== null && filter[attribute] !== undefined) {
+          // The role needs only one of the attributes
+          if (filter[attribute] && role[attribute]) {
+            return true;
+          }
+          // The role must not have any of the restricted attributes
+          if (!filter[attribute] && role[attribute]) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }));
 
     return users;
   }
@@ -131,7 +150,7 @@ export class UsersService {
 
     let guestRole = null;
     if (!registerUserDto.roleSlugs || registerUserDto.roleSlugs.length === 0) {
-      guestRole = await this.rolesService.findOneBySlug('guest');
+      guestRole = await this.rolesService.findOneBySlug(ROLES.GUEST);
       createUser.roles.push(guestRole.id);
     }
 
@@ -154,7 +173,7 @@ export class UsersService {
 
     await this.userRepository.save(newUser);
 
-    return await this.userRepository.findOne(newUser.id, { relations: ['roles', 'roles.permissions', 'groups'] });
+    return this.userRepository.findOne(newUser.id, { relations: ['roles', 'roles.permissions', 'groups'] });
   }
 
   async create(
@@ -177,7 +196,7 @@ export class UsersService {
 
       const adPassword = await this.hashPassword(createUserDto.password);
 
-      return await this.register({
+      return this.register({
         name: createUserDto.name,
         email: createUserDto.email,
         adEmail: createUserDto.adEmail,
@@ -211,7 +230,7 @@ export class UsersService {
     await this.addRoles(createdUser, createUserDto.roleSlugs);
     await this.userRepository.save(createdUser);
 
-    return await this.userRepository.findOne(createdUser.id, { relations: ['roles', 'roles.permissions', 'groups'] });
+    return this.userRepository.findOne(createdUser.id, { relations: ['roles', 'roles.permissions', 'groups'] });
   }
 
   async update(
@@ -234,7 +253,7 @@ export class UsersService {
     await this.addGroups(updatedUser, updateUserDto.groups);
     await this.userRepository.save(updatedUser);
 
-    return await this.userRepository
+    return this.userRepository
       .createQueryBuilder('user')
       .whereInIds(updatedUser.id)
       .leftJoinAndSelect('user.roles', 'roles')
@@ -273,8 +292,8 @@ export class UsersService {
     return this.userRepository.findOne({ id: user.id }, { relations: ['roles'] });
   }
 
-  async hashPassword(password: string): Promise<string> {
-    return await bcrypt.hash(password, 10);
+  hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
   }
 
   hasPermissions(
@@ -307,6 +326,25 @@ export class UsersService {
       });
     }
     return permissions;
+  }
+
+  /**
+   * Determine whether the user can work with the given roles (e.g. coming from a form).
+   *
+   * @param userDto
+   * @param roles
+   */
+  canWorkWithRoles(
+    userDto: UserDto,
+    roles: RoleDto[],
+  ): boolean {
+    const canManageTeachers = this.hasPermissions(userDto, PERMISSIONS.MANAGE_TEACHER_USERS);
+    const canManageStudents = this.hasPermissions(userDto, PERMISSIONS.MANAGE_STUDENT_USERS);
+
+    const manageTeachers = !roles.find(role => role.teacher) || canManageTeachers;
+    const manageStudents = !roles.find(role => role.student) || canManageStudents;
+
+    return !roles.find(role => role.admin) && manageTeachers && manageStudents;
   }
 
   async delete(user: UserDto): Promise<UserDto> {

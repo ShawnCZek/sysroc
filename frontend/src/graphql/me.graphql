@@ -9,7 +9,10 @@ query Me {
         id
         name
         slug
+        system
         admin
+        teacher
+        student
       }
     }
   }

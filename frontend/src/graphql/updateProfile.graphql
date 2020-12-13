@@ -24,6 +24,8 @@ mutation UpdateProfile(
         name
         slug
         admin
+        teacher
+        student
       }
     }
   }

@@ -10,7 +10,7 @@ import { TransitionProps } from '@material-ui/core/transitions';
 
 const Transition = React.forwardRef<unknown, TransitionProps>(
   function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
+    return <Slide {...props} direction="up" ref={ref} />;
   }
 );
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 import { AppBar, Button, IconButton, Menu, MenuItem, Toolbar, Typography } from '@material-ui/core';
-import { setAccessToken } from '../auth/accessToke';
+import { setAccessToken } from '../auth/accessToken';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';

@@ -4,7 +4,6 @@ import { Field, Form, Formik } from 'formik';
 import { MyField } from '../MyField';
 import { useUsersQuery } from '../../generated/graphql';
 import { Autocomplete } from '@material-ui/lab';
-import { ROLES } from '../../generated/roles';
 
 const useStyles = makeStyles({
   form: {
@@ -43,7 +42,7 @@ export const ProjectsFilter: React.FC<Props> = ({
   const classes = useStyles();
 
   const { data: authorsData, loading: authorsLoading } = useUsersQuery();
-  const { data: supervisorsData, loading: supervisorsLoading } = useUsersQuery({ variables: { rolesSlug: [ROLES.ADMIN, ROLES.TEACHER] } });
+  const { data: supervisorsData, loading: supervisorsLoading } = useUsersQuery({ variables: { admin: true, teacher: true } });
 
   let authors: number[] | undefined = defaultValues.authors;
   let supervisors: number[] | undefined = defaultValues.supervisors;

@@ -23,13 +23,19 @@ export class RolesModule {
     await this.rolesService.createOrUpdate({
       name: 'Super Administrator',
       slug: ROLES.ADMIN,
+      system: true,
       admin: true,
+      teacher: true,
+      student: false,
       permissionSlugs: [],
     });
     await this.rolesService.createOrUpdate({
       name: 'Teacher',
       slug: ROLES.TEACHER,
+      system: true,
       admin: false,
+      teacher: true,
+      student: false,
       permissionSlugs: [
         PERMISSIONS.PROJECTS_MANAGE,
         PERMISSIONS.PROJECTS_CREATE,
@@ -44,7 +50,10 @@ export class RolesModule {
     await this.rolesService.createOrUpdate({
       name: 'Student',
       slug: ROLES.STUDENT,
+      system: true,
       admin: false,
+      teacher: false,
+      student: true,
       permissionSlugs: [
         PERMISSIONS.PROJECTS_CREATE,
         PERMISSIONS.PROJECTS_VIEW,
@@ -53,7 +62,10 @@ export class RolesModule {
     await this.rolesService.createOrUpdate({
       name: 'Guest',
       slug: ROLES.GUEST,
+      system: true,
       admin: false,
+      teacher: false,
+      student: false,
       permissionSlugs: [
         PERMISSIONS.PROJECTS_VIEW,
       ],

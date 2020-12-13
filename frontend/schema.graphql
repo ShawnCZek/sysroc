@@ -1,304 +1,338 @@
 # This file was generated based on ".graphqlconfig". Do not edit manually.
 
 schema {
-    query: Query
-    mutation: Mutation
+  query: Query
+  mutation: Mutation
 }
 
 type ADUser {
-    cn: String!
-    dn: String!
-    userPrincipalName: String!
+  cn: String!
+  dn: String!
+  userPrincipalName: String!
 }
 
 type Classification {
-    createdAt: DateTime!
-    id: ID!
-    mark: Float!
-    note: String!
-    project: Project!
-    user: User!
+  createdAt: DateTime!
+  id: ID!
+  mark: Float!
+  note: String!
+  project: Project!
+  user: User!
 }
 
 type ClassificationDto {
-    createdAt: DateTime!
-    id: Float!
-    mark: Float!
-    note: String!
-    project: ProjectDto!
-    user: UserDto!
+  createdAt: DateTime!
+  id: Float!
+  mark: Float!
+  note: String!
+  project: ProjectDto!
+  user: UserDto!
 }
 
 type Group {
-    id: ID!
-    name: String!
-    users: [User!]!
+  id: ID!
+  name: String!
+  users: [User!]!
 }
 
 type Mutation {
-    claimProject(filter: ProjectsFilter!): ProjectDto!
-    createClassification(input: CreateClassificationDto!): ClassificationDto!
-    createProject(input: CreateProjectDto!): ProjectDto!
-    createTask(input: CreateTaskDto!): TaskDto!
-    createUser(input: CreateUserDto!): UserDto!
-    deleteClassification(filter: ClassificationsFilter!): ClassificationDto!
-    deleteProject(projectId: Float!): ProjectDto!
-    deleteTask(filter: TasksFilter!): TaskDto!
-    deleteUser(userId: Float!): UserDto!
-    logout: Boolean!
-    signin(auth: UserAuthInputDto!): UserAuthDto!
-    signup(input: SignUpUserDto!): UserAuthDto!
-    updateClassification(filter: ClassificationsFilter!, updates: UpdateClassificationDto!): ClassificationDto!
-    updateProfile(input: UpdateProfileDto!): UserAuthDto!
-    updateProject(filter: ProjectsFilter!, updates: UpdateProjectDto!): ProjectDto!
-    updateTask(filter: TasksFilter!, updates: UpdateTaskDto!): TaskDto!
-    updateUser(filter: UsersFilter!, input: UpdateUserDto!): UserDto!
+  claimProject(filter: ProjectsFilter!): ProjectDto!
+  createClassification(input: CreateClassificationDto!): ClassificationDto!
+  createProject(input: CreateProjectDto!): ProjectDto!
+  createRole(input: CreateRoleDto!): RoleDto!
+  createTask(input: CreateTaskDto!): TaskDto!
+  createUser(input: CreateUserDto!): UserDto!
+  deleteClassification(filter: ClassificationsFilter!): ClassificationDto!
+  deleteProject(projectId: Float!): ProjectDto!
+  deleteRole(roleId: Float!): RoleDto!
+  deleteTask(filter: TasksFilter!): TaskDto!
+  deleteUser(userId: Float!): UserDto!
+  logout: Boolean!
+  signin(auth: UserAuthInputDto!): UserAuthDto!
+  signup(input: SignUpUserDto!): UserAuthDto!
+  updateClassification(filter: ClassificationsFilter!, updates: UpdateClassificationDto!): ClassificationDto!
+  updateProfile(input: UpdateProfileDto!): UserAuthDto!
+  updateProject(filter: ProjectsFilter!, updates: UpdateProjectDto!): ProjectDto!
+  updateRole(filter: RolesFilter!, input: UpdateRoleDto!): RoleDto!
+  updateTask(filter: TasksFilter!, updates: UpdateTaskDto!): TaskDto!
+  updateUser(filter: UsersFilter!, input: UpdateUserDto!): UserDto!
 }
 
 type Permission {
-    id: ID!
-    name: String!
-    roles: [Role!]!
-    slug: String!
+  id: ID!
+  name: String!
+  roles: [Role!]!
+  slug: String!
 }
 
 type PermissionDto {
-    id: ID!
-    name: String!
-    slug: String!
+  id: ID!
+  name: String!
+  slug: String!
 }
 
 type PermissionStateDto {
-    permitted: Boolean!
-    slug: String!
+  permitted: Boolean!
+  slug: String!
 }
 
 type Project {
-    classifications: [Classification!]!
-    description: String!
-    id: ID!
-    name: String!
-    supervisor: User!
-    tasks: [Task!]!
-    user: User!
+  classifications: [Classification!]!
+  createdAt: DateTime!
+  description: String!
+  id: ID!
+  name: String!
+  supervisor: User!
+  tasks: [Task!]!
+  user: User!
 }
 
 type ProjectDto {
-    classifications: [ClassificationDto!]
-    description: String!
-    id: ID!
-    name: String!
-    supervisor: UserDto
-    tasks: [TaskDto!]
-    user: UserDto!
+  classifications: [ClassificationDto!]!
+  createdAt: DateTime!
+  description: String!
+  id: ID!
+  name: String!
+  supervisor: UserDto
+  tasks: [TaskDto!]!
+  user: UserDto!
 }
 
 type Query {
-    authUser(auth: UserAuthInputDto!): ADUser!
-    classifications(filter: ClassificationsFilter!): [ClassificationDto!]!
-    groups: [Group!]!
-    me: UserAuthDto
-    meExtended: UserAuthDto
-    project(filter: ProjectsFilter!): ProjectDto!
-    projects(filter: ProjectsFilter!): [ProjectDto!]!
-    roles(filter: RolesFilter!): [RoleDto!]!
-    task(filter: TasksFilter!): TaskDto!
-    user(filter: UsersFilter!): UserDto!
-    users(filter: AllUsersFilter!): [UserDto!]!
+  authUser(auth: UserAuthInputDto!): ADUser!
+  classifications(filter: ClassificationsFilter!): [ClassificationDto!]!
+  groups: [Group!]!
+  me: UserAuthDto
+  myPermissions: [PermissionStateDto!]!
+  permissions: [PermissionDto!]!
+  project(filter: ProjectsFilter!): ProjectDto!
+  projects(filter: ProjectsFilter!): [ProjectDto!]!
+  roles(filter: RolesFilter!): [RoleDto!]!
+  task(filter: TasksFilter!): TaskDto!
+  user(filter: UsersFilter!): UserDto!
+  users(filter: AllUsersFilter!): [UserDto!]!
 }
 
 type Role {
-    admin: Boolean!
-    id: ID!
-    name: String!
-    permissions: [Permission!]!
-    slug: String!
-    users: [User!]!
+  admin: Boolean!
+  id: ID!
+  name: String!
+  permissions: [Permission!]!
+  slug: String!
+  student: Boolean!
+  system: Boolean!
+  teacher: Boolean!
+  users: [User!]!
 }
 
 type RoleDto {
-    admin: Boolean!
-    id: ID!
-    name: String!
-    permissions: [PermissionDto!]!
-    slug: String!
+  admin: Boolean!
+  id: ID!
+  name: String!
+  permissions: [PermissionDto!]!
+  slug: String!
+  student: Boolean!
+  system: Boolean!
+  teacher: Boolean!
 }
 
 type Task {
-    completed: Boolean!
-    createdAt: DateTime!
-    description: String!
-    dueDate: DateTime!
-    id: ID!
-    name: String!
-    project: Project!
+  completed: Boolean!
+  createdAt: DateTime!
+  description: String!
+  dueDate: DateTime!
+  id: ID!
+  name: String!
+  project: Project!
 }
 
 type TaskDto {
-    completed: Boolean!
-    createdAt: DateTime!
-    description: String!
-    dueDate: DateTime!
-    id: Float!
-    name: String!
-    project: ProjectDto!
+  completed: Boolean!
+  createdAt: DateTime!
+  description: String!
+  dueDate: DateTime!
+  id: Float!
+  name: String!
+  project: ProjectDto!
 }
 
 type User {
-    adEmail: String!
-    classifications: [Classification!]!
-    email: String!
-    groups: [Group!]!
-    id: ID!
-    name: String!
-    password: String!
-    projects: [Project!]!
-    roles: [Role!]!
-    supervisedProjects: [Project!]!
+  adEmail: String!
+  classifications: [Classification!]!
+  email: String!
+  groups: [Group!]!
+  id: ID!
+  name: String!
+  password: String!
+  projects: [Project!]!
+  roles: [Role!]!
+  supervisedProjects: [Project!]!
 }
 
 type UserAuthDto {
-    accessToken: String
-    permissions: [PermissionStateDto!]
-    registerToken: String
-    user: UserDto
-    userTemp: UserTempDto
+  accessToken: String
+  registerToken: String
+  user: UserDto
+  userTemp: UserTempDto
 }
 
 type UserDto {
-    adEmail: String!
-    email: String!
-    groups: [Group!]!
-    id: ID!
-    name: String!
-    password: String!
-    projects: [ProjectDto!]!
-    roles: [RoleDto!]!
+  adEmail: String!
+  email: String!
+  groups: [Group!]!
+  id: ID!
+  name: String!
+  password: String!
+  permissions: [PermissionStateDto!]!
+  projects: [ProjectDto!]!
+  roles: [RoleDto!]!
 }
 
 type UserTempDto {
-    email: String!
-    name: String!
+  email: String!
+  name: String!
 }
 
 input AllUsersFilter {
-    adEmail: String
-    email: String
-    groups: [Float!]
-    name: String
-    roles: [Float!]
+  adEmail: String
+  admin: Boolean
+  email: String
+  groups: [Float!]
+  name: String
+  roles: [Float!]
+  rolesSlug: [String!]
+  student: Boolean
+  teacher: Boolean
 }
 
 input ClassificationsFilter {
-    fromDate: DateTime = "2020-03-14T15:44:27.377Z"
-    id: Float
-    projects: [Float!] = []
-    toDate: DateTime = "2020-04-14T14:44:27.378Z"
-    users: [Float!] = []
+  fromDate: DateTime = "2020-11-13T17:39:06.193Z"
+  id: Float
+  projects: [Float!] = []
+  toDate: DateTime = "2020-12-13T17:39:06.194Z"
+  users: [Float!] = []
 }
 
 input CreateClassificationDto {
-    mark: Float!
-    note: String
-    project: Float!
-    user: Float!
+  mark: Float!
+  note: String
+  project: Float!
+  user: Float!
 }
 
 input CreateProjectDto {
-    description: String
-    name: String!
+  description: String
+  name: String!
+}
+
+input CreateRoleDto {
+  admin: Boolean = false
+  name: String!
+  permissionSlugs: [String!]
+  student: Boolean = false
+  teacher: Boolean = false
 }
 
 input CreateTaskDto {
-    completed: Boolean
-    description: String
-    dueDate: DateTime!
-    name: String!
-    project: Float!
+  completed: Boolean
+  description: String
+  dueDate: DateTime!
+  name: String!
+  project: Float!
 }
 
 input CreateUserDto {
-    adEmail: String
-    email: String!
-    name: String!
-    password: String
-    roleSlugs: [String!]
+  adEmail: String
+  email: String!
+  name: String!
+  password: String
+  roleSlugs: [String!]
 }
 
 input ProjectsFilter {
-    authors: [Float!] = []
-    id: Float
-    name: String
-    supervisors: [Float!] = []
-    user: String
+  authors: [Float!] = []
+  id: Float
+  name: String
+  supervisors: [Float!] = []
+  user: String
 }
 
 input RolesFilter {
-    admin: Boolean
-    id: Float
-    name: String
-    permission: String
-    slug: String
-    user: String
+  admin: Boolean
+  id: Float
+  name: String
+  permission: String
+  slug: String
+  student: Boolean
+  teacher: Boolean
+  user: String
 }
 
 input SignUpUserDto {
-    email: String
-    name: String
-    password: String
+  email: String
+  name: String
+  password: String
 }
 
 input TasksFilter {
-    id: Float
-    name: String
+  id: Float
+  name: String
 }
 
 input UpdateClassificationDto {
-    mark: Float!
-    note: String!
-    projectId: Float
+  mark: Float!
+  note: String!
+  projectId: Float
 }
 
 input UpdateProfileDto {
-    email: String
-    name: String!
-    oldPassword: String
-    password: String
-    passwordAgain: String
+  email: String
+  name: String!
+  oldPassword: String
+  password: String
+  passwordAgain: String
 }
 
 input UpdateProjectDto {
-    description: String
-    name: String
-    supervisor: Float
+  description: String
+  name: String
+  supervisor: Float
+}
+
+input UpdateRoleDto {
+  admin: Boolean = false
+  name: String!
+  permissionSlugs: [String!]
+  student: Boolean = false
+  teacher: Boolean = false
 }
 
 input UpdateTaskDto {
-    completed: Boolean
-    description: String
-    dueDate: DateTime
-    name: String
+  completed: Boolean
+  description: String
+  dueDate: DateTime
+  name: String
 }
 
 input UpdateUserDto {
-    email: String!
-    groups: [Float!]
-    name: String!
-    roleSlugs: [String!]
+  email: String!
+  groups: [Float!]
+  name: String!
+  roleSlugs: [String!]
 }
 
 input UserAuthInputDto {
-    email: String!
-    password: String!
+  email: String!
+  password: String!
 }
 
 input UsersFilter {
-    adEmail: String
-    email: String
-    id: Float
-    name: String
+  adEmail: String
+  email: String
+  id: Float
+  name: String
 }
 
 
-"The javascript `Date` as string. Type represents date and time as the ISO Date string."
+"A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format."
 scalar DateTime

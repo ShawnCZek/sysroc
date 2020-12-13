@@ -5,12 +5,15 @@ export class CreateRoleDto {
   @Field()
   readonly name: string;
 
-  @Field()
-  readonly slug: string;
-
   @Field({ defaultValue: false })
   readonly admin: boolean;
 
-  @Field({ nullable: true })
+  @Field({ defaultValue: false })
+  readonly teacher: boolean;
+
+  @Field({ defaultValue: false })
+  readonly student: boolean;
+
+  @Field(type => [String], { nullable: true })
   readonly permissionSlugs: string[];
 }

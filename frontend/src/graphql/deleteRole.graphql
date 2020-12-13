@@ -1,0 +1,5 @@
+mutation DeleteRole($roleId: Float!) {
+  deleteRole(roleId: $roleId) {
+    id
+  }
+}

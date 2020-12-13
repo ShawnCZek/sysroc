@@ -3,7 +3,6 @@ import { useRolesQuery } from '../../generated/graphql';
 import { Checkbox, FormControlLabel, FormGroup } from '@material-ui/core';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
-import { ROLES } from '../../generated/roles';
 
 interface Props {
   admin: boolean;
@@ -29,7 +28,7 @@ export const UserRoles: React.FC<Props> = ({
     if (!event.target.checked) {
       newRoles = roles.filter(role => role !== name);
     } else {
-      newRoles = [ ...roles, name ];
+      newRoles = [...roles, name];
     }
 
     setRoles(newRoles);
@@ -40,9 +39,8 @@ export const UserRoles: React.FC<Props> = ({
 
   return (
     <FormGroup>
-      { rolesData &&
-        rolesData.roles &&
-        rolesData.roles.filter(role => (role.slug !== ROLES.TEACHER || canManageTeachers) && (role.slug !== ROLES.STUDENT || canManageStudents)).map(role => (
+      { rolesData?.roles &&
+        rolesData.roles.filter(role => (!role.teacher || canManageTeachers) && (!role.student || canManageStudents)).map(role => (
         <FormControlLabel
           key={role.id}
           control={

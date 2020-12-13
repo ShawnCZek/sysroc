@@ -3,7 +3,10 @@ query Roles($admin: Boolean, $permission: String) {
     id
     name
     slug
+    system
     admin
+    teacher
+    student
     permissions {
       name
       slug

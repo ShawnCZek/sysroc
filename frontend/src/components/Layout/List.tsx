@@ -14,7 +14,7 @@ export const List = styled.div`
     justify-content: space-evenly;
     align-items: stretch;
     align-content: space-between;
-    height: 5rem;
+    min-height: 5rem;
     padding: 5px 2rem;
     transition: all 0.3s ease;
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { PERMISSIONS } from '../generated/permissions';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { SignIn } from '../components/SignIn';
 import { Home } from '../components/Home';
@@ -14,7 +15,8 @@ import { Settings } from '../views/Settings';
 import { Classification } from '../views/Classification';
 import { SingleUser } from '../views/SingleUser';
 import { hasPermissions } from '../auth/hasPermissions';
-import { PERMISSIONS } from '../generated/permissions';
+import { Roles } from '../views/Roles';
+import { isAdmin } from '../auth/roles';
 
 export const Routes: React.FC = () => {
   const { data, loading } = useMeQuery();
@@ -25,6 +27,7 @@ export const Routes: React.FC = () => {
   const projectList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.PROJECTS_CREATE, PERMISSIONS.PROJECTS_VIEW, PERMISSIONS.PROJECTS_MANAGE);
   const userList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.MANAGE_STUDENT_USERS, PERMISSIONS.MANAGE_TEACHER_USERS);
   const classificationList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.CLASSIFICATION_VIEW);
+  const manageRoles = isAdmin(data?.me?.user);
 
   return (
     <BrowserRouter>
@@ -88,6 +91,15 @@ export const Routes: React.FC = () => {
               exact
               path="/classification"
               component={Classification}
+            />
+            <ProtectedRoute
+              isAuthenticated={!!data?.me}
+              isAllowed={manageRoles}
+              restrictedPath={'/notallowed'}
+              authenticationPath={'/signin'}
+              exact
+              path="/roles"
+              component={Roles}
             />
           </Switch>
         </PersistentDrawerLeft>

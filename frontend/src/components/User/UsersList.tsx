@@ -11,7 +11,16 @@ import { useSnackbar } from 'notistack';
 import { UserLink } from '../UserLink';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
-import { ROLES } from '../../generated/roles';
+import { isAdmin, isStudent, isTeacher } from '../../auth/roles';
+
+interface CanManageUserDto {
+  id: string;
+  roles: Array<{
+    admin: boolean;
+    teacher: boolean;
+    student: boolean;
+  }>;
+}
 
 export const UsersList: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -40,7 +49,6 @@ export const UsersList: React.FC = () => {
   const canManageTeachers = useHasPermissions(PERMISSIONS.MANAGE_TEACHER_USERS);
   const canManageStudents = useHasPermissions(PERMISSIONS.MANAGE_STUDENT_USERS);
   const canDeleteUsers = useHasPermissions(PERMISSIONS.DELETE_USERS);
-  const isAdmin = me?.me?.user?.roles && me.me.user.roles.some(role => role.admin);
 
   const handleCloseUserModal = () => setUserModalOpen(false);
   const handleOpenUserModal = () => setUserModalOpen(true);
@@ -50,6 +58,10 @@ export const UsersList: React.FC = () => {
 
   const handleSubmitDeleteUserDialog = async (userId: number) => {
     await deleteUser({ variables: { id: userId } });
+  };
+
+  const canManageUser = (user: CanManageUserDto | undefined | null): boolean => {
+    return !!user && !isAdmin(user) && (!isTeacher(user) || canManageTeachers) && (!isStudent(user) || canManageStudents);
   };
 
   if (loading || meLoading) return <span>Loading...</span>;
@@ -85,9 +97,7 @@ export const UsersList: React.FC = () => {
               <div>Action</div>
             </Item>
           </div>
-          {data &&
-          data.users &&
-          data.users.map(user => (
+          { data?.users && data.users.map(user => (
             <div key={user.id} className="flex">
               <Item>
                 <div><UserLink id={user.id} name={user.name} /></div>
@@ -105,7 +115,7 @@ export const UsersList: React.FC = () => {
                 <div>{user.roles && user.roles.map(role => role.name).join(', ')}</div>
               </Item>
               <Item className="actions">
-                {!user.roles.some(role => role.admin) && !user.roles.some(role => (role.slug === ROLES.TEACHER && !canManageTeachers) || (role.slug === ROLES.STUDENT && !canManageStudents)) &&
+                { canManageUser(user) &&
                   <Fab
                     color="primary"
                     variant="extended"
@@ -122,11 +132,7 @@ export const UsersList: React.FC = () => {
                   >
                     Edit
                   </Fab>
-                }
-                {canDeleteUsers
-                  && user.id !== me?.me?.user?.id
-                  && (!user.roles.some(role => role.admin) || isAdmin)
-                  && !user.roles.some(role => (role.slug === ROLES.TEACHER && !canManageTeachers) || (role.slug === ROLES.STUDENT && !canManageStudents)) &&
+                } { canDeleteUsers && user.id !== me?.me?.user?.id && canManageUser(user) &&
                   <Fab
                     color="secondary"
                     variant="extended"

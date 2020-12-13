@@ -15,6 +15,12 @@ export class RolesFilter {
   admin?: boolean;
 
   @Field({ nullable: true })
+  teacher?: boolean;
+
+  @Field({ nullable: true })
+  student?: boolean;
+
+  @Field({ nullable: true })
   permission?: string;
 
   @Field({ nullable: true })

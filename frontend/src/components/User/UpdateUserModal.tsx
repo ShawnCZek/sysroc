@@ -1,35 +1,9 @@
 import React from 'react';
 import Modal from '@material-ui/core/Modal';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { useUpdateUserMutation } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
 import { UpdateUserForm } from './UpdateUserForm';
-
-function getModalStyle() {
-  const top = 50;
-  const left = 50;
-
-  return {
-    top: `${top}%`,
-    left: `${left}%`,
-    transform: `translate(-${top}%, -${left}%)`
-  };
-}
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    paper: {
-      position: 'absolute',
-      width: 400,
-      backgroundColor: theme.palette.background.paper,
-      border: '2px solid #000',
-      boxShadow: theme.shadows[5],
-      padding: theme.spacing(2, 4, 3),
-      maxHeight: '95%',
-      overflowY: 'auto'
-    }
-  })
-);
+import { ModalBody } from '../Layout/Modal/ModalBody';
 
 interface Props {
   open: boolean;
@@ -49,14 +23,13 @@ export const UpdateUserModal: React.FC<Props> = ({
   userId,
   data,
 }) => {
-  const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
-
-  const [modalStyle] = React.useState(getModalStyle);
 
   const [updateUser, { error, client }] = useUpdateUserMutation({
     async update() {
+      enqueueSnackbar('User updated!', { variant: 'success' });
       client?.resetStore();
+      handleClose();
     }
   });
 
@@ -67,23 +40,19 @@ export const UpdateUserModal: React.FC<Props> = ({
       open={open}
       onClose={handleClose}
     >
-      <div style={modalStyle} className={classes.paper}>
+      <ModalBody>
         <h2 id="update-user-modal-title">Edit User</h2>
         <p id="update-user-modal-description">Edit the user account.</p>
         <UpdateUserForm
           error={error}
           userData={data}
           onSubmit={async ({ name, email, roles, groups }) => {
-            const res = await updateUser({
+            await updateUser({
               variables: { name, email, roleSlugs: roles, groups, userId }
             });
-            if (res.data) {
-              enqueueSnackbar('User updated!', { variant: 'success' });
-              handleClose();
-            }
           }}
         />
-      </div>
+      </ModalBody>
     </Modal>
   );
 };

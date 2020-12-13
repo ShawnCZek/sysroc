@@ -11,18 +11,12 @@ const useStyles = makeStyles({
   form: {
     margin: '0 auto'
   },
-  formControl: {
-    marginTop: '0.5rem'
-  },
   button: {
     marginTop: '1rem'
   },
   formTitle: {
     marginTop: '1.5rem'
   },
-  formNote: {
-    marginBottom: '0.5rem'
-  }
 });
 
 interface Values {
@@ -39,7 +33,7 @@ interface Props {
 }
 
 export const UpdateUserForm: React.FC<Props> = ({ onSubmit, userData, error }) => {
-  const classes = useStyles({});
+  const classes = useStyles();
   let roles: string[] | undefined = userData.roles;
   let groups: number[] | undefined = userData.groups;
 

@@ -19,6 +19,8 @@ import { Header } from './Header';
 import { useHistory } from 'react-router';
 import { useHasPermissions } from '../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../generated/permissions';
+import { useMeQuery } from '../generated/graphql';
+import { isAdmin } from '../auth/roles';
 
 const drawerWidth = 240;
 
@@ -78,20 +80,24 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-interface Props {}
-
-export const PersistentDrawerLeft: React.FC<Props> = props => {
+export const PersistentDrawerLeft: React.FC = props => {
   const classes = useStyles();
   const theme = useTheme();
   const history = useHistory();
+
   const [open, setOpen] = React.useState(false);
+
+  const { data, loading } = useMeQuery();
 
   const canViewProjects = useHasPermissions(PERMISSIONS.PROJECTS_VIEW);
   const canViewUsers = useHasPermissions(PERMISSIONS.MANAGE_STUDENT_USERS, PERMISSIONS.MANAGE_TEACHER_USERS);
   const canViewClassification = useHasPermissions(PERMISSIONS.CLASSIFICATION_VIEW);
+  const canManageRoles = isAdmin(data?.me?.user);
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className={classes.root}>
@@ -165,6 +171,14 @@ export const PersistentDrawerLeft: React.FC<Props> = props => {
                 <EmojiEventsIcon />
               </ListItemIcon>
               <ListItemText primary="Classification" />
+            </ListItem>
+          }
+          { canManageRoles &&
+            <ListItem button onClick={() => history.push('/roles')}>
+              <ListItemIcon>
+                <AccountCircleIcon />
+              </ListItemIcon>
+              <ListItemText primary="Roles" />
             </ListItem>
           }
         </List>

@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router';
 import { SignUpForm } from './SignUpForm';
 import { getRegisterToken } from '../auth/registerToken';
 import { MeDocument, MeQuery, useSignUpMutation } from '../generated/graphql';
-import { setAccessToken } from '../auth/accessToke';
+import { setAccessToken } from '../auth/accessToken';
 
 export const SignUp: React.FC<RouteComponentProps> = ({ history }) => {
   if (!getRegisterToken()) {

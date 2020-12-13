@@ -1,7 +1,7 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { MeDocument, MeQuery, useSignInMutation } from '../generated/graphql';
-import { setAccessToken } from '../auth/accessToke';
+import { setAccessToken } from '../auth/accessToken';
 import { SignInForm } from './SignInForm';
 import { setRegisterToken } from '../auth/registerToken';
 import { setUserTemp } from '../auth/userTemp';

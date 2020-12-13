@@ -27,6 +27,9 @@ export type AllUsersFilter = {
   name?: Maybe<Scalars['String']>,
   roles?: Maybe<Array<Scalars['Float']>>,
   rolesSlug?: Maybe<Array<Scalars['String']>>,
+  admin?: Maybe<Scalars['Boolean']>,
+  teacher?: Maybe<Scalars['Boolean']>,
+  student?: Maybe<Scalars['Boolean']>,
   groups?: Maybe<Array<Scalars['Float']>>,
 };
 
@@ -70,6 +73,14 @@ export type CreateProjectDto = {
   description?: Maybe<Scalars['String']>,
 };
 
+export type CreateRoleDto = {
+  name: Scalars['String'],
+  admin?: Maybe<Scalars['Boolean']>,
+  teacher?: Maybe<Scalars['Boolean']>,
+  student?: Maybe<Scalars['Boolean']>,
+  permissionSlugs?: Maybe<Array<Scalars['String']>>,
+};
+
 export type CreateTaskDto = {
   name: Scalars['String'],
   description?: Maybe<Scalars['String']>,
@@ -103,6 +114,9 @@ export type Mutation = {
   updateProfile: UserAuthDto,
   logout: Scalars['Boolean'],
   deleteUser: UserDto,
+  createRole: RoleDto,
+  updateRole: RoleDto,
+  deleteRole: RoleDto,
   createProject: ProjectDto,
   deleteProject: ProjectDto,
   updateProject: ProjectDto,
@@ -144,6 +158,22 @@ export type MutationUpdateProfileArgs = {
 
 export type MutationDeleteUserArgs = {
   userId: Scalars['Float']
+};
+
+
+export type MutationCreateRoleArgs = {
+  input: CreateRoleDto
+};
+
+
+export type MutationUpdateRoleArgs = {
+  input: UpdateRoleDto,
+  filter: RolesFilter
+};
+
+
+export type MutationDeleteRoleArgs = {
+  roleId: Scalars['Float']
 };
 
 
@@ -261,6 +291,7 @@ export type Query = {
   me?: Maybe<UserAuthDto>,
   myPermissions: Array<PermissionStateDto>,
   roles: Array<RoleDto>,
+  permissions: Array<PermissionDto>,
   projects: Array<ProjectDto>,
   project: ProjectDto,
   task: TaskDto,
@@ -312,7 +343,10 @@ export type Role = {
   id: Scalars['ID'],
   name: Scalars['String'],
   slug: Scalars['String'],
+  system: Scalars['Boolean'],
   admin: Scalars['Boolean'],
+  teacher: Scalars['Boolean'],
+  student: Scalars['Boolean'],
   permissions: Array<Permission>,
   users: Array<User>,
 };
@@ -322,7 +356,10 @@ export type RoleDto = {
   id: Scalars['ID'],
   name: Scalars['String'],
   slug: Scalars['String'],
+  system: Scalars['Boolean'],
   admin: Scalars['Boolean'],
+  teacher: Scalars['Boolean'],
+  student: Scalars['Boolean'],
   permissions: Array<PermissionDto>,
 };
 
@@ -331,6 +368,8 @@ export type RolesFilter = {
   name?: Maybe<Scalars['String']>,
   slug?: Maybe<Scalars['String']>,
   admin?: Maybe<Scalars['Boolean']>,
+  teacher?: Maybe<Scalars['Boolean']>,
+  student?: Maybe<Scalars['Boolean']>,
   permission?: Maybe<Scalars['String']>,
   user?: Maybe<Scalars['String']>,
 };
@@ -388,6 +427,14 @@ export type UpdateProjectDto = {
   supervisor?: Maybe<Scalars['Float']>,
 };
 
+export type UpdateRoleDto = {
+  name: Scalars['String'],
+  admin?: Maybe<Scalars['Boolean']>,
+  teacher?: Maybe<Scalars['Boolean']>,
+  student?: Maybe<Scalars['Boolean']>,
+  permissionSlugs?: Maybe<Array<Scalars['String']>>,
+};
+
 export type UpdateTaskDto = {
   name?: Maybe<Scalars['String']>,
   description?: Maybe<Scalars['String']>,
@@ -439,6 +486,7 @@ export type UserDto = {
   projects: Array<ProjectDto>,
   groups: Array<Group>,
   roles: Array<RoleDto>,
+  permissions: Array<PermissionStateDto>,
 };
 
 export type UsersFilter = {
@@ -549,6 +597,26 @@ export type CreateProjectMutation = (
   ) }
 );
 
+export type CreateRoleMutationVariables = {
+  name: Scalars['String'],
+  teacher: Scalars['Boolean'],
+  student: Scalars['Boolean'],
+  permissions?: Maybe<Array<Scalars['String']>>
+};
+
+
+export type CreateRoleMutation = (
+  { __typename?: 'Mutation' }
+  & { createRole: (
+    { __typename?: 'RoleDto' }
+    & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
+    & { permissions: Array<(
+      { __typename?: 'PermissionDto' }
+      & Pick<PermissionDto, 'name' | 'slug'>
+    )> }
+  ) }
+);
+
 export type CreateTaskMutationVariables = {
   name: Scalars['String'],
   description?: Maybe<Scalars['String']>,
@@ -641,6 +709,19 @@ export type DeleteProjectMutation = (
   ) }
 );
 
+export type DeleteRoleMutationVariables = {
+  roleId: Scalars['Float']
+};
+
+
+export type DeleteRoleMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteRole: (
+    { __typename?: 'RoleDto' }
+    & Pick<RoleDto, 'id'>
+  ) }
+);
+
 export type DeleteTaskMutationVariables = {
   id: Scalars['Float']
 };
@@ -698,7 +779,7 @@ export type MeQuery = (
       & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
       & { roles: Array<(
         { __typename?: 'RoleDto' }
-        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin'>
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
       )> }
     )> }
   )> }
@@ -712,6 +793,17 @@ export type MyPermissionsQuery = (
   & { myPermissions: Array<(
     { __typename?: 'PermissionStateDto' }
     & Pick<PermissionStateDto, 'slug' | 'permitted'>
+  )> }
+);
+
+export type PermissionsQueryVariables = {};
+
+
+export type PermissionsQuery = (
+  { __typename?: 'Query' }
+  & { permissions: Array<(
+    { __typename?: 'PermissionDto' }
+    & Pick<PermissionDto, 'id' | 'name' | 'slug'>
   )> }
 );
 
@@ -795,7 +887,7 @@ export type RolesQuery = (
   { __typename?: 'Query' }
   & { roles: Array<(
     { __typename?: 'RoleDto' }
-    & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin'>
+    & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
     & { permissions: Array<(
       { __typename?: 'PermissionDto' }
       & Pick<PermissionDto, 'name' | 'slug'>
@@ -819,7 +911,7 @@ export type SignInMutation = (
       & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
       & { roles: Array<(
         { __typename?: 'RoleDto' }
-        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin'>
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin' | 'teacher' | 'student'>
       )> }
     )>, userTemp: Maybe<(
       { __typename?: 'UserTempDto' }
@@ -845,7 +937,7 @@ export type SignUpMutation = (
       & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
       & { roles: Array<(
         { __typename?: 'RoleDto' }
-        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin'>
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin' | 'teacher' | 'student'>
       )> }
     )> }
   ) }
@@ -923,7 +1015,7 @@ export type UpdateProfileMutation = (
       & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
       & { roles: Array<(
         { __typename?: 'RoleDto' }
-        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin'>
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin' | 'teacher' | 'student'>
       )> }
     )> }
   ) }
@@ -948,6 +1040,27 @@ export type UpdateProjectMutation = (
     ), supervisor: Maybe<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
+    )> }
+  ) }
+);
+
+export type UpdateRoleMutationVariables = {
+  id: Scalars['Float'],
+  name: Scalars['String'],
+  teacher: Scalars['Boolean'],
+  student: Scalars['Boolean'],
+  permissions?: Maybe<Array<Scalars['String']>>
+};
+
+
+export type UpdateRoleMutation = (
+  { __typename?: 'Mutation' }
+  & { updateRole: (
+    { __typename?: 'RoleDto' }
+    & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
+    & { permissions: Array<(
+      { __typename?: 'PermissionDto' }
+      & Pick<PermissionDto, 'name' | 'slug'>
     )> }
   ) }
 );
@@ -987,7 +1100,7 @@ export type UpdateUserMutation = (
       & Pick<Group, 'id' | 'name'>
     )>, roles: Array<(
       { __typename?: 'RoleDto' }
-      & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin'>
+      & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin' | 'teacher' | 'student'>
     )> }
   ) }
 );
@@ -1025,6 +1138,9 @@ export type UsersQueryVariables = {
   adEmail?: Maybe<Scalars['String']>,
   roles?: Maybe<Array<Scalars['Float']>>,
   rolesSlug?: Maybe<Array<Scalars['String']>>,
+  admin?: Maybe<Scalars['Boolean']>,
+  teacher?: Maybe<Scalars['Boolean']>,
+  student?: Maybe<Scalars['Boolean']>,
   groups?: Maybe<Array<Scalars['Float']>>
 };
 
@@ -1039,7 +1155,7 @@ export type UsersQuery = (
       & Pick<Group, 'id' | 'name'>
     )>, roles: Array<(
       { __typename?: 'RoleDto' }
-      & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin'>
+      & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
     )> }
   )> }
 );
@@ -1229,6 +1345,51 @@ export function useCreateProjectMutation(baseOptions?: ApolloReactHooks.Mutation
 export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProjectMutation>;
 export type CreateProjectMutationResult = ApolloReactCommon.MutationResult<CreateProjectMutation>;
 export type CreateProjectMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
+export const CreateRoleDocument = gql`
+    mutation CreateRole($name: String!, $teacher: Boolean!, $student: Boolean!, $permissions: [String!]) {
+  createRole(input: {name: $name, teacher: $teacher, student: $student, permissionSlugs: $permissions}) {
+    id
+    name
+    slug
+    system
+    admin
+    teacher
+    student
+    permissions {
+      name
+      slug
+    }
+  }
+}
+    `;
+export type CreateRoleMutationFn = ApolloReactCommon.MutationFunction<CreateRoleMutation, CreateRoleMutationVariables>;
+
+/**
+ * __useCreateRoleMutation__
+ *
+ * To run a mutation, you first call `useCreateRoleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateRoleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createRoleMutation, { data, loading, error }] = useCreateRoleMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      teacher: // value for 'teacher'
+ *      student: // value for 'student'
+ *      permissions: // value for 'permissions'
+ *   },
+ * });
+ */
+export function useCreateRoleMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateRoleMutation, CreateRoleMutationVariables>) {
+        return ApolloReactHooks.useMutation<CreateRoleMutation, CreateRoleMutationVariables>(CreateRoleDocument, baseOptions);
+      }
+export type CreateRoleMutationHookResult = ReturnType<typeof useCreateRoleMutation>;
+export type CreateRoleMutationResult = ApolloReactCommon.MutationResult<CreateRoleMutation>;
+export type CreateRoleMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateRoleMutation, CreateRoleMutationVariables>;
 export const CreateTaskDocument = gql`
     mutation CreateTask($name: String!, $description: String, $dueDate: DateTime!, $project: Float!) {
   createTask(input: {name: $name, description: $description, dueDate: $dueDate, project: $project}) {
@@ -1419,6 +1580,38 @@ export function useDeleteProjectMutation(baseOptions?: ApolloReactHooks.Mutation
 export type DeleteProjectMutationHookResult = ReturnType<typeof useDeleteProjectMutation>;
 export type DeleteProjectMutationResult = ApolloReactCommon.MutationResult<DeleteProjectMutation>;
 export type DeleteProjectMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteProjectMutation, DeleteProjectMutationVariables>;
+export const DeleteRoleDocument = gql`
+    mutation DeleteRole($roleId: Float!) {
+  deleteRole(roleId: $roleId) {
+    id
+  }
+}
+    `;
+export type DeleteRoleMutationFn = ApolloReactCommon.MutationFunction<DeleteRoleMutation, DeleteRoleMutationVariables>;
+
+/**
+ * __useDeleteRoleMutation__
+ *
+ * To run a mutation, you first call `useDeleteRoleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteRoleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteRoleMutation, { data, loading, error }] = useDeleteRoleMutation({
+ *   variables: {
+ *      roleId: // value for 'roleId'
+ *   },
+ * });
+ */
+export function useDeleteRoleMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteRoleMutation, DeleteRoleMutationVariables>) {
+        return ApolloReactHooks.useMutation<DeleteRoleMutation, DeleteRoleMutationVariables>(DeleteRoleDocument, baseOptions);
+      }
+export type DeleteRoleMutationHookResult = ReturnType<typeof useDeleteRoleMutation>;
+export type DeleteRoleMutationResult = ApolloReactCommon.MutationResult<DeleteRoleMutation>;
+export type DeleteRoleMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteRoleMutation, DeleteRoleMutationVariables>;
 export const DeleteTaskDocument = gql`
     mutation DeleteTask($id: Float!) {
   deleteTask(filter: {id: $id}) {
@@ -1558,7 +1751,10 @@ export const MeDocument = gql`
         id
         name
         slug
+        system
         admin
+        teacher
+        student
       }
     }
   }
@@ -1622,6 +1818,40 @@ export function useMyPermissionsLazyQuery(baseOptions?: ApolloReactHooks.LazyQue
 export type MyPermissionsQueryHookResult = ReturnType<typeof useMyPermissionsQuery>;
 export type MyPermissionsLazyQueryHookResult = ReturnType<typeof useMyPermissionsLazyQuery>;
 export type MyPermissionsQueryResult = ApolloReactCommon.QueryResult<MyPermissionsQuery, MyPermissionsQueryVariables>;
+export const PermissionsDocument = gql`
+    query Permissions {
+  permissions {
+    id
+    name
+    slug
+  }
+}
+    `;
+
+/**
+ * __usePermissionsQuery__
+ *
+ * To run a query within a React component, call `usePermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePermissionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePermissionsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePermissionsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<PermissionsQuery, PermissionsQueryVariables>) {
+        return ApolloReactHooks.useQuery<PermissionsQuery, PermissionsQueryVariables>(PermissionsDocument, baseOptions);
+      }
+export function usePermissionsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<PermissionsQuery, PermissionsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<PermissionsQuery, PermissionsQueryVariables>(PermissionsDocument, baseOptions);
+        }
+export type PermissionsQueryHookResult = ReturnType<typeof usePermissionsQuery>;
+export type PermissionsLazyQueryHookResult = ReturnType<typeof usePermissionsLazyQuery>;
+export type PermissionsQueryResult = ApolloReactCommon.QueryResult<PermissionsQuery, PermissionsQueryVariables>;
 export const ProjectDocument = gql`
     query Project($id: Float) {
   project(filter: {id: $id}) {
@@ -1780,7 +2010,10 @@ export const RolesDocument = gql`
     id
     name
     slug
+    system
     admin
+    teacher
+    student
     permissions {
       name
       slug
@@ -1829,6 +2062,8 @@ export const SignInDocument = gql`
         name
         slug
         admin
+        teacher
+        student
       }
     }
     userTemp {
@@ -1879,6 +2114,8 @@ export const SignUpDocument = gql`
         name
         slug
         admin
+        teacher
+        student
       }
     }
   }
@@ -2046,6 +2283,8 @@ export const UpdateProfileDocument = gql`
         name
         slug
         admin
+        teacher
+        student
       }
     }
   }
@@ -2124,6 +2363,52 @@ export function useUpdateProjectMutation(baseOptions?: ApolloReactHooks.Mutation
 export type UpdateProjectMutationHookResult = ReturnType<typeof useUpdateProjectMutation>;
 export type UpdateProjectMutationResult = ApolloReactCommon.MutationResult<UpdateProjectMutation>;
 export type UpdateProjectMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateProjectMutation, UpdateProjectMutationVariables>;
+export const UpdateRoleDocument = gql`
+    mutation UpdateRole($id: Float!, $name: String!, $teacher: Boolean!, $student: Boolean!, $permissions: [String!]) {
+  updateRole(filter: {id: $id}, input: {name: $name, teacher: $teacher, student: $student, permissionSlugs: $permissions}) {
+    id
+    name
+    slug
+    system
+    admin
+    teacher
+    student
+    permissions {
+      name
+      slug
+    }
+  }
+}
+    `;
+export type UpdateRoleMutationFn = ApolloReactCommon.MutationFunction<UpdateRoleMutation, UpdateRoleMutationVariables>;
+
+/**
+ * __useUpdateRoleMutation__
+ *
+ * To run a mutation, you first call `useUpdateRoleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateRoleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateRoleMutation, { data, loading, error }] = useUpdateRoleMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
+ *      teacher: // value for 'teacher'
+ *      student: // value for 'student'
+ *      permissions: // value for 'permissions'
+ *   },
+ * });
+ */
+export function useUpdateRoleMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateRoleMutation, UpdateRoleMutationVariables>) {
+        return ApolloReactHooks.useMutation<UpdateRoleMutation, UpdateRoleMutationVariables>(UpdateRoleDocument, baseOptions);
+      }
+export type UpdateRoleMutationHookResult = ReturnType<typeof useUpdateRoleMutation>;
+export type UpdateRoleMutationResult = ApolloReactCommon.MutationResult<UpdateRoleMutation>;
+export type UpdateRoleMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateRoleMutation, UpdateRoleMutationVariables>;
 export const UpdateTaskDocument = gql`
     mutation UpdateTask($id: Float!, $name: String!, $description: String, $dueDate: DateTime!) {
   updateTask(filter: {id: $id}, updates: {name: $name, description: $description, dueDate: $dueDate}) {
@@ -2180,6 +2465,8 @@ export const UpdateUserDocument = gql`
       name
       slug
       admin
+      teacher
+      student
     }
   }
 }
@@ -2267,8 +2554,8 @@ export type UserQueryHookResult = ReturnType<typeof useUserQuery>;
 export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
 export type UserQueryResult = ApolloReactCommon.QueryResult<UserQuery, UserQueryVariables>;
 export const UsersDocument = gql`
-    query Users($name: String, $email: String, $adEmail: String, $roles: [Float!], $rolesSlug: [String!], $groups: [Float!]) {
-  users(filter: {name: $name, email: $email, adEmail: $adEmail, roles: $roles, rolesSlug: $rolesSlug, groups: $groups}) {
+    query Users($name: String, $email: String, $adEmail: String, $roles: [Float!], $rolesSlug: [String!], $admin: Boolean, $teacher: Boolean, $student: Boolean, $groups: [Float!]) {
+  users(filter: {name: $name, email: $email, adEmail: $adEmail, roles: $roles, rolesSlug: $rolesSlug, admin: $admin, teacher: $teacher, student: $student, groups: $groups}) {
     id
     name
     email
@@ -2281,7 +2568,10 @@ export const UsersDocument = gql`
       id
       name
       slug
+      system
       admin
+      teacher
+      student
     }
   }
 }
@@ -2304,6 +2594,9 @@ export const UsersDocument = gql`
  *      adEmail: // value for 'adEmail'
  *      roles: // value for 'roles'
  *      rolesSlug: // value for 'rolesSlug'
+ *      admin: // value for 'admin'
+ *      teacher: // value for 'teacher'
+ *      student: // value for 'student'
  *      groups: // value for 'groups'
  *   },
  * });

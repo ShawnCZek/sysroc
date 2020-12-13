@@ -13,7 +13,16 @@ export class RoleDto {
   readonly slug: string;
 
   @Field()
+  readonly system: boolean;
+
+  @Field()
   readonly admin: boolean;
+
+  @Field()
+  readonly teacher: boolean;
+
+  @Field()
+  readonly student: boolean;
 
   @Field(type => [PermissionDto])
   readonly permissions: PermissionDto[];

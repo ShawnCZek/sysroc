@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
 import { UsersFilter } from './filters/users.filter';
 import { GqlAuthGuard } from '../auth/graphql-auth.guard';
-import { ConflictException, HttpService, NotFoundException, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { ConflictException, HttpService, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserAuthDto } from './dto/user-auth.dto';
 import { AuthService } from '../auth/auth.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -24,7 +24,6 @@ import { PERMISSIONS } from '../permissions/permissions';
 import { RolesService } from '../roles/roles.service';
 import { UserAuthInputDto } from './dto/user-auth-input.dto';
 import { ADResponse } from '../active-directory/models/ad-response.model';
-import { RoleDto } from '../roles/dto/role.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AllUsersFilter } from './filters/all-users.filter';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -49,14 +48,14 @@ export class UsersResolver {
 
   @Query(() => UserDto)
   @UseGuards(GqlAuthGuard)
-  async user(@Args('filter') filter: UsersFilter) {
-    return await this.usersService.findOne(filter);
+  user(@Args('filter') filter: UsersFilter) {
+    return this.usersService.findOne(filter);
   }
 
   @Query(() => [UserDto])
   @UseGuards(GqlAuthGuard)
-  async users(@Args('filter') filter: AllUsersFilter) {
-    return await this.usersService.findAll(filter);
+  users(@Args('filter') filter: AllUsersFilter) {
+    return this.usersService.findAll(filter);
   }
 
   @Query(() => UserAuthDto, { nullable: true })
@@ -78,18 +77,8 @@ export class UsersResolver {
     @CurrentUser() user: User,
     @Args('input') input: CreateUserDto,
   ) {
-    // The selected role cannot be for administrators
-    const requestsAdminRole = await this.rolesService.containsAdminRole(input.roleSlugs);
-
-    const canManageTeachers = await this.usersService.hasPermissions(user, PERMISSIONS.MANAGE_TEACHER_USERS);
-    const canManageStudents = await this.usersService.hasPermissions(user, PERMISSIONS.MANAGE_STUDENT_USERS);
-
-    // The user cannot set the teacher role if they do not have the permission for it
-    const requestsTeacherRole = input.roleSlugs.includes('teacher') && !canManageTeachers;
-    // The user cannot set the student role if they do not have the permission for it
-    const requestsStudentRole = input.roleSlugs.includes('student') && !canManageStudents;
-
-    if (requestsAdminRole || requestsTeacherRole || requestsStudentRole) {
+    const roles = await this.rolesService.fetchAll(input.roleSlugs);
+    if (!this.usersService.canWorkWithRoles(user, roles)) {
       throw new UnauthorizedException('You cannot create a user account with the role.');
     }
 
@@ -270,41 +259,17 @@ export class UsersResolver {
     @Args('input') input: UpdateUserDto,
   ) {
     // The user that is supposed to be updated
-    let userDto: UserDto = null;
-    try {
-      userDto = await this.usersService.findOne(filter);
-    } catch {
-      throw new NotFoundException('The user that is supposed to be edited could not be found.');
-    }
+    const userDto = await this.usersService.findOne(filter);
 
-    // The selected role cannot be for administrators
-    const containsAdminRole = await this.rolesService.containsAdminRole(input.roleSlugs);
-    // The user to be updated cannot be an administrator, too
-    const userDtoHasAdminRole = await this.rolesService.containsAdminRole(
-      userDto.roles.map((userRole: RoleDto) => userRole.slug),
-    );
-
-    const canManageTeachers = await this.usersService.hasPermissions(user, PERMISSIONS.MANAGE_TEACHER_USERS);
-    const canManageStudents = await this.usersService.hasPermissions(user, PERMISSIONS.MANAGE_STUDENT_USERS);
-
-    // The user cannot set the teacher role if they do not have the permission for it
-    const requestsTeacherRole = input.roleSlugs.includes('teacher') && !canManageTeachers;
-    // The check must be performed for current roles, too
-    const userDtoHasTeacherRole = userDto.roles.map((role: RoleDto) => role.slug).includes('teacher') && !canManageTeachers;
-
-    // The user cannot set the student role if they do not have the permission for it
-    const requestsStudentRole = input.roleSlugs.includes('student') && !canManageStudents;
-    // The check must be performed for current roles, too
-    const userDtoHasStudentRole = userDto.roles.map((role: RoleDto) => role.slug).includes('student') && !canManageStudents;
-
-    if (userDtoHasAdminRole || userDtoHasTeacherRole || userDtoHasStudentRole) {
+    const roles = await this.rolesService.fetchAll(input.roleSlugs);
+    if (!this.usersService.canWorkWithRoles(user, userDto.roles)) {
       throw new UnauthorizedException('You cannot manage this user.');
     }
-    if (containsAdminRole || requestsTeacherRole || requestsStudentRole) {
+    if (!this.usersService.canWorkWithRoles(user, roles)) {
       throw new UnauthorizedException('You cannot assign one of the selected roles to the user.');
     }
 
-    return await this.usersService.update(userDto, input);
+    return this.usersService.update(userDto, input);
   }
 
   @Mutation(() => UserAuthDto)
@@ -340,30 +305,11 @@ export class UsersResolver {
       throw new UnauthorizedException('You cannot delete yourself!');
     }
 
-    let userToDelete: UserDto = null;
-    try {
-      userToDelete = await this.usersService.findOne({ id: userId });
-    } catch {
-      throw new NotFoundException('The user could not be found.');
+    const userToDelete = await this.usersService.findOne({ id: userId });
+    if (!this.usersService.canWorkWithRoles(user, userToDelete.roles)) {
+      throw new UnauthorizedException('You cannot delete this user account!');
     }
 
-    // User with an administrator role cannot be deleted unless the current user is an administrator, too
-    if (userToDelete.roles.some(role => role.admin) && !user.roles.some(role => role.admin)) {
-      throw new UnauthorizedException('You cannot delete administrator accounts!');
-    }
-
-    const canManageTeachers = await this.usersService.hasPermissions(user, PERMISSIONS.MANAGE_TEACHER_USERS);
-    const canManageStudents = await this.usersService.hasPermissions(user, PERMISSIONS.MANAGE_STUDENT_USERS);
-
-    // The user cannot be a teacher if the current user cannot manage teacher accounts
-    if (userToDelete.roles.map(role => role.slug).includes('teacher') && !canManageTeachers) {
-      throw new UnauthorizedException('You cannot delete teacher accounts!');
-    }
-    // The user cannot be a student if the current user cannot manage student accounts
-    if (userToDelete.roles.map(role => role.slug).includes('student') && !canManageStudents) {
-      throw new UnauthorizedException('You cannot delete student accounts!');
-    }
-
-    return await this.usersService.delete(userToDelete);
+    return this.usersService.delete(userToDelete);
   }
 }

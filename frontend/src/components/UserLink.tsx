@@ -12,13 +12,14 @@ export const UserLink: React.FC<Props> = ({
   name,
 }) => {
   const history = useHistory();
+  const url = `/users/${id}`;
 
   return (
     <Link
-      href="#"
+      href={url}
       onClick={(event: any) => {
         event.preventDefault();
-        history.push(`/users/${id}`);
+        history.push(url);
       }}
     >
       {name}

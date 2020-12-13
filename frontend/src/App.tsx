@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ApolloProvider } from '@apollo/react-hooks';
 import client from './apollo/apollo.client';
-import { setAccessToken } from './auth/accessToke';
+import { setAccessToken } from './auth/accessToken';
 import { Routes } from './routes/Routes';
 import { Config } from './config/config';
 import { SnackbarProvider } from 'notistack';
