@@ -10,6 +10,7 @@ mutation SignIn($email: String!, $password: String!) {
         id
         name
         slug
+        system
         admin
         teacher
         student

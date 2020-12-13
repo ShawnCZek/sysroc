@@ -10,6 +10,7 @@ mutation SignUp($name: String, $email: String, $password: String) {
         id
         name
         slug
+        system
         admin
         teacher
         student

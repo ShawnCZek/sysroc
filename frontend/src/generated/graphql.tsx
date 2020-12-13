@@ -911,7 +911,7 @@ export type SignInMutation = (
       & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
       & { roles: Array<(
         { __typename?: 'RoleDto' }
-        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin' | 'teacher' | 'student'>
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
       )> }
     )>, userTemp: Maybe<(
       { __typename?: 'UserTempDto' }
@@ -937,7 +937,7 @@ export type SignUpMutation = (
       & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
       & { roles: Array<(
         { __typename?: 'RoleDto' }
-        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin' | 'teacher' | 'student'>
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
       )> }
     )> }
   ) }
@@ -1015,7 +1015,7 @@ export type UpdateProfileMutation = (
       & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
       & { roles: Array<(
         { __typename?: 'RoleDto' }
-        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin' | 'teacher' | 'student'>
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
       )> }
     )> }
   ) }
@@ -1100,7 +1100,7 @@ export type UpdateUserMutation = (
       & Pick<Group, 'id' | 'name'>
     )>, roles: Array<(
       { __typename?: 'RoleDto' }
-      & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin' | 'teacher' | 'student'>
+      & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
     )> }
   ) }
 );
@@ -2061,6 +2061,7 @@ export const SignInDocument = gql`
         id
         name
         slug
+        system
         admin
         teacher
         student
@@ -2113,6 +2114,7 @@ export const SignUpDocument = gql`
         id
         name
         slug
+        system
         admin
         teacher
         student
@@ -2282,6 +2284,7 @@ export const UpdateProfileDocument = gql`
         id
         name
         slug
+        system
         admin
         teacher
         student
@@ -2464,6 +2467,7 @@ export const UpdateUserDocument = gql`
       id
       name
       slug
+      system
       admin
       teacher
       student

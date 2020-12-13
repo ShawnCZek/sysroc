@@ -23,6 +23,7 @@ mutation UpdateProfile(
         id
         name
         slug
+        system
         admin
         teacher
         student
