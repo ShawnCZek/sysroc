@@ -60,16 +60,16 @@ export class ProjectsService {
   ): Promise<ProjectDto> {
     const project = await this.projectRepository.findOne({ id: projectId }, { relations: ['user', 'supervisor'] });
     if (!project) {
-      throw new NotFoundException(`Project couldn't be found.`);
+      throw new NotFoundException('Project couldn\'t be found.');
     }
 
     if (project.user.id !== user.id && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
-      throw new UnauthorizedException(`Missing permissions for deleting this project`);
+      throw new UnauthorizedException('Missing permissions for deleting this project');
     }
 
     const res = await this.projectRepository.delete({ id: projectId });
     if (res.affected < 1) {
-      throw new InternalServerErrorException(`There has been an error during deleting the project.`);
+      throw new InternalServerErrorException('There has been an error during deleting the project.');
     }
 
     return project;
@@ -96,11 +96,11 @@ export class ProjectsService {
     const project = await this.projectRepository.findOne(filter.id, { relations: ['user', 'supervisor'] });
 
     if (!project) {
-      throw new NotFoundException(`Could not find project!`);
+      throw new NotFoundException('Could not find project!');
     }
 
     if (project.user.id !== user.id && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
-      throw new UnauthorizedException(`Missing permissions for updating this project`);
+      throw new UnauthorizedException('Missing permissions for updating this project');
     }
 
     const updateProject: Project = {
@@ -116,7 +116,7 @@ export class ProjectsService {
     const res = await this.projectRepository.update(filter.id, updateProject);
 
     if (!res || res.affected < 1) {
-      throw new InternalServerErrorException(`Could not update the project`);
+      throw new InternalServerErrorException('Could not update the project');
     }
 
     return await this.projectRepository.findOne(filter.id, { relations: ['user', 'supervisor'] });
@@ -129,18 +129,18 @@ export class ProjectsService {
     const project = await this.projectRepository.findOne(filter.id, { relations: ['user', 'supervisor'] });
 
     if (!project) {
-      throw new NotFoundException(`Could not find project!`);
+      throw new NotFoundException('Could not find project!');
     }
 
     if (project.supervisor && project.supervisor.id !== user.id) {
-      throw new UnauthorizedException(`You cannot claim this project.`);
+      throw new UnauthorizedException('You cannot claim this project.');
     }
 
     project.supervisor = project.supervisor ? null : await this.userRepository.findOne({ id: user.id });
     const res = await this.projectRepository.update(filter.id, project);
 
     if (!res || res.affected < 1) {
-      throw new InternalServerErrorException(`Could not claim the project.`);
+      throw new InternalServerErrorException('Could not claim the project.');
     }
 
     return await this.projectRepository.findOne(filter.id, { relations: ['user', 'supervisor'] });

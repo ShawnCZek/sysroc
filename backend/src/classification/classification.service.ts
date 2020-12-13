@@ -77,13 +77,13 @@ export class ClassificationService {
     const classification = await this.getOne(filter);
 
     if (!classification) {
-      throw new NotFoundException(`Could not find project for given filter!`);
+      throw new NotFoundException('Could not find project for given filter!');
     }
 
     const res = await this.classificationRepository.delete({ id: filter.id });
 
     if (!res || res.affected < 1) {
-      throw new InternalServerErrorException(`There has been an error deleting project!`);
+      throw new InternalServerErrorException('There has been an error deleting project!');
     }
 
     return classification;
@@ -93,7 +93,7 @@ export class ClassificationService {
     const classification = await this.classificationRepository.findOne(filter.id);
 
     if (!classification) {
-      throw new NotFoundException(`Could not find classification for given ID!`);
+      throw new NotFoundException('Could not find classification for given ID!');
     }
 
     const updateClassification = { ...classification, ...updates };
@@ -101,7 +101,7 @@ export class ClassificationService {
     const res = await this.classificationRepository.update(filter.id, updateClassification);
 
     if (!res || res.affected < 1) {
-      throw new InternalServerErrorException(`Could not update the classification!`);
+      throw new InternalServerErrorException('Could not update the classification!');
     }
 
     return this.classificationRepository.findOne(filter.id, { relations: ['user', 'project', 'project.user'] });

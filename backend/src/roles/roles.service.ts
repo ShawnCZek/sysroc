@@ -23,7 +23,7 @@ export class RolesService {
     const filter = JSON.parse(JSON.stringify(rolesFilter));
     const role = await this.roleRepository.findOne({ relations: ['permissions', 'users'], where: filter });
     if (!role) {
-      throw new Error(`Role not found!`);
+      throw new Error('Role not found!');
     }
 
     return role;
@@ -86,7 +86,7 @@ export class RolesService {
   async update(
     role: Role,
     updateRole: UpdateRoleDto,
-    overridePermissions: boolean = false,
+    overridePermissions = false,
   ): Promise<Role> {
     await this.roleRepository.update(role.id, {
       name: updateRole.name,
@@ -101,7 +101,7 @@ export class RolesService {
   async updatePermissions(
     role: Role,
     permissions: string[],
-    override: boolean = false,
+    override = false,
   ): Promise<Role> {
     role = await this.roleRepository
       .createQueryBuilder('role')

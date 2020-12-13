@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException, } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Task } from './entities/tasks.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskDto } from './dto/task.dto';
@@ -29,7 +29,7 @@ export class TasksService {
     );
 
     if (project.user.id !== user.id && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
-      throw new UnauthorizedException(`Missing permissions for adding a task to this project`);
+      throw new UnauthorizedException('Missing permissions for adding a task to this project');
     }
 
     const newTask = this.taskRepository.create({
@@ -51,16 +51,16 @@ export class TasksService {
   ): Promise<TaskDto> {
     const task = await this.taskRepository.findOne(filter.id, { relations: ['project', 'project.user'] });
     if (!task) {
-      throw new NotFoundException(`Could not find task with given ID!`);
+      throw new NotFoundException('Could not find task with given ID!');
     }
 
     if (task.project.user.id !== user.id && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
-      throw new UnauthorizedException(`Missing permissions for deleting a task of this project`);
+      throw new UnauthorizedException('Missing permissions for deleting a task of this project');
     }
 
     const res = await this.taskRepository.delete(filter.id);
     if (res.affected < 1) {
-      throw new InternalServerErrorException(`Could not delete task!`);
+      throw new InternalServerErrorException('Could not delete task!');
     }
 
     return task;
@@ -74,12 +74,12 @@ export class TasksService {
     const task = await this.taskRepository.findOne(filter.id, { relations: ['project', 'project.user'] });
 
     if (!task) {
-      throw new NotFoundException(`Could not find task with given ID!`);
+      throw new NotFoundException('Could not find task with given ID!');
     }
 
     const canManageProjects = await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE);
     if (!(task.project.user.id === user.id || canManageProjects)) {
-      throw new UnauthorizedException(`Missing permissions for updating a task of this project`);
+      throw new UnauthorizedException('Missing permissions for updating a task of this project');
     }
 
     const updateTask = { ...task, ...updates };
@@ -87,7 +87,7 @@ export class TasksService {
 
     if (!res || res.affected < 1) {
       throw new InternalServerErrorException(
-        `Could not update task with given ID!`,
+        'Could not update task with given ID!',
       );
     }
 

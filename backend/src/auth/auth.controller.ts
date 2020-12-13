@@ -21,7 +21,7 @@ export class AuthController {
 
     let payload: any = null;
     try {
-      payload = verify(token, jwtConstants.refreshSecret!);
+      payload = verify(token, jwtConstants.refreshSecret);
     } catch (err) {
       return res.send({ ok: false, accessToken: '' });
     }

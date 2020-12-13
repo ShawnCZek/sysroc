@@ -105,7 +105,7 @@ export class UsersService {
       .findOne(filter, { relations: ['roles', 'roles.permissions', 'groups', 'projects'] });
 
     if (!user) {
-      throw new Error(`User not found!`);
+      throw new Error('User not found!');
     }
 
     return user;
