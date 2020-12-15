@@ -2,7 +2,7 @@ import React from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import { UpdateProjectForm } from './UpdateProjectForm';
-import { ProjectTasksDocument, useUpdateProjectMutation } from '../../generated/graphql';
+import { ProjectDto, ProjectTasksDocument, useUpdateProjectMutation } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
 
 function getModalStyle() {
@@ -37,13 +37,7 @@ interface Props {
   open: boolean;
   handleClose: () => void;
   projectId: number;
-  data: {
-    name: string;
-    description?: string;
-    supervisor?: {
-      name: string;
-    }
-  };
+  data: ProjectDto;
 }
 
 export const UpdateProjectModal: React.FC<Props> = ({

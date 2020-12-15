@@ -1,7 +1,7 @@
 import moment from 'moment';
 import styled from 'styled-components';
 import React, { useState } from 'react';
-import { ClassificationDto, useMeQuery, useProjectQuery } from '../generated/graphql';
+import { ClassificationDto, ProjectDto, useMeQuery, useProjectQuery } from '../generated/graphql';
 import { RouteComponentProps, useHistory } from 'react-router';
 import { Fab, Typography } from '@material-ui/core';
 import { UpdateProjectModal } from '../components/Project/UpdateProjectModal';
@@ -200,12 +200,12 @@ export const SingleProject: React.FC<Props> = props => {
               open={modalOpen}
               handleClose={handleModalClose}
               projectId={parseInt(props.match.params.projectId)}
-              data={data?.project}
+              data={data?.project as ProjectDto}
             />
             <ProjectClassificationOverview
-                open={classOverviewOpen}
-                handleClose={handleClassOverviewClose}
-                classification={data?.project.classifications as ClassificationDto[]}
+              open={classOverviewOpen}
+              handleClose={handleClassOverviewClose}
+              classification={data?.project.classifications as ClassificationDto[]}
             />
           </>
       )}
@@ -214,7 +214,7 @@ export const SingleProject: React.FC<Props> = props => {
           open={modalOpen}
           handleClose={handleModalClose}
           projectId={parseInt(props.match.params.projectId)}
-          data={data?.project}
+          data={data?.project as ProjectDto}
         />
       )}
       <CreateTaskModal

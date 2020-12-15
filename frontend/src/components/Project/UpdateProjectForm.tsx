@@ -7,6 +7,7 @@ import { Error } from '../Error';
 import { Supervisor } from './Supervisor';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
+import { ProjectDto } from '../../generated/graphql';
 
 const useStyles = makeStyles({
   form: {
@@ -34,13 +35,7 @@ interface Values {
 interface Props {
   onSubmit: (values: Values) => void;
   error: ApolloError | any;
-  data: {
-    name: string;
-    description?: string;
-    supervisor?: {
-      name: string;
-    }
-  };
+  data: ProjectDto;
 }
 
 export const UpdateProjectForm: React.FC<Props> = ({
