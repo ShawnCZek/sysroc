@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ApolloProvider } from '@apollo/react-hooks';
 import client from './apollo/apollo.client';
 import { setAccessToken } from './auth/accessToken';
 import { Routes } from './routes/Routes';
 import { Config } from './config/config';
 import { SnackbarProvider } from 'notistack';
+import { ApolloProvider } from '@apollo/client';
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState(true);

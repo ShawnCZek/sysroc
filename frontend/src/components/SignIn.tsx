@@ -1,6 +1,6 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { MeDocument, MeQuery, useSignInMutation } from '../generated/graphql';
+import { MeDocument, MeQuery, UserTempDto, useSignInMutation } from '../generated/graphql';
 import { setAccessToken } from '../auth/accessToken';
 import { SignInForm } from './SignInForm';
 import { setRegisterToken } from '../auth/registerToken';
@@ -45,7 +45,7 @@ export const SignIn: React.FC<RouteComponentProps> = ({ history }) => {
               window.location.reload();
             } else if (data.registerToken) {
               setRegisterToken(data.registerToken);
-              setUserTemp(data.userTemp);
+              setUserTemp(data.userTemp as UserTempDto);
 
               history.push('/signup');
             }

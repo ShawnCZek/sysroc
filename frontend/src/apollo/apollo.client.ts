@@ -1,12 +1,9 @@
-import { getAccessToken, setAccessToken } from '../auth/accessToken';
-import { ApolloClient } from 'apollo-client';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { HttpLink } from 'apollo-link-http';
-import { onError } from 'apollo-link-error';
-import { ApolloLink, Observable } from 'apollo-link';
-import { TokenRefreshLink } from 'apollo-link-token-refresh';
 import jwtDecode from 'jwt-decode';
+import { getAccessToken, setAccessToken } from '../auth/accessToken';
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, Observable } from '@apollo/client';
+import { onError } from '@apollo/client/link/error';
 import { Config } from '../config/config';
+import { TokenRefreshLink } from 'apollo-link-token-refresh';
 
 const cache = new InMemoryCache({});
 

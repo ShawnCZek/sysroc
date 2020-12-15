@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Checkbox, FormControlLabel, FormGroup, makeStyles, Typography } from '@material-ui/core';
-import { ApolloError } from 'apollo-client';
+import { ApolloError } from '@apollo/client';
 import { Field, Form, Formik } from 'formik';
 import { Error } from '../Error';
 import { MyField } from '../MyField';

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { NoSsr } from '@material-ui/core';
-import { ApolloError } from 'apollo-client';
+import { ApolloError } from '@apollo/client';
 
 interface Props {
   error: ApolloError | any;

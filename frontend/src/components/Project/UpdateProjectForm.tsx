@@ -2,12 +2,12 @@ import React from 'react';
 import { Button, makeStyles, Typography } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
 import { MyField } from '../MyField';
-import { ApolloError } from 'apollo-client';
 import { Error } from '../Error';
 import { Supervisor } from './Supervisor';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
 import { ProjectDto } from '../../generated/graphql';
+import { ApolloError } from '@apollo/client';
 
 const useStyles = makeStyles({
   form: {

@@ -1,5 +1,5 @@
 import { Button, makeStyles, Typography } from '@material-ui/core';
-import { ApolloError } from 'apollo-client';
+import { ApolloError } from '@apollo/client';
 import React, { useState } from 'react';
 import { Field, Form, Formik } from 'formik';
 import { Error } from '../Error';
