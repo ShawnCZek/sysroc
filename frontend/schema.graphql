@@ -35,6 +35,12 @@ type Group {
   users: [User!]!
 }
 
+type GroupDto {
+  id: ID!
+  name: String!
+  users: [UserDto!]!
+}
+
 type Mutation {
   claimProject(filter: ProjectsFilter!): ProjectDto!
   createClassification(input: CreateClassificationDto!): ClassificationDto!
@@ -43,6 +49,7 @@ type Mutation {
   createTask(input: CreateTaskDto!): TaskDto!
   createUser(input: CreateUserDto!): UserDto!
   deleteClassification(filter: ClassificationsFilter!): ClassificationDto!
+  deleteGroup(groupId: Float!): GroupDto!
   deleteProject(projectId: Float!): ProjectDto!
   deleteRole(roleId: Float!): RoleDto!
   deleteTask(filter: TasksFilter!): TaskDto!
@@ -101,7 +108,7 @@ type ProjectDto {
 type Query {
   authUser(auth: UserAuthInputDto!): ADUser!
   classifications(filter: ClassificationsFilter!): [ClassificationDto!]!
-  groups: [Group!]!
+  groups(filter: GroupsFilter!): [GroupDto!]!
   me: UserAuthDto
   myPermissions: [PermissionStateDto!]!
   permissions: [PermissionDto!]!
@@ -206,10 +213,10 @@ input AllUsersFilter {
 }
 
 input ClassificationsFilter {
-  fromDate: DateTime = "2020-11-13T17:39:06.193Z"
+  fromDate: DateTime = "2020-11-15T19:46:28.237Z"
   id: Float
   projects: [Float!] = []
-  toDate: DateTime = "2020-12-13T17:39:06.194Z"
+  toDate: DateTime = "2020-12-15T19:46:28.237Z"
   users: [Float!] = []
 }
 
@@ -247,6 +254,11 @@ input CreateUserDto {
   name: String!
   password: String
   roleSlugs: [String!]
+}
+
+input GroupsFilter {
+  id: Float
+  name: String
 }
 
 input ProjectsFilter {

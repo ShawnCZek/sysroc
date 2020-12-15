@@ -31,4 +31,7 @@ export const PERMISSIONS = {
 
   // Can view classification
   CLASSIFICATION_VIEW: 'classification.view',
+
+  // Can manage user groups coming from Active Directory
+  GROUP_MANAGE: 'groups.manage',
 };

@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { UsersService } from '../users/users.service';
@@ -8,6 +8,7 @@ import { AuthenticationError } from 'apollo-server-core';
 export class RolesGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
   ) {}
 

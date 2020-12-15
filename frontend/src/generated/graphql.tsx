@@ -107,8 +107,21 @@ export type Group = {
   users: Array<User>;
 };
 
+export type GroupDto = {
+  __typename?: 'GroupDto';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  users: Array<UserDto>;
+};
+
+export type GroupsFilter = {
+  id?: Maybe<Scalars['Float']>;
+  name?: Maybe<Scalars['String']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  deleteGroup: GroupDto;
   createUser: UserDto;
   signup: UserAuthDto;
   signin: UserAuthDto;
@@ -129,6 +142,11 @@ export type Mutation = {
   createClassification: ClassificationDto;
   deleteClassification: ClassificationDto;
   updateClassification: ClassificationDto;
+};
+
+
+export type MutationDeleteGroupArgs = {
+  groupId: Scalars['Float'];
 };
 
 
@@ -286,7 +304,7 @@ export type ProjectsFilter = {
 
 export type Query = {
   __typename?: 'Query';
-  groups: Array<Group>;
+  groups: Array<GroupDto>;
   user: UserDto;
   users: Array<UserDto>;
   me?: Maybe<UserAuthDto>;
@@ -298,6 +316,11 @@ export type Query = {
   project: ProjectDto;
   task: TaskDto;
   classifications: Array<ClassificationDto>;
+};
+
+
+export type QueryGroupsArgs = {
+  filter: GroupsFilter;
 };
 
 
@@ -691,6 +714,19 @@ export type DeleteClassificationMutation = (
   ) }
 );
 
+export type DeleteGroupMutationVariables = Exact<{
+  id: Scalars['Float'];
+}>;
+
+
+export type DeleteGroupMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteGroup: (
+    { __typename?: 'GroupDto' }
+    & Pick<GroupDto, 'id' | 'name'>
+  ) }
+);
+
 export type DeleteProjectMutationVariables = Exact<{
   projectId: Scalars['Float'];
 }>;
@@ -759,8 +795,12 @@ export type GroupsQueryVariables = Exact<{
 export type GroupsQuery = (
   { __typename?: 'Query' }
   & { groups: Array<(
-    { __typename?: 'Group' }
-    & Pick<Group, 'id' | 'name'>
+    { __typename?: 'GroupDto' }
+    & Pick<GroupDto, 'id' | 'name'>
+    & { users: Array<(
+      { __typename?: 'UserDto' }
+      & Pick<UserDto, 'id'>
+    )> }
   )> }
 );
 
@@ -1544,6 +1584,39 @@ export function useDeleteClassificationMutation(baseOptions?: Apollo.MutationHoo
 export type DeleteClassificationMutationHookResult = ReturnType<typeof useDeleteClassificationMutation>;
 export type DeleteClassificationMutationResult = Apollo.MutationResult<DeleteClassificationMutation>;
 export type DeleteClassificationMutationOptions = Apollo.BaseMutationOptions<DeleteClassificationMutation, DeleteClassificationMutationVariables>;
+export const DeleteGroupDocument = gql`
+    mutation DeleteGroup($id: Float!) {
+  deleteGroup(groupId: $id) {
+    id
+    name
+  }
+}
+    `;
+export type DeleteGroupMutationFn = Apollo.MutationFunction<DeleteGroupMutation, DeleteGroupMutationVariables>;
+
+/**
+ * __useDeleteGroupMutation__
+ *
+ * To run a mutation, you first call `useDeleteGroupMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteGroupMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteGroupMutation, { data, loading, error }] = useDeleteGroupMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteGroupMutation(baseOptions?: Apollo.MutationHookOptions<DeleteGroupMutation, DeleteGroupMutationVariables>) {
+        return Apollo.useMutation<DeleteGroupMutation, DeleteGroupMutationVariables>(DeleteGroupDocument, baseOptions);
+      }
+export type DeleteGroupMutationHookResult = ReturnType<typeof useDeleteGroupMutation>;
+export type DeleteGroupMutationResult = Apollo.MutationResult<DeleteGroupMutation>;
+export type DeleteGroupMutationOptions = Apollo.BaseMutationOptions<DeleteGroupMutation, DeleteGroupMutationVariables>;
 export const DeleteProjectDocument = gql`
     mutation deleteProject($projectId: Float!) {
   deleteProject(projectId: $projectId) {
@@ -1683,10 +1756,13 @@ export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutati
 export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
 export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
 export const GroupsDocument = gql`
-    query Groups {
-  groups {
+    query Groups($id: Float, $name: String) {
+  groups(filter: {id: $id, name: $name}) {
     id
     name
+    users {
+      id
+    }
   }
 }
     `;
@@ -1703,6 +1779,8 @@ export const GroupsDocument = gql`
  * @example
  * const { data, loading, error } = useGroupsQuery({
  *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
  *   },
  * });
  */

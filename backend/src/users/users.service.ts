@@ -78,7 +78,7 @@ export class UsersService {
     }
 
     const roleAttributes = ['admin', 'teacher', 'student'];
-    users = users.filter(user => user.roles.some(role => {
+    users = users.filter(user => user.roles.length === 0 || user.roles.some(role => {
       for (const attribute of roleAttributes) {
         if (filter[attribute] !== null && filter[attribute] !== undefined) {
           // The role needs only one of the attributes

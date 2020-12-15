@@ -14,6 +14,8 @@ import SchoolIcon from '@material-ui/icons/School';
 import HomeIcon from '@material-ui/icons/Home';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import EmojiEventsIcon from '@material-ui/icons/EmojiEvents';
+import AssignmentIndRoundedIcon from '@material-ui/icons/AssignmentIndRounded';
+import GroupRoundedIcon from '@material-ui/icons/GroupRounded';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Header } from './Header';
 import { useHistory } from 'react-router';
@@ -92,6 +94,7 @@ export const PersistentDrawerLeft: React.FC = props => {
   const canViewProjects = useHasPermissions(PERMISSIONS.PROJECTS_VIEW);
   const canViewUsers = useHasPermissions(PERMISSIONS.MANAGE_STUDENT_USERS, PERMISSIONS.MANAGE_TEACHER_USERS);
   const canViewClassification = useHasPermissions(PERMISSIONS.CLASSIFICATION_VIEW);
+  const canViewGroups = useHasPermissions(PERMISSIONS.GROUP_MANAGE);
   const canManageRoles = isAdmin(data?.me?.user);
 
   const handleDrawerOpen = () => setOpen(true);
@@ -176,9 +179,17 @@ export const PersistentDrawerLeft: React.FC = props => {
           { canManageRoles &&
             <ListItem button onClick={() => history.push('/roles')}>
               <ListItemIcon>
-                <AccountCircleIcon />
+                <AssignmentIndRoundedIcon />
               </ListItemIcon>
               <ListItemText primary="Roles" />
+            </ListItem>
+          }
+          { canViewGroups &&
+            <ListItem button onClick={() => history.push('/groups')}>
+              <ListItemIcon>
+                <GroupRoundedIcon />
+              </ListItemIcon>
+              <ListItemText primary="Groups" />
             </ListItem>
           }
         </List>

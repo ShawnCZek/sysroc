@@ -77,7 +77,7 @@ export class RolesService {
   async createOrUpdate(createFullRoleDto: CreateFullRoleDto): Promise<Role> {
     try {
       const foundRole = await this.findOneBySlug(createFullRoleDto.slug);
-      return this.update(foundRole, createFullRoleDto);
+      return this.update(foundRole, createFullRoleDto, true);
     } catch {
       return this.createFullRole(createFullRoleDto);
     }

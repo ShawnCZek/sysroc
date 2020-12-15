@@ -1,6 +1,12 @@
-query Groups {
-  groups {
+query Groups($id: Float, $name: String) {
+  groups(filter: {
+    id: $id,
+    name: $name}
+  ) {
     id
     name
+    users {
+      id
+    }
   }
 }

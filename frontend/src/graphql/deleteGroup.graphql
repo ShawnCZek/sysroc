@@ -1,0 +1,6 @@
+mutation DeleteGroup($id: Float!) {
+  deleteGroup(groupId: $id) {
+    id
+    name
+  }
+}

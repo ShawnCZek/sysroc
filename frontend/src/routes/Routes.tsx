@@ -14,8 +14,9 @@ import { Users } from '../views/Users';
 import { Settings } from '../views/Settings';
 import { Classification } from '../views/Classification';
 import { SingleUser } from '../views/SingleUser';
-import { hasPermissions } from '../auth/hasPermissions';
 import { Roles } from '../views/Roles';
+import { Groups } from '../views/Groups';
+import { hasPermissions } from '../auth/hasPermissions';
 import { isAdmin } from '../auth/roles';
 
 export const Routes: React.FC = () => {
@@ -27,6 +28,7 @@ export const Routes: React.FC = () => {
   const projectList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.PROJECTS_CREATE, PERMISSIONS.PROJECTS_VIEW, PERMISSIONS.PROJECTS_MANAGE);
   const userList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.MANAGE_STUDENT_USERS, PERMISSIONS.MANAGE_TEACHER_USERS);
   const classificationList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.CLASSIFICATION_VIEW);
+  const groupsList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.GROUP_MANAGE);
   const manageRoles = isAdmin(data?.me?.user);
 
   return (
@@ -100,6 +102,15 @@ export const Routes: React.FC = () => {
               exact
               path="/roles"
               component={Roles}
+            />
+            <ProtectedRoute
+              isAuthenticated={!!data?.me}
+              isAllowed={groupsList}
+              restrictedPath={'/notallowed'}
+              authenticationPath={'/signin'}
+              exact
+              path="/groups"
+              component={Groups}
             />
           </Switch>
         </PersistentDrawerLeft>

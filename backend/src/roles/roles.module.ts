@@ -45,6 +45,7 @@ export class RolesModule {
         PERMISSIONS.CLASSIFICATION_CREATE,
         PERMISSIONS.CLASSIFICATION_MANAGE,
         PERMISSIONS.CLASSIFICATION_VIEW,
+        PERMISSIONS.GROUP_MANAGE,
       ],
     });
     await this.rolesService.createOrUpdate({

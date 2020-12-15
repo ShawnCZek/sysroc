@@ -8,18 +8,16 @@ interface Props {
   handleOpen: () => void;
 }
 
-export const RolesHeader: React.FC<Props> = ({ handleOpen }) => {
-  return (
-    <PageHeader>
-      <PageHeaderContent>
-        <h2>Roles</h2>
-        <p>Manage user roles with their permissions in the system.</p>
-      </PageHeaderContent>
-      <PageHeaderActions>
-        <NewButton onClick={handleOpen}>
-          New Role
-        </NewButton>
-      </PageHeaderActions>
-    </PageHeader>
-  );
-};
+export const RolesHeader: React.FC<Props> = ({ handleOpen }) => (
+  <PageHeader>
+    <PageHeaderContent>
+      <h2>Roles</h2>
+      <p>Manage user roles with their permissions in the system.</p>
+    </PageHeaderContent>
+    <PageHeaderActions>
+      <NewButton onClick={handleOpen}>
+        New Role
+      </NewButton>
+    </PageHeaderActions>
+  </PageHeader>
+);
