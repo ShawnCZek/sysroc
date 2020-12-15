@@ -67,7 +67,6 @@
     "@graphql-codegen/typescript-react-apollo": "1.8.3",
     "@types/graphql": "^14.5.0",
     "@types/material-ui": "^0.21.7",
-    "@types/moment": "^2.13.0",
-    "babel-loader": "^8.0.6"
+    "@types/moment": "^2.13.0"
   }
 }
