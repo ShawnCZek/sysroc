@@ -1,20 +1,22 @@
 import React from 'react';
 import { useSnackbar } from 'notistack';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
-import { useDeleteGroupMutation, useGroupsQuery } from '../../generated/graphql';
+import { GroupFilter, useDeleteGroupMutation, useGroupsQuery } from '../../generated/graphql';
 import { PERMISSIONS } from '../../generated/permissions';
 import { Fab, Paper } from '@material-ui/core';
 import { List } from '../Layout/List';
 import { Item } from '../Layout/Item';
 import { DeleteGroupDialog } from './DeleteGroupDialog';
+import { GroupsFilter } from './GroupsFilter';
 
 export const GroupsList: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedGroupId, setSelectedGroupId] = React.useState<number | null>(null);
+  const [filters, setFilters] = React.useState<GroupFilter>({ id: 0, order: '', name: '' });
 
-  const { data, loading } = useGroupsQuery();
+  const { data, loading } = useGroupsQuery({ variables: filters });
 
   const [deleteGroup, { client }] = useDeleteGroupMutation({
     async update(cache, result) {
@@ -41,6 +43,12 @@ export const GroupsList: React.FC = () => {
 
   return (
     <div>
+      <GroupsFilter
+        defaultValues={filters}
+        onSubmit={filter => {
+          setFilters(filter);
+        }}
+      />
       <h2>Groups List</h2>
       <Paper>
         <List>
@@ -61,7 +69,7 @@ export const GroupsList: React.FC = () => {
                 <div>{group.name}</div>
               </Item>
               <Item>
-                <div>{group.users.length}</div>
+                <div>{group.usersCount}</div>
               </Item>
               <Item className="actions">
                 { canDeleteGroup &&

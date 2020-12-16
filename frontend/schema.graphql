@@ -33,12 +33,14 @@ type Group {
   id: ID!
   name: String!
   users: [User!]!
+  usersCount: Float!
 }
 
 type GroupDto {
   id: ID!
   name: String!
   users: [UserDto!]!
+  usersCount: Float!
 }
 
 type Mutation {
@@ -108,7 +110,7 @@ type ProjectDto {
 type Query {
   authUser(auth: UserAuthInputDto!): ADUser!
   classifications(filter: ClassificationsFilter!): [ClassificationDto!]!
-  groups(filter: GroupsFilter!): [GroupDto!]!
+  groups(filter: GroupFilter!): [GroupDto!]!
   me: UserAuthDto
   myPermissions: [PermissionStateDto!]!
   permissions: [PermissionDto!]!
@@ -213,10 +215,10 @@ input AllUsersFilter {
 }
 
 input ClassificationsFilter {
-  fromDate: DateTime = "2020-11-15T19:46:28.237Z"
+  fromDate: DateTime = "2020-11-16T19:44:36.464Z"
   id: Float
   projects: [Float!] = []
-  toDate: DateTime = "2020-12-15T19:46:28.237Z"
+  toDate: DateTime = "2020-12-16T19:44:36.465Z"
   users: [Float!] = []
 }
 
@@ -256,9 +258,10 @@ input CreateUserDto {
   roleSlugs: [String!]
 }
 
-input GroupsFilter {
+input GroupFilter {
   id: Float
   name: String
+  order: String
 }
 
 input ProjectsFilter {

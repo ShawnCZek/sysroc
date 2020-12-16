@@ -2,7 +2,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../auth/graphql-auth.guard';
 import { GroupsService } from './groups.service';
-import { GroupsFilter } from './filters/groups.filter';
+import { GroupFilter } from './filters/group.filter';
 import { GroupDto } from './dto/group.dto';
 import { HasPermissions } from '../users/decorators/has-permissions.decorator';
 import { PERMISSIONS } from '../permissions/permissions';
@@ -14,7 +14,7 @@ export class GroupsResolver {
   @Query(() => [GroupDto])
   @UseGuards(GqlAuthGuard)
   groups(
-    @Args('filter') filter: GroupsFilter,
+    @Args('filter') filter: GroupFilter,
   ): Promise<GroupDto[]> {
     return this.groupsService.findAll(filter);
   }

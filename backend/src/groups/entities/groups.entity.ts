@@ -16,4 +16,7 @@ export class Group {
   @ManyToMany(type => User, user => user.groups)
   @Field(type => [User])
   users: User[];
+
+  @Field()
+  usersCount: number;
 }

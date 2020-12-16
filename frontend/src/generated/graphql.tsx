@@ -105,6 +105,7 @@ export type Group = {
   id: Scalars['ID'];
   name: Scalars['String'];
   users: Array<User>;
+  usersCount: Scalars['Float'];
 };
 
 export type GroupDto = {
@@ -112,11 +113,13 @@ export type GroupDto = {
   id: Scalars['ID'];
   name: Scalars['String'];
   users: Array<UserDto>;
+  usersCount: Scalars['Float'];
 };
 
-export type GroupsFilter = {
+export type GroupFilter = {
   id?: Maybe<Scalars['Float']>;
   name?: Maybe<Scalars['String']>;
+  order?: Maybe<Scalars['String']>;
 };
 
 export type Mutation = {
@@ -320,7 +323,7 @@ export type Query = {
 
 
 export type QueryGroupsArgs = {
-  filter: GroupsFilter;
+  filter: GroupFilter;
 };
 
 
@@ -789,6 +792,7 @@ export type DeleteUserMutation = (
 export type GroupsQueryVariables = Exact<{
   id?: Maybe<Scalars['Float']>;
   name?: Maybe<Scalars['String']>;
+  order?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -796,11 +800,7 @@ export type GroupsQuery = (
   { __typename?: 'Query' }
   & { groups: Array<(
     { __typename?: 'GroupDto' }
-    & Pick<GroupDto, 'id' | 'name'>
-    & { users: Array<(
-      { __typename?: 'UserDto' }
-      & Pick<UserDto, 'id'>
-    )> }
+    & Pick<GroupDto, 'id' | 'name' | 'usersCount'>
   )> }
 );
 
@@ -1756,13 +1756,11 @@ export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutati
 export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
 export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
 export const GroupsDocument = gql`
-    query Groups($id: Float, $name: String) {
-  groups(filter: {id: $id, name: $name}) {
+    query Groups($id: Float, $name: String, $order: String) {
+  groups(filter: {id: $id, name: $name, order: $order}) {
     id
     name
-    users {
-      id
-    }
+    usersCount
   }
 }
     `;
@@ -1781,6 +1779,7 @@ export const GroupsDocument = gql`
  *   variables: {
  *      id: // value for 'id'
  *      name: // value for 'name'
+ *      order: // value for 'order'
  *   },
  * });
  */
