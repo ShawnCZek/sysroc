@@ -38,7 +38,11 @@ export class RolesService {
   findAll(rolesFilter: RolesFilter): Promise<RoleDto[]> {
     // As the filter is a null prototype and TypeORM has issues with such objects, we need to recreate the filter instance
     const filter = JSON.parse(JSON.stringify(rolesFilter));
-    return this.roleRepository.find({ relations: ['permissions'], where: filter });
+    return this.roleRepository.find({
+      relations: ['permissions'],
+      where: filter,
+      order: { admin: 'DESC', teacher: 'DESC', student: 'DESC', name: 'ASC' },
+    });
   }
 
   fetchAll(roleSlugs: string[]): Promise<RoleDto[]> {

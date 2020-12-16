@@ -105,13 +105,17 @@ export const RoleForm: React.FC<Props> = ({
             label="Student"
           />
         </FormGroup>
-        <Typography className={classes.formTitle} variant="h6">
-          Permissions
-        </Typography>
-        <RolePermissions
-          rolePermissions={permissions}
-          onPermissionsStateChange={handleRoleChange}
-        />
+        { !roleData.admin &&
+          <>
+            <Typography className={classes.formTitle} variant="h6">
+              Permissions
+            </Typography>
+            <RolePermissions
+              rolePermissions={permissions}
+              onPermissionsStateChange={handleRoleChange}
+            />
+          </>
+          }
         <Button
           className={classes.button}
           type="submit"

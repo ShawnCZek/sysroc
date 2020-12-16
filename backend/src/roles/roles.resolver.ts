@@ -31,7 +31,7 @@ export class RolesResolver {
     // Filter roles
     if (input.permissionSlugs.length > 0) {
       const permissions = await this.permissionsService.fetchMany(input.permissionSlugs);
-      input = { ...input, permissionSlugs: permissions.map(permission => permission.slug) };
+      input.permissionSlugs = permissions.map(permission => permission.slug);
     }
 
     return this.rolesService.create(input);
@@ -45,14 +45,17 @@ export class RolesResolver {
   ): Promise<RoleDto> {
     const role = await this.rolesService.findOne(filter);
     if (role.admin) {
-      throw new UnauthorizedException('You cannot manage this role.');
+      input.permissionSlugs = [];
     }
 
     // Filter roles
     if (input.permissionSlugs.length > 0) {
       const permissions = await this.permissionsService.fetchMany(input.permissionSlugs);
-      input = { ...input, permissionSlugs: permissions.map(permission => permission.slug) };
+      input.permissionSlugs = permissions.map(permission => permission.slug);
     }
+
+    // Override values that the user cannot modify
+    input.admin = role.admin;
 
     return this.rolesService.update(role, input, true);
   }

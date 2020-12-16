@@ -113,39 +113,35 @@ export const RolesList: React.FC = () => {
                 <div>{role.admin ? <strong>All</strong> : role.permissions.map(permission => permission.name).join(', ')}</div>
               </Item>
               <Item className="actions">
-                { !role.admin && (
-                  <>
-                    <Fab
-                      color="primary"
-                      variant="extended"
-                      onClick={() => {
-                        setSelectedRoleId(parseInt(role.id));
-                        setRoleData({
-                          name: role.name,
-                          admin: role.admin,
-                          teacher: role.teacher,
-                          student: role.student,
-                          permissions: role.permissions.map(permission => permission.slug),
-                        });
-                        handleOpenEditModal();
-                      }}
-                    >
-                      Edit
-                    </Fab>
-                    { !role.system && (
-                      <Fab
-                        color="secondary"
-                        variant="extended"
-                        onClick={() => {
-                          setSelectedRoleId(parseInt(role.id));
-                          handleOpenDeleteDialog();
-                        }}
-                      >
-                        Delete
-                      </Fab>
-                    )}
-                  </>
-                ) }
+                <Fab
+                  color="primary"
+                  variant="extended"
+                  onClick={() => {
+                    setSelectedRoleId(parseInt(role.id));
+                    setRoleData({
+                      name: role.name,
+                      admin: role.admin,
+                      teacher: role.teacher,
+                      student: role.student,
+                      permissions: role.permissions.map(permission => permission.slug),
+                    });
+                    handleOpenEditModal();
+                  }}
+                >
+                  Edit
+                </Fab>
+                { !role.system && !role.admin && (
+                  <Fab
+                    color="secondary"
+                    variant="extended"
+                    onClick={() => {
+                      setSelectedRoleId(parseInt(role.id));
+                      handleOpenDeleteDialog();
+                    }}
+                  >
+                    Delete
+                  </Fab>
+                )}
               </Item>
             </div>
           )) }

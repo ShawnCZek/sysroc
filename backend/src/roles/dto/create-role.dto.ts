@@ -3,17 +3,17 @@ import { Field, InputType } from '@nestjs/graphql';
 @InputType()
 export class CreateRoleDto {
   @Field()
-  readonly name: string;
+  name: string;
 
   @Field({ defaultValue: false })
-  readonly admin: boolean;
+  admin: boolean;
 
   @Field({ defaultValue: false })
-  readonly teacher: boolean;
+  teacher: boolean;
 
   @Field({ defaultValue: false })
-  readonly student: boolean;
+  student: boolean;
 
   @Field(type => [String], { nullable: true })
-  readonly permissionSlugs: string[];
+  permissionSlugs: string[];
 }
