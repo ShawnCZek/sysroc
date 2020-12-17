@@ -10,7 +10,7 @@ export class ActiveDirectoryResolver {
   ) {}
 
   @Query(() => ADUser)
-  async authUser(@Args('auth') auth: UserAuthInputDto) {
+  authUser(@Args('auth') auth: UserAuthInputDto): Promise<ADUser> {
     return this.activeDirectoryService.authUser(auth);
   }
 }

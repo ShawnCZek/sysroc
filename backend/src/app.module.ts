@@ -12,6 +12,7 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { TasksModule } from './tasks/tasks.module';
 import { DatabaseModule } from './database/database.module';
 import { ClassificationModule } from './classification/classification.module';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ClassificationModule } from './classification/classification.module';
     ProjectsModule,
     TasksModule,
     DatabaseModule,
+    MailerModule,
     ClassificationModule,
   ],
 })
