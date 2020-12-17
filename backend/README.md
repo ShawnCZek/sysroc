@@ -18,3 +18,8 @@ pro vývoj na lokálním prostředí stačí pouze soubor `development.env`.
 |               | Možnosti | Popis                                                                               |
 |---------------|----------|-------------------------------------------------------------------------------------|
 | `AD_ENDPOINT` | `string` | Adresa na server s běžícím prostředníkem pro komunikaci se službou ActiveDirectory. |
+| `DB_HOST`     | `string` | Adresa na databázový server (PostgreSQL).                                           |
+| `DB_PORT`     | `number` | Port databázového serveru.                                                          |
+| `DB_USER`     | `string` | Uživatelské jméno databázového uživatele.                                           |
+| `DB_PASSWORD` | `string` | Heslo databázového uživatele.                                                       |
+| `DB_DATABASE` | `string` | Název databáze projektu.                                                            |
