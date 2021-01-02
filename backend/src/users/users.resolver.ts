@@ -54,7 +54,6 @@ export class UsersResolver {
 
   @Query(() => [UserDto])
   @UseGuards(GqlAuthGuard)
-  @HasPermissions(PERMISSIONS.MANAGE_STUDENT_USERS, PERMISSIONS.MANAGE_TEACHER_USERS)
   users(@Args('filter') filter: AllUsersFilter) {
     return this.usersService.findAll(filter);
   }
