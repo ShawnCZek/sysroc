@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcryptjs';
 import {
   ConflictException,
   HttpService,
@@ -6,8 +7,8 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { MailerService } from '@nestjs-modules/mailer';
 import { CreateUserDto } from './dto/create-user.dto';
-import * as bcrypt from 'bcryptjs';
 import { UsersFilter } from './filters/users.filter';
 import { User } from './entities/users.entity';
 import { UserDto } from './dto/user.dto';
@@ -40,6 +41,7 @@ export class UsersService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly rolesService: RolesService,
     private readonly groupsService: GroupsService,
+    private readonly mailerService: MailerService,
   ) {
     this.ADEndpoint = config.get('AD_ENDPOINT');
   }
@@ -173,6 +175,9 @@ export class UsersService {
 
     await this.userRepository.save(newUser);
 
+    // Ignore the promise here so sending the mail does not slow down the process
+    this.sendRegisterEmail(newUser).then(() => {});
+
     return this.userRepository.findOne(newUser.id, { relations: ['roles', 'roles.permissions', 'groups'] });
   }
 
@@ -210,8 +215,6 @@ export class UsersService {
     const passwordRaw = createUserDto.password ? createUserDto.password : crypto.randomBytes(16).toString('hex');
     const password = await this.hashPassword(passwordRaw);
 
-    console.log(`Password to be sent in email: ${passwordRaw}`);
-
     const createUser = {
       email: createUserDto.email,
       adEmail: createUserDto.adEmail ? createUserDto.adEmail : createUserDto.email,
@@ -229,6 +232,9 @@ export class UsersService {
 
     await this.addRoles(createdUser, createUserDto.roleSlugs);
     await this.userRepository.save(createdUser);
+
+    // Ignore the promise here so sending the mail does not slow down the process
+    this.sendNewAccountEmail(createdUser, passwordRaw).then(() => {});
 
     return this.userRepository.findOne(createdUser.id, { relations: ['roles', 'roles.permissions', 'groups'] });
   }
@@ -355,6 +361,34 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  private sendNewAccountEmail(
+    userDto: UserDto,
+    password: string,
+  ): Promise<any> {
+    return this.mailerService.sendMail({
+      to: userDto.email,
+      subject: 'New Account',
+      template: 'account',
+      context: {
+        name: userDto.name,
+        password,
+      },
+    });
+  }
+
+  private sendRegisterEmail(userDto: UserDto): Promise<any> {
+    return this.mailerService.sendMail({
+      to: userDto.email,
+      subject: 'Welcome to Sysroc',
+      template: 'register',
+      context: {
+        name: userDto.name,
+        email: userDto.email,
+        adEmail: userDto.adEmail,
+      },
+    });
   }
 
   /**

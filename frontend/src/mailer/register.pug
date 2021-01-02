@@ -1,0 +1,19 @@
+extends base
+
+block content
+    +header("Hi, " + name + "!")
+    +paragraph.
+        Welcome to the Sysroc platform! Here you can view and manage your school projects.
+    +paragraph.
+        Keep in mind that for signing in, you must use this email address even if it is different than the one
+        connected to your Active Directory account.
+    +paragraph
+        | On this address, you will also receive all notifications regarding your project:
+        strong  #{email}
+        br
+        | This can be changed in the account settings at any time.
+    +paragraph
+        | Nevertheless, make sure that you can access your Active Directory account as it might be used in case
+        | you forget your password. The email address of your Active Directory account is following:
+        strong  #{adEmail}
+    include signature

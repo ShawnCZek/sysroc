@@ -1,0 +1,12 @@
+extends base
+
+block content
+    +header("Hi, " + name + "!")
+    +paragraph.
+        You are receiving this email because a new account has been created for you on the Sysroc platform.
+    +paragraph
+        | The password to your new account is:
+        strong  #{password}
+        br
+        | For signing in, use this email address.
+    include signature
