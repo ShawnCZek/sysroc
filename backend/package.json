@@ -19,6 +19,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config src/ormconfig.ts",
     "typeorm:migrate": "npm run typeorm migration:generate -- -n",
+    "typeorm:rollback": "npm run typeorm migration:revert",
     "typeorm:run": "npm run typeorm migration:run"
   },
   "dependencies": {
@@ -39,6 +40,7 @@
     "graphql": "^15.3.0",
     "graphql-tools": "^6.2.1",
     "nestjs-redis": "^1.2.8",
+    "nestjs-throttler": "^0.3.0",
     "nodemailer": "^6.4.17",
     "nodemon": "^2.0.4",
     "passport": "^0.4.1",
