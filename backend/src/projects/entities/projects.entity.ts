@@ -37,5 +37,5 @@ export class Project {
 
   @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
   @Field(type => Date)
-  createdAt: Date;
+  readonly createdAt: Date;
 }
