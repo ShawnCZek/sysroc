@@ -44,8 +44,10 @@ type GroupDto {
 }
 
 type Mutation {
+  changePassword(hash: String!, password: String!): Boolean!
   claimProject(filter: ProjectsFilter!): ProjectDto!
   createClassification(input: CreateClassificationDto!): ClassificationDto!
+  createPasswordReset(input: CreatePasswordResetDto!): Boolean!
   createProject(input: CreateProjectDto!): ProjectDto!
   createRole(input: CreateRoleDto!): RoleDto!
   createTask(input: CreateTaskDto!): TaskDto!
@@ -65,6 +67,14 @@ type Mutation {
   updateRole(filter: RolesFilter!, input: UpdateRoleDto!): RoleDto!
   updateTask(filter: TasksFilter!, updates: UpdateTaskDto!): TaskDto!
   updateUser(filter: UsersFilter!, input: UpdateUserDto!): UserDto!
+}
+
+type PasswordResetDto {
+  createdAt: DateTime!
+  hash: String!
+  id: ID!
+  used: Boolean!
+  user: UserDto!
 }
 
 type Permission {
@@ -113,6 +123,7 @@ type Query {
   groups(filter: GroupFilter!): [GroupDto!]!
   me: UserAuthDto
   myPermissions: [PermissionStateDto!]!
+  passwordReset(hash: String!): PasswordResetDto!
   permissions: [PermissionDto!]!
   project(filter: ProjectsFilter!): ProjectDto!
   projects(filter: ProjectsFilter!): [ProjectDto!]!
@@ -215,10 +226,10 @@ input AllUsersFilter {
 }
 
 input ClassificationsFilter {
-  fromDate: DateTime = "2020-11-16T19:44:36.464Z"
+  fromDate: DateTime = "2020-12-06T19:18:11.543Z"
   id: Float
   projects: [Float!] = []
-  toDate: DateTime = "2020-12-16T19:44:36.465Z"
+  toDate: DateTime = "2021-01-06T19:18:11.543Z"
   users: [Float!] = []
 }
 
@@ -227,6 +238,10 @@ input CreateClassificationDto {
   note: String
   project: Float!
   user: Float!
+}
+
+input CreatePasswordResetDto {
+  email: String!
 }
 
 input CreateProjectDto {

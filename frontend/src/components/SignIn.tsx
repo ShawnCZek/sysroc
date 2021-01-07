@@ -25,7 +25,6 @@ export const SignIn: React.FC<RouteComponentProps> = ({ history }) => {
                   query: MeDocument,
                   data: {
                     me: {
-                      // @ts-ignore
                       user: data.signin.user,
                       __typename: data.signin.__typename,
                     }

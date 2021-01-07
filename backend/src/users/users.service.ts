@@ -1,4 +1,7 @@
 import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
+import { PERMISSIONS } from '../permissions/permissions';
+import { ROLES } from '../roles/roles';
 import {
   ConflictException,
   HttpService,
@@ -17,8 +20,6 @@ import { ADResponse } from '../active-directory/models/ad-response.model';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { RolesService } from '../roles/roles.service';
 import { PermissionStateDto } from './dto/permission-state.dto';
-import { PERMISSIONS } from '../permissions/permissions';
-import * as crypto from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserAuthInputDto } from './dto/user-auth-input.dto';
@@ -29,7 +30,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AllUsersFilter } from './filters/all-users.filter';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { RoleDto } from '../roles/dto/role.dto';
-import { ROLES } from '../roles/roles';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 @Injectable()
 export class UsersService {
@@ -271,7 +272,7 @@ export class UsersService {
     user: UserDto,
     updateProfileDto: UpdateProfileDto,
   ): Promise<UserDto> {
-    const updateUser: any = { name: updateProfileDto.name };
+    const updateUser: QueryDeepPartialEntity<User> = { name: updateProfileDto.name };
 
     if (updateProfileDto.email) {
       updateUser.email = updateProfileDto.email;
@@ -295,6 +296,15 @@ export class UsersService {
       throw new ConflictException('This email is already in use!');
     }
 
+    return this.userRepository.findOne({ id: user.id }, { relations: ['roles'] });
+  }
+
+  async updatePassword(
+    user: UserDto,
+    password: string,
+  ): Promise<UserDto> {
+    password = await this.hashPassword(password);
+    await this.userRepository.update(user.id, { password });
     return this.userRepository.findOne({ id: user.id }, { relations: ['roles'] });
   }
 

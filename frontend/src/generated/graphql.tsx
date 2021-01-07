@@ -70,6 +70,10 @@ export type CreateClassificationDto = {
   user: Scalars['Float'];
 };
 
+export type CreatePasswordResetDto = {
+  email: Scalars['String'];
+};
+
 export type CreateProjectDto = {
   name: Scalars['String'];
   description?: Maybe<Scalars['String']>;
@@ -145,6 +149,8 @@ export type Mutation = {
   createClassification: ClassificationDto;
   deleteClassification: ClassificationDto;
   updateClassification: ClassificationDto;
+  createPasswordReset: Scalars['Boolean'];
+  changePassword: Scalars['Boolean'];
 };
 
 
@@ -252,6 +258,26 @@ export type MutationUpdateClassificationArgs = {
   filter: ClassificationsFilter;
 };
 
+
+export type MutationCreatePasswordResetArgs = {
+  input: CreatePasswordResetDto;
+};
+
+
+export type MutationChangePasswordArgs = {
+  password: Scalars['String'];
+  hash: Scalars['String'];
+};
+
+export type PasswordResetDto = {
+  __typename?: 'PasswordResetDto';
+  id: Scalars['ID'];
+  user: UserDto;
+  hash: Scalars['String'];
+  used: Scalars['Boolean'];
+  createdAt: Scalars['DateTime'];
+};
+
 export type Permission = {
   __typename?: 'Permission';
   id: Scalars['ID'];
@@ -319,6 +345,7 @@ export type Query = {
   project: ProjectDto;
   task: TaskDto;
   classifications: Array<ClassificationDto>;
+  passwordReset: PasswordResetDto;
 };
 
 
@@ -364,6 +391,11 @@ export type QueryTaskArgs = {
 
 export type QueryClassificationsArgs = {
   filter: ClassificationsFilter;
+};
+
+
+export type QueryPasswordResetArgs = {
+  hash: Scalars['String'];
 };
 
 export type Role = {
@@ -530,6 +562,17 @@ export type UserTempDto = {
   email: Scalars['String'];
 };
 
+export type ChangePasswordMutationVariables = Exact<{
+  hash: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type ChangePasswordMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'changePassword'>
+);
+
 export type ClaimProjectMutationVariables = Exact<{
   projectId: Scalars['Float'];
 }>;
@@ -602,6 +645,16 @@ export type CreateClassificationMutation = (
       & Pick<UserDto, 'id' | 'name'>
     ) }
   ) }
+);
+
+export type CreatePasswordResetMutationVariables = Exact<{
+  email: Scalars['String'];
+}>;
+
+
+export type CreatePasswordResetMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'createPasswordReset'>
 );
 
 export type CreateProjectMutationVariables = Exact<{
@@ -839,6 +892,19 @@ export type MyPermissionsQuery = (
     { __typename?: 'PermissionStateDto' }
     & Pick<PermissionStateDto, 'slug' | 'permitted'>
   )> }
+);
+
+export type PasswordResetQueryVariables = Exact<{
+  hash: Scalars['String'];
+}>;
+
+
+export type PasswordResetQuery = (
+  { __typename?: 'Query' }
+  & { passwordReset: (
+    { __typename?: 'PasswordResetDto' }
+    & Pick<PasswordResetDto, 'id' | 'hash'>
+  ) }
 );
 
 export type PermissionsQueryVariables = Exact<{ [key: string]: never; }>;
@@ -1206,6 +1272,37 @@ export type UsersQuery = (
 );
 
 
+export const ChangePasswordDocument = gql`
+    mutation ChangePassword($hash: String!, $password: String!) {
+  changePassword(hash: $hash, password: $password)
+}
+    `;
+export type ChangePasswordMutationFn = Apollo.MutationFunction<ChangePasswordMutation, ChangePasswordMutationVariables>;
+
+/**
+ * __useChangePasswordMutation__
+ *
+ * To run a mutation, you first call `useChangePasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangePasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changePasswordMutation, { data, loading, error }] = useChangePasswordMutation({
+ *   variables: {
+ *      hash: // value for 'hash'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useChangePasswordMutation(baseOptions?: Apollo.MutationHookOptions<ChangePasswordMutation, ChangePasswordMutationVariables>) {
+        return Apollo.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument, baseOptions);
+      }
+export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswordMutation>;
+export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
+export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
 export const ClaimProjectDocument = gql`
     mutation ClaimProject($projectId: Float!) {
   claimProject(filter: {id: $projectId}) {
@@ -1347,6 +1444,36 @@ export function useCreateClassificationMutation(baseOptions?: Apollo.MutationHoo
 export type CreateClassificationMutationHookResult = ReturnType<typeof useCreateClassificationMutation>;
 export type CreateClassificationMutationResult = Apollo.MutationResult<CreateClassificationMutation>;
 export type CreateClassificationMutationOptions = Apollo.BaseMutationOptions<CreateClassificationMutation, CreateClassificationMutationVariables>;
+export const CreatePasswordResetDocument = gql`
+    mutation CreatePasswordReset($email: String!) {
+  createPasswordReset(input: {email: $email})
+}
+    `;
+export type CreatePasswordResetMutationFn = Apollo.MutationFunction<CreatePasswordResetMutation, CreatePasswordResetMutationVariables>;
+
+/**
+ * __useCreatePasswordResetMutation__
+ *
+ * To run a mutation, you first call `useCreatePasswordResetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePasswordResetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPasswordResetMutation, { data, loading, error }] = useCreatePasswordResetMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useCreatePasswordResetMutation(baseOptions?: Apollo.MutationHookOptions<CreatePasswordResetMutation, CreatePasswordResetMutationVariables>) {
+        return Apollo.useMutation<CreatePasswordResetMutation, CreatePasswordResetMutationVariables>(CreatePasswordResetDocument, baseOptions);
+      }
+export type CreatePasswordResetMutationHookResult = ReturnType<typeof useCreatePasswordResetMutation>;
+export type CreatePasswordResetMutationResult = Apollo.MutationResult<CreatePasswordResetMutation>;
+export type CreatePasswordResetMutationOptions = Apollo.BaseMutationOptions<CreatePasswordResetMutation, CreatePasswordResetMutationVariables>;
 export const CreateProjectDocument = gql`
     mutation CreateProject($name: String!, $description: String) {
   createProject(input: {name: $name, description: $description}) {
@@ -1900,6 +2027,40 @@ export function useMyPermissionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type MyPermissionsQueryHookResult = ReturnType<typeof useMyPermissionsQuery>;
 export type MyPermissionsLazyQueryHookResult = ReturnType<typeof useMyPermissionsLazyQuery>;
 export type MyPermissionsQueryResult = Apollo.QueryResult<MyPermissionsQuery, MyPermissionsQueryVariables>;
+export const PasswordResetDocument = gql`
+    query PasswordReset($hash: String!) {
+  passwordReset(hash: $hash) {
+    id
+    hash
+  }
+}
+    `;
+
+/**
+ * __usePasswordResetQuery__
+ *
+ * To run a query within a React component, call `usePasswordResetQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePasswordResetQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePasswordResetQuery({
+ *   variables: {
+ *      hash: // value for 'hash'
+ *   },
+ * });
+ */
+export function usePasswordResetQuery(baseOptions: Apollo.QueryHookOptions<PasswordResetQuery, PasswordResetQueryVariables>) {
+        return Apollo.useQuery<PasswordResetQuery, PasswordResetQueryVariables>(PasswordResetDocument, baseOptions);
+      }
+export function usePasswordResetLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PasswordResetQuery, PasswordResetQueryVariables>) {
+          return Apollo.useLazyQuery<PasswordResetQuery, PasswordResetQueryVariables>(PasswordResetDocument, baseOptions);
+        }
+export type PasswordResetQueryHookResult = ReturnType<typeof usePasswordResetQuery>;
+export type PasswordResetLazyQueryHookResult = ReturnType<typeof usePasswordResetLazyQuery>;
+export type PasswordResetQueryResult = Apollo.QueryResult<PasswordResetQuery, PasswordResetQueryVariables>;
 export const PermissionsDocument = gql`
     query Permissions {
   permissions {

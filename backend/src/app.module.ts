@@ -13,6 +13,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { DatabaseModule } from './database/database.module';
 import { ClassificationModule } from './classification/classification.module';
 import { MailerModule } from './mailer/mailer.module';
+import { PasswordResetModule } from './password-reset/password-reset.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { MailerModule } from './mailer/mailer.module';
     DatabaseModule,
     MailerModule,
     ClassificationModule,
+    PasswordResetModule,
   ],
 })
 export class AppModule {

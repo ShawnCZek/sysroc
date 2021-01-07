@@ -4,6 +4,8 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { SignIn } from '../components/SignIn';
 import { Home } from '../components/Home';
 import { SignUp } from '../components/SignUp';
+import { PasswordReset } from '../components/PasswordReset/PasswordReset';
+import { ChangePassword } from '../components/PasswordReset/ChangePassword';
 import { PersistentDrawerLeft } from '../components/PersisstentDrawerLeft';
 import { Projects } from '../views/Projects';
 import { SingleProject } from '../views/SingleProject';
@@ -39,6 +41,8 @@ export const Routes: React.FC = () => {
             <Route exact path="/" component={Home} />
             <Route exact path="/signin" component={SignIn} />
             <Route exact path="/signup" component={SignUp} />
+            <Route exact path="/password-reset" component={PasswordReset} />
+            <Route exact path="/password-reset/:hash" component={ChangePassword} />
             <Route exact path="/notallowed" component={NotAllowed} />
             <ProtectedRoute
               isAuthenticated={!!data?.me}

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Button, makeStyles, Typography } from '@material-ui/core';
+import { Box, Button, Link, makeStyles, Typography } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
 import { MyField } from './MyField';
 import { ApolloError } from '@apollo/client';
 import { Error } from './Error';
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles({
   form: {
@@ -17,6 +18,9 @@ const useStyles = makeStyles({
   },
   formTitle: {
     marginBottom: '0.8rem'
+  },
+  box: {
+    marginTop: '2rem'
   }
 });
 
@@ -32,6 +36,7 @@ interface Props {
 
 export const SignInForm: React.FC<Props> = ({ onSubmit, error }) => {
   const classes = useStyles();
+  const history = useHistory();
 
   return (
     <Formik
@@ -73,6 +78,19 @@ export const SignInForm: React.FC<Props> = ({ onSubmit, error }) => {
           >
             Sign In
           </Button>
+          <Box className={classes.box}>
+            <Typography>
+              <Link
+                href={'/password-reset'}
+                onClick={(event: any) => {
+                  event.preventDefault();
+                  history.push('/password-reset');
+                }}
+              >
+                Forgot your password?
+              </Link>
+            </Typography>
+          </Box>
         </Form>
       )}
     </Formik>
