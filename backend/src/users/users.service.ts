@@ -31,6 +31,8 @@ import { AllUsersFilter } from './filters/all-users.filter';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { RoleDto } from '../roles/dto/role.dto';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { BaseUsersFilter } from './filters/base-users.filter';
+import { BaseUserDto } from './dto/base-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -67,37 +69,20 @@ export class UsersService {
 
     let users = await query.getMany();
 
-    // We cannot use the query here, otherwise, the results would be limited as well.
-    // That means that if the user had more groups and one was filtered, the user in
-    // the table would be seen as they have only one group
-    if (filter.roles && filter.roles.length > 0) {
-      users = users.filter(user => user.roles.some(role => filter.roles.includes(role.id)));
-    }
-    if (filter.rolesSlug && filter.rolesSlug.length > 0) {
-      users = users.filter(user => user.roles.some(role => filter.rolesSlug.includes(role.slug)));
-    }
-    if (filter.groups && filter.groups.length > 0) {
-      users = users.filter(user => user.groups.some(group => filter.groups.includes(group.id)));
-    }
+    return this.applyAfterQueryFilters(users, filter);
+  }
 
-    const roleAttributes = ['admin', 'teacher', 'student'];
-    users = users.filter(user => user.roles.length === 0 || user.roles.some(role => {
-      for (const attribute of roleAttributes) {
-        if (filter[attribute] !== null && filter[attribute] !== undefined) {
-          // The role needs only one of the attributes
-          if (filter[attribute] && role[attribute]) {
-            return true;
-          }
-          // The role must not have any of the restricted attributes
-          if (!filter[attribute] && role[attribute]) {
-            return false;
-          }
-        }
-      }
-      return true;
-    }));
+  async findAllBase(filter: BaseUsersFilter): Promise<BaseUserDto[]> {
+    let users = await this.userRepository
+      .createQueryBuilder('user')
+      .select(['user.id', 'user.name'])
+      .leftJoinAndSelect('user.roles', 'roles')
+      .leftJoinAndSelect('user.groups', 'groups')
+      .addOrderBy('user.name')
+      .addOrderBy('groups.name', 'DESC')
+      .getMany();
 
-    return users;
+    return this.applyAfterQueryFilters(users, filter);
   }
 
   async findOne(filter: UsersFilter): Promise<UserDto> {
@@ -433,5 +418,42 @@ export class UsersService {
       const group = await this.groupsService.findOne({ id: groupId });
       user.groups.push(group);
     }
+  }
+
+  private applyAfterQueryFilters(
+    users: User[],
+    filter: BaseUsersFilter,
+  ): User[] {
+    // We cannot use the query here, otherwise, the results would be limited as well.
+    // That means that if the user had more groups and one was filtered, the user in
+    // the table would be seen as they have only one group
+    if (filter.roles && filter.roles.length > 0) {
+      users = users.filter(user => user.roles.some(role => filter.roles.includes(role.id)));
+    }
+    if (filter.rolesSlug && filter.rolesSlug.length > 0) {
+      users = users.filter(user => user.roles.some(role => filter.rolesSlug.includes(role.slug)));
+    }
+    if (filter.groups && filter.groups.length > 0) {
+      users = users.filter(user => user.groups.some(group => filter.groups.includes(group.id)));
+    }
+
+    const roleAttributes = ['admin', 'teacher', 'student'];
+    users = users.filter(user => user.roles.length === 0 || user.roles.some(role => {
+      for (const attribute of roleAttributes) {
+        if (filter[attribute] !== null && filter[attribute] !== undefined) {
+          // The role needs only one of the attributes
+          if (filter[attribute] && role[attribute]) {
+            return true;
+          }
+          // The role must not have any of the restricted attributes
+          if (!filter[attribute] && role[attribute]) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }));
+
+    return users;
   }
 }

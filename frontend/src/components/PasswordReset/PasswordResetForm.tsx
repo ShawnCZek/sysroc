@@ -17,6 +17,9 @@ const useStyles = makeStyles({
   },
   formTitle: {
     marginBottom: '0.8rem'
+  },
+  paragraph: {
+    marginTop: '1rem'
   }
 });
 
@@ -44,9 +47,12 @@ export const PasswordResetForm: React.FC<Props> = ({ onSubmit, error }) => {
         <Typography className={classes.formTitle} variant="h4">
           Password Reset
         </Typography>
-        <Typography>
-          Please enter your email address here. If the address is correct and we have it in our database,
-          you will receive a message with further instructions.
+        <Typography className={classes.paragraph}>
+          Please enter your email address of your Active Directory account here. In a case you do not have your account
+          connected to the Active Directory service, use the email address of your account instead.
+        </Typography>
+        <Typography className={classes.paragraph}>
+          If the address is correct and we have it in our database, you will receive a message with further instructions.
         </Typography>
         {error && <Error error={error} />}
         <div>

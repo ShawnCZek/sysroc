@@ -28,6 +28,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AllUsersFilter } from './filters/all-users.filter';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { PermissionStateDto } from './dto/permission-state.dto';
+import { BaseUserDto } from './dto/base-user.dto';
+import { BaseUsersFilter } from './filters/base-users.filter';
 
 @Resolver()
 export class UsersResolver {
@@ -54,8 +56,15 @@ export class UsersResolver {
 
   @Query(() => [UserDto])
   @UseGuards(GqlAuthGuard)
+  @HasPermissions(PERMISSIONS.MANAGE_TEACHER_USERS, PERMISSIONS.MANAGE_STUDENT_USERS)
   users(@Args('filter') filter: AllUsersFilter) {
     return this.usersService.findAll(filter);
+  }
+
+  @Query(() => [BaseUserDto])
+  @UseGuards(GqlAuthGuard)
+  baseUsers(@Args('filter') filter: BaseUsersFilter): Promise<BaseUserDto[]> {
+    return this.usersService.findAllBase(filter);
   }
 
   @Query(() => UserAuthDto, { nullable: true })

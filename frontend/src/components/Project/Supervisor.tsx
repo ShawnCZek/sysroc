@@ -1,7 +1,7 @@
 import React from 'react';
-import { makeStyles, TextField } from '@material-ui/core';
-import { useRolesQuery, useUsersQuery } from '../../generated/graphql';
 import styled from 'styled-components';
+import { makeStyles, TextField } from '@material-ui/core';
+import { useBaseUsersQuery, useRolesQuery } from '../../generated/graphql';
 import { Autocomplete } from '@material-ui/lab';
 
 const SupervisorStyles = styled.div`
@@ -28,7 +28,7 @@ export const Supervisor: React.FC<Props> = ({
   const [value, setValue] = React.useState(defaultValue);
 
   const { data: rolesData, loading: rolesLoading } = useRolesQuery({ variables: { permission: "projects.claim" } });
-  const { data: usersData, loading: usersLoading } = useUsersQuery({ variables: { roles: rolesData?.roles.map(role => parseInt(role.id)) } });
+  const { data: usersData, loading: usersLoading } = useBaseUsersQuery({ variables: { roles: rolesData?.roles.map(role => parseInt(role.id)) } });
 
   const handleChange = (event: React.ChangeEvent<{}>, value: any) => {
     setValue(value);
@@ -36,8 +36,8 @@ export const Supervisor: React.FC<Props> = ({
   };
 
   const updateSupervisor = (value: any) => {
-    if (usersData?.users) {
-      onSupervisorStateChange(value ? parseInt(usersData.users.filter(user => user.name === value)[0].id) : null);
+    if (usersData?.baseUsers) {
+      onSupervisorStateChange(value ? parseInt(usersData.baseUsers.filter(user => user.name === value)[0].id) : null);
     }
   };
 
@@ -51,10 +51,10 @@ export const Supervisor: React.FC<Props> = ({
 
   return (
     <SupervisorStyles>
-      {usersData?.users &&
+      {usersData?.baseUsers &&
         <Autocomplete
           placeholder="Supervisor"
-          options={usersData?.users.map(user => user.name)}
+          options={usersData.baseUsers.map(user => user.name)}
           value={value}
           onChange={handleChange}
           renderInput={params => (

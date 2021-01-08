@@ -14,7 +14,7 @@ export class PasswordResetResolver {
 
   @Query(() => PasswordResetDto)
   @UseGuards(GuestGuard, ThrottlerGuard)
-  @Throttle(5, 60)
+  @Throttle(5, 300)
   passwordReset(
     @Args('hash') hash: string,
   ): Promise<PasswordResetDto> {
@@ -23,7 +23,7 @@ export class PasswordResetResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(GuestGuard, ThrottlerGuard)
-  @Throttle(2, 60)
+  @Throttle(3, 300)
   async createPasswordReset(
     @Args('input') input: CreatePasswordResetDto,
   ): Promise<boolean> {
@@ -32,7 +32,7 @@ export class PasswordResetResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(GuestGuard, ThrottlerGuard)
-  @Throttle(2, 60)
+  @Throttle(3, 300)
   changePassword(
     @Args('hash') hash: string,
     @Args('password') password: string,

@@ -24,9 +24,26 @@ export type AdUser = {
 };
 
 export type AllUsersFilter = {
+  roles?: Maybe<Array<Scalars['Float']>>;
+  rolesSlug?: Maybe<Array<Scalars['String']>>;
+  admin?: Maybe<Scalars['Boolean']>;
+  teacher?: Maybe<Scalars['Boolean']>;
+  student?: Maybe<Scalars['Boolean']>;
+  groups?: Maybe<Array<Scalars['Float']>>;
   email?: Maybe<Scalars['String']>;
   adEmail?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
+};
+
+export type BaseUserDto = {
+  __typename?: 'BaseUserDto';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  groups: Array<Group>;
+  roles: Array<RoleDto>;
+};
+
+export type BaseUsersFilter = {
   roles?: Maybe<Array<Scalars['Float']>>;
   rolesSlug?: Maybe<Array<Scalars['String']>>;
   admin?: Maybe<Scalars['Boolean']>;
@@ -109,7 +126,7 @@ export type Group = {
   id: Scalars['ID'];
   name: Scalars['String'];
   users: Array<User>;
-  usersCount: Scalars['Float'];
+  usersCount?: Maybe<Scalars['Float']>;
 };
 
 export type GroupDto = {
@@ -117,7 +134,7 @@ export type GroupDto = {
   id: Scalars['ID'];
   name: Scalars['String'];
   users: Array<UserDto>;
-  usersCount: Scalars['Float'];
+  usersCount?: Maybe<Scalars['Float']>;
 };
 
 export type GroupFilter = {
@@ -336,6 +353,7 @@ export type Query = {
   groups: Array<GroupDto>;
   user: UserDto;
   users: Array<UserDto>;
+  baseUsers: Array<BaseUserDto>;
   me?: Maybe<UserAuthDto>;
   myPermissions: Array<PermissionStateDto>;
   roles: Array<RoleDto>;
@@ -361,6 +379,11 @@ export type QueryUserArgs = {
 
 export type QueryUsersArgs = {
   filter: AllUsersFilter;
+};
+
+
+export type QueryBaseUsersArgs = {
+  filter: BaseUsersFilter;
 };
 
 
@@ -561,6 +584,31 @@ export type UserTempDto = {
   name: Scalars['String'];
   email: Scalars['String'];
 };
+
+export type BaseUsersQueryVariables = Exact<{
+  roles?: Maybe<Array<Scalars['Float']>>;
+  rolesSlug?: Maybe<Array<Scalars['String']>>;
+  admin?: Maybe<Scalars['Boolean']>;
+  teacher?: Maybe<Scalars['Boolean']>;
+  student?: Maybe<Scalars['Boolean']>;
+  groups?: Maybe<Array<Scalars['Float']>>;
+}>;
+
+
+export type BaseUsersQuery = (
+  { __typename?: 'Query' }
+  & { baseUsers: Array<(
+    { __typename?: 'BaseUserDto' }
+    & Pick<BaseUserDto, 'id' | 'name'>
+    & { groups: Array<(
+      { __typename?: 'Group' }
+      & Pick<Group, 'id' | 'name'>
+    )>, roles: Array<(
+      { __typename?: 'RoleDto' }
+      & Pick<RoleDto, 'id' | 'name'>
+    )> }
+  )> }
+);
 
 export type ChangePasswordMutationVariables = Exact<{
   hash: Scalars['String'];
@@ -1272,6 +1320,53 @@ export type UsersQuery = (
 );
 
 
+export const BaseUsersDocument = gql`
+    query BaseUsers($roles: [Float!], $rolesSlug: [String!], $admin: Boolean, $teacher: Boolean, $student: Boolean, $groups: [Float!]) {
+  baseUsers(filter: {roles: $roles, rolesSlug: $rolesSlug, admin: $admin, teacher: $teacher, student: $student, groups: $groups}) {
+    id
+    name
+    groups {
+      id
+      name
+    }
+    roles {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useBaseUsersQuery__
+ *
+ * To run a query within a React component, call `useBaseUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBaseUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBaseUsersQuery({
+ *   variables: {
+ *      roles: // value for 'roles'
+ *      rolesSlug: // value for 'rolesSlug'
+ *      admin: // value for 'admin'
+ *      teacher: // value for 'teacher'
+ *      student: // value for 'student'
+ *      groups: // value for 'groups'
+ *   },
+ * });
+ */
+export function useBaseUsersQuery(baseOptions?: Apollo.QueryHookOptions<BaseUsersQuery, BaseUsersQueryVariables>) {
+        return Apollo.useQuery<BaseUsersQuery, BaseUsersQueryVariables>(BaseUsersDocument, baseOptions);
+      }
+export function useBaseUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<BaseUsersQuery, BaseUsersQueryVariables>) {
+          return Apollo.useLazyQuery<BaseUsersQuery, BaseUsersQueryVariables>(BaseUsersDocument, baseOptions);
+        }
+export type BaseUsersQueryHookResult = ReturnType<typeof useBaseUsersQuery>;
+export type BaseUsersLazyQueryHookResult = ReturnType<typeof useBaseUsersLazyQuery>;
+export type BaseUsersQueryResult = Apollo.QueryResult<BaseUsersQuery, BaseUsersQueryVariables>;
 export const ChangePasswordDocument = gql`
     mutation ChangePassword($hash: String!, $password: String!) {
   changePassword(hash: $hash, password: $password)

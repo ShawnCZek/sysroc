@@ -2,7 +2,7 @@ import { Button, makeStyles, TextField } from '@material-ui/core';
 import React from 'react';
 import { Field, Form, Formik } from 'formik';
 import { MyField } from '../MyField';
-import { useUsersQuery } from '../../generated/graphql';
+import { useBaseUsersQuery } from '../../generated/graphql';
 import { Autocomplete } from '@material-ui/lab';
 
 const useStyles = makeStyles({
@@ -41,32 +41,32 @@ export const ProjectsFilter: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  const { data: authorsData, loading: authorsLoading } = useUsersQuery();
-  const { data: supervisorsData, loading: supervisorsLoading } = useUsersQuery({ variables: { admin: true, teacher: true } });
+  const { data: authorsData, loading: authorsLoading } = useBaseUsersQuery();
+  const { data: supervisorsData, loading: supervisorsLoading } = useBaseUsersQuery({ variables: { admin: true, teacher: true } });
 
   let authors: number[] | undefined = defaultValues.authors;
   let supervisors: number[] | undefined = defaultValues.supervisors;
 
   const handleAuthorsChange = (event: React.ChangeEvent<{}>, value: any) => {
-    if (filterAuthor && authorsData && authorsData.users) {
-      authors = authorsData.users.filter(user => value.includes(user.name)).map(user => parseInt(user.id));
+    if (filterAuthor && authorsData && authorsData.baseUsers) {
+      authors = authorsData.baseUsers.filter(user => value.includes(user.name)).map(user => parseInt(user.id));
     }
   };
 
   const handleSupervisorsChange = (event: React.ChangeEvent<{}>, value: any) => {
-    if (supervisorsData && supervisorsData.users) {
-      supervisors = supervisorsData.users.filter(user => value.includes(user.name)).map(user => parseInt(user.id));
+    if (supervisorsData && supervisorsData.baseUsers) {
+      supervisors = supervisorsData.baseUsers.filter(user => value.includes(user.name)).map(user => parseInt(user.id));
     }
   };
 
   // Prepare the default values (which can be forwarded from outside)
   let defaultAuthors: string[] = [];
-  if (filterAuthor && authorsData && authorsData.users) {
-    defaultAuthors = authorsData.users.filter(user => authors?.includes(parseInt(user.id))).map(user => user.name);
+  if (filterAuthor && authorsData && authorsData.baseUsers) {
+    defaultAuthors = authorsData.baseUsers.filter(user => authors?.includes(parseInt(user.id))).map(user => user.name);
   }
   let defaultSupervisors: string[] = [];
-  if (supervisorsData && supervisorsData.users) {
-    defaultSupervisors = supervisorsData.users.filter(user => supervisors?.includes(parseInt(user.id))).map(user => user.name);
+  if (supervisorsData && supervisorsData.baseUsers) {
+    defaultSupervisors = supervisorsData.baseUsers.filter(user => supervisors?.includes(parseInt(user.id))).map(user => user.name);
   }
 
   if (authorsLoading || supervisorsLoading) return <span>Loading...</span>;
@@ -87,11 +87,11 @@ export const ProjectsFilter: React.FC<Props> = ({
           component={MyField}
           className={classes.textField}
         />
-        {filterAuthor &&
+        {filterAuthor && authorsData?.baseUsers &&
           <Autocomplete
             placeholder="Authors"
             multiple
-            options={authorsData?.users?.map(user => user.name) as string[]}
+            options={authorsData.baseUsers.map(user => user.name)}
             onChange={handleAuthorsChange}
             className={classes.autoComplete}
             defaultValue={defaultAuthors}
@@ -108,7 +108,7 @@ export const ProjectsFilter: React.FC<Props> = ({
         <Autocomplete
           placeholder="Supervisors"
           multiple
-          options={supervisorsData?.users?.map(user => user.name) as string[]}
+          options={supervisorsData?.baseUsers?.map(user => user.name) as string[]}
           onChange={handleSupervisorsChange}
           className={classes.autoComplete}
           defaultValue={defaultSupervisors}

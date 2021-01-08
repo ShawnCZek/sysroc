@@ -2,7 +2,7 @@ import React from 'react';
 import MomentUtils from '@date-io/moment';
 import moment, { Moment } from 'moment';
 import { Button, makeStyles, TextField } from '@material-ui/core';
-import { useProjectsQuery, useUsersQuery } from '../../generated/graphql';
+import { useBaseUsersQuery, useProjectsQuery } from '../../generated/graphql';
 import { Form, Formik } from 'formik';
 import { Autocomplete } from '@material-ui/lab';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
@@ -41,7 +41,7 @@ export const ClassificationFilter: React.FC<Props> = ({ defaultValues, onSubmit 
   const classes = useStyles();
 
   const { data: projectsData, loading: projectsLoading } = useProjectsQuery();
-  const { data: usersData, loading: usersLoading } = useUsersQuery();
+  const { data: usersData, loading: usersLoading } = useBaseUsersQuery();
   const [fromDate, setFromDate] = React.useState<Moment | null>(moment(defaultValues.fromDate ?? new Date(new Date().setMonth(new Date().getMonth() - 1))));
   const [toDate, setToDate] = React.useState<Moment | null>(moment(defaultValues.toDate ?? new Date()));
 
@@ -58,8 +58,8 @@ export const ClassificationFilter: React.FC<Props> = ({ defaultValues, onSubmit 
   };
 
   const handleUsersChange = (event: React.ChangeEvent<{}>, value: any) => {
-    if (usersData && usersData.users) {
-      users = usersData.users.filter(user => value.includes(user.name)).map(user => parseInt(user.id));
+    if (usersData && usersData.baseUsers) {
+      users = usersData.baseUsers.filter(user => value.includes(user.name)).map(user => parseInt(user.id));
     }
   };
 
@@ -69,8 +69,8 @@ export const ClassificationFilter: React.FC<Props> = ({ defaultValues, onSubmit 
   }
 
   let defaultUsers: string[] = [];
-  if (usersData && usersData.users) {
-    defaultUsers = usersData.users.filter(user => users?.includes(parseInt(user.id))).map(user => user.name);
+  if (usersData && usersData.baseUsers) {
+    defaultUsers = usersData.baseUsers.filter(user => users?.includes(parseInt(user.id))).map(user => user.name);
   }
 
   if (projectsLoading || usersLoading) return <span>Loading...</span>;
@@ -109,7 +109,7 @@ export const ClassificationFilter: React.FC<Props> = ({ defaultValues, onSubmit 
           <Autocomplete
             placeholder="Users"
             multiple
-            options={usersData?.users?.map(user => user.name) as string[]}
+            options={usersData?.baseUsers?.map(user => user.name) as string[]}
             onChange={handleUsersChange}
             className={classes.autoComplete}
             defaultValue={defaultUsers}
