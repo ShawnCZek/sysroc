@@ -4,7 +4,7 @@ import { ProjectsService } from './projects.service';
 import { UsersModule } from '../users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Project } from './entities/projects.entity';
-import {User} from '../users/entities/users.entity';
+import { User } from '../users/entities/users.entity';
 
 @Module({
   imports: [
@@ -12,5 +12,6 @@ import {User} from '../users/entities/users.entity';
     UsersModule,
   ],
   providers: [ProjectsResolver, ProjectsService],
+  exports: [ProjectsService],
 })
 export class ProjectsModule {}

@@ -22,7 +22,7 @@ query Project($id: Float) {
         name
       }
     }
-    user {
+    users {
       id
       name
     }

@@ -5,8 +5,8 @@ import { makeStyles, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles({
   title: {
-    marginBottom: '1rem'
-  }
+    marginBottom: '1rem',
+  },
 });
 
 interface Props {}
@@ -17,15 +17,15 @@ export const Home: React.FC<Props> = () => {
 
   if (loading) return <div>Loading...</div>;
 
-  if(!data?.me?.user) {
+  if (!data?.me?.user) {
     return (
-        <div />
+      <div />
     );
   }
 
   return (
     <div>
-      <Typography variant="h3" className={classes.title}>My Profile</Typography>
+      <Typography variant="h4" className={classes.title}>My Profile</Typography>
       <Profile userId={parseInt(data.me.user.id)} forceEmail={true} />
     </div>
   );

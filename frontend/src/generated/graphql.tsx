@@ -157,9 +157,9 @@ export type Mutation = {
   updateRole: RoleDto;
   deleteRole: RoleDto;
   createProject: ProjectDto;
-  deleteProject: ProjectDto;
   updateProject: ProjectDto;
   claimProject: ProjectDto;
+  deleteProject: ProjectDto;
   createTask: TaskDto;
   deleteTask: TaskDto;
   updateTask: TaskDto;
@@ -228,11 +228,6 @@ export type MutationCreateProjectArgs = {
 };
 
 
-export type MutationDeleteProjectArgs = {
-  projectId: Scalars['Float'];
-};
-
-
 export type MutationUpdateProjectArgs = {
   updates: UpdateProjectDto;
   filter: ProjectsFilter;
@@ -241,6 +236,11 @@ export type MutationUpdateProjectArgs = {
 
 export type MutationClaimProjectArgs = {
   filter: ProjectsFilter;
+};
+
+
+export type MutationDeleteProjectArgs = {
+  projectId: Scalars['Float'];
 };
 
 
@@ -321,7 +321,7 @@ export type Project = {
   id: Scalars['ID'];
   name: Scalars['String'];
   description: Scalars['String'];
-  user: User;
+  users: Array<User>;
   supervisor: User;
   tasks: Array<Task>;
   classifications: Array<Classification>;
@@ -333,7 +333,7 @@ export type ProjectDto = {
   id: Scalars['ID'];
   name: Scalars['String'];
   description: Scalars['String'];
-  user: UserDto;
+  users: Array<UserDto>;
   supervisor?: Maybe<UserDto>;
   tasks: Array<TaskDto>;
   classifications: Array<ClassificationDto>;
@@ -343,7 +343,6 @@ export type ProjectDto = {
 export type ProjectsFilter = {
   id?: Maybe<Scalars['Float']>;
   name?: Maybe<Scalars['String']>;
-  user?: Maybe<Scalars['String']>;
   authors?: Maybe<Array<Scalars['Float']>>;
   supervisors?: Maybe<Array<Scalars['Float']>>;
 };
@@ -360,6 +359,7 @@ export type Query = {
   permissions: Array<PermissionDto>;
   authUser: AdUser;
   projects: Array<ProjectDto>;
+  myProjects: Array<ProjectDto>;
   project: ProjectDto;
   task: TaskDto;
   classifications: Array<ClassificationDto>;
@@ -631,10 +631,10 @@ export type ClaimProjectMutation = (
   & { claimProject: (
     { __typename?: 'ProjectDto' }
     & Pick<ProjectDto, 'id'>
-    & { user: (
+    & { users: Array<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
-    ), supervisor?: Maybe<(
+    )>, supervisor?: Maybe<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
     )> }
@@ -657,10 +657,10 @@ export type ClassificationsQuery = (
     & { project: (
       { __typename?: 'ProjectDto' }
       & Pick<ProjectDto, 'id' | 'name'>
-      & { user: (
+      & { users: Array<(
         { __typename?: 'UserDto' }
         & Pick<UserDto, 'id' | 'name'>
-      ) }
+      )> }
     ), user: (
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
@@ -684,10 +684,10 @@ export type CreateClassificationMutation = (
     & { project: (
       { __typename?: 'ProjectDto' }
       & Pick<ProjectDto, 'id' | 'name'>
-      & { user: (
+      & { users: Array<(
         { __typename?: 'UserDto' }
         & Pick<UserDto, 'id' | 'name'>
-      ) }
+      )> }
     ), user: (
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
@@ -716,10 +716,10 @@ export type CreateProjectMutation = (
   & { createProject: (
     { __typename?: 'ProjectDto' }
     & Pick<ProjectDto, 'id' | 'name' | 'description'>
-    & { user: (
+    & { users: Array<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
-    ), supervisor?: Maybe<(
+    )>, supervisor?: Maybe<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
     )> }
@@ -807,10 +807,10 @@ export type DeleteClassificationMutation = (
     & { project: (
       { __typename?: 'ProjectDto' }
       & Pick<ProjectDto, 'id' | 'name'>
-      & { user: (
+      & { users: Array<(
         { __typename?: 'UserDto' }
         & Pick<UserDto, 'id' | 'name'>
-      ) }
+      )> }
     ), user: (
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
@@ -841,10 +841,10 @@ export type DeleteProjectMutation = (
   & { deleteProject: (
     { __typename?: 'ProjectDto' }
     & Pick<ProjectDto, 'id' | 'name'>
-    & { user: (
+    & { users: Array<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
-    ), supervisor?: Maybe<(
+    )>, supervisor?: Maybe<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
     )> }
@@ -942,6 +942,24 @@ export type MyPermissionsQuery = (
   )> }
 );
 
+export type MyProjectsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyProjectsQuery = (
+  { __typename?: 'Query' }
+  & { myProjects: Array<(
+    { __typename?: 'ProjectDto' }
+    & Pick<ProjectDto, 'id' | 'name' | 'description' | 'createdAt'>
+    & { users: Array<(
+      { __typename?: 'UserDto' }
+      & Pick<UserDto, 'id' | 'name'>
+    )>, supervisor?: Maybe<(
+      { __typename?: 'UserDto' }
+      & Pick<UserDto, 'id' | 'name'>
+    )> }
+  )> }
+);
+
 export type PasswordResetQueryVariables = Exact<{
   hash: Scalars['String'];
 }>;
@@ -986,10 +1004,10 @@ export type ProjectQuery = (
         { __typename?: 'UserDto' }
         & Pick<UserDto, 'id' | 'name'>
       ) }
-    )>, user: (
+    )>, users: Array<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
-    ), supervisor?: Maybe<(
+    )>, supervisor?: Maybe<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
     )> }
@@ -1014,7 +1032,6 @@ export type ProjectTasksQuery = (
 );
 
 export type ProjectsQueryVariables = Exact<{
-  userId?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
   authors?: Maybe<Array<Scalars['Float']>>;
   supervisors?: Maybe<Array<Scalars['Float']>>;
@@ -1026,10 +1043,10 @@ export type ProjectsQuery = (
   & { projects: Array<(
     { __typename?: 'ProjectDto' }
     & Pick<ProjectDto, 'id' | 'name' | 'description' | 'createdAt'>
-    & { user: (
+    & { users: Array<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
-    ), supervisor?: Maybe<(
+    )>, supervisor?: Maybe<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
     )> }
@@ -1145,10 +1162,10 @@ export type UpdateClassificationMutation = (
     & { project: (
       { __typename?: 'ProjectDto' }
       & Pick<ProjectDto, 'id' | 'name'>
-      & { user: (
+      & { users: Array<(
         { __typename?: 'UserDto' }
         & Pick<UserDto, 'id' | 'name'>
-      ) }
+      )> }
     ), user: (
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
@@ -1193,10 +1210,10 @@ export type UpdateProjectMutation = (
   & { updateProject: (
     { __typename?: 'ProjectDto' }
     & Pick<ProjectDto, 'id' | 'name' | 'description'>
-    & { user: (
+    & { users: Array<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id'>
-    ), supervisor?: Maybe<(
+    )>, supervisor?: Maybe<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
     )> }
@@ -1402,7 +1419,7 @@ export const ClaimProjectDocument = gql`
     mutation ClaimProject($projectId: Float!) {
   claimProject(filter: {id: $projectId}) {
     id
-    user {
+    users {
       id
       name
     }
@@ -1447,7 +1464,7 @@ export const ClassificationsDocument = gql`
     project {
       id
       name
-      user {
+      users {
         id
         name
       }
@@ -1498,7 +1515,7 @@ export const CreateClassificationDocument = gql`
     project {
       id
       name
-      user {
+      users {
         id
         name
       }
@@ -1575,7 +1592,7 @@ export const CreateProjectDocument = gql`
     id
     name
     description
-    user {
+    users {
       id
       name
     }
@@ -1768,7 +1785,7 @@ export const DeleteClassificationDocument = gql`
     project {
       id
       name
-      user {
+      users {
         id
         name
       }
@@ -1844,7 +1861,7 @@ export const DeleteProjectDocument = gql`
   deleteProject(projectId: $projectId) {
     id
     name
-    user {
+    users {
       id
       name
     }
@@ -2122,6 +2139,49 @@ export function useMyPermissionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type MyPermissionsQueryHookResult = ReturnType<typeof useMyPermissionsQuery>;
 export type MyPermissionsLazyQueryHookResult = ReturnType<typeof useMyPermissionsLazyQuery>;
 export type MyPermissionsQueryResult = Apollo.QueryResult<MyPermissionsQuery, MyPermissionsQueryVariables>;
+export const MyProjectsDocument = gql`
+    query MyProjects {
+  myProjects {
+    id
+    name
+    description
+    createdAt
+    users {
+      id
+      name
+    }
+    supervisor {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useMyProjectsQuery__
+ *
+ * To run a query within a React component, call `useMyProjectsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyProjectsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyProjectsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMyProjectsQuery(baseOptions?: Apollo.QueryHookOptions<MyProjectsQuery, MyProjectsQueryVariables>) {
+        return Apollo.useQuery<MyProjectsQuery, MyProjectsQueryVariables>(MyProjectsDocument, baseOptions);
+      }
+export function useMyProjectsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyProjectsQuery, MyProjectsQueryVariables>) {
+          return Apollo.useLazyQuery<MyProjectsQuery, MyProjectsQueryVariables>(MyProjectsDocument, baseOptions);
+        }
+export type MyProjectsQueryHookResult = ReturnType<typeof useMyProjectsQuery>;
+export type MyProjectsLazyQueryHookResult = ReturnType<typeof useMyProjectsLazyQuery>;
+export type MyProjectsQueryResult = Apollo.QueryResult<MyProjectsQuery, MyProjectsQueryVariables>;
 export const PasswordResetDocument = gql`
     query PasswordReset($hash: String!) {
   passwordReset(hash: $hash) {
@@ -2215,7 +2275,7 @@ export const ProjectDocument = gql`
         name
       }
     }
-    user {
+    users {
       id
       name
     }
@@ -2296,13 +2356,13 @@ export type ProjectTasksQueryHookResult = ReturnType<typeof useProjectTasksQuery
 export type ProjectTasksLazyQueryHookResult = ReturnType<typeof useProjectTasksLazyQuery>;
 export type ProjectTasksQueryResult = Apollo.QueryResult<ProjectTasksQuery, ProjectTasksQueryVariables>;
 export const ProjectsDocument = gql`
-    query Projects($userId: String, $name: String, $authors: [Float!], $supervisors: [Float!]) {
-  projects(filter: {user: $userId, name: $name, authors: $authors, supervisors: $supervisors}) {
+    query Projects($name: String, $authors: [Float!], $supervisors: [Float!]) {
+  projects(filter: {name: $name, authors: $authors, supervisors: $supervisors}) {
     id
     name
     description
     createdAt
-    user {
+    users {
       id
       name
     }
@@ -2326,7 +2386,6 @@ export const ProjectsDocument = gql`
  * @example
  * const { data, loading, error } = useProjectsQuery({
  *   variables: {
- *      userId: // value for 'userId'
  *      name: // value for 'name'
  *      authors: // value for 'authors'
  *      supervisors: // value for 'supervisors'
@@ -2569,7 +2628,7 @@ export const UpdateClassificationDocument = gql`
     project {
       id
       name
-      user {
+      users {
         id
         name
       }
@@ -2666,7 +2725,7 @@ export const UpdateProjectDocument = gql`
     id
     name
     description
-    user {
+    users {
       id
     }
     supervisor {

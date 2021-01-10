@@ -1,7 +1,9 @@
-mutation deleteProject($projectId: Float!) {
-  deleteProject(projectId: $projectId) {
+query MyProjects {
+  myProjects {
     id
     name
+    description
+    createdAt
     users {
       id
       name

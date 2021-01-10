@@ -38,7 +38,8 @@ export class User {
   @Field(type => [Group])
   groups: Group[];
 
-  @OneToMany(type => Project, project => project.user)
+  @ManyToMany(type => Project, project => project.users, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+  @JoinTable()
   @Field(type => [Project])
   projects: Project[];
 

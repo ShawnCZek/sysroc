@@ -81,6 +81,8 @@ export const SingleProject: React.FC<Props> = props => {
     variables: { id: parseInt(props.match.params.projectId) }
   });
 
+  const isAuthor = data?.project?.users?.some(author => author.id === meData?.me?.user?.id);
+  const canManageOwnProject = useHasPermissions(PERMISSIONS.PROJECTS_CREATE);
   const canManageProject = useHasPermissions(PERMISSIONS.PROJECTS_MANAGE);
 
   const handleModalOpen = () => setModalOpen(true);
@@ -122,17 +124,19 @@ export const SingleProject: React.FC<Props> = props => {
           >
             Back
           </Fab>
-          {(canManageProject || data?.project?.user?.id === meData?.me?.user?.id) ? (
+          { (canManageProject || isAuthor) ? (
             <>
-              <Fab
-                color="secondary"
-                variant="extended"
-                onClick={() => {
-                  handleModalOpen();
-                }}
-              >
-                Edit
-              </Fab>
+              { (canManageProject || (canManageOwnProject && isAuthor)) &&
+                <Fab
+                  color="secondary"
+                  variant="extended"
+                  onClick={() => {
+                    handleModalOpen();
+                  }}
+                >
+                  Edit
+                </Fab>
+              }
 
               <Fab
                 color="primary"
@@ -163,7 +167,7 @@ export const SingleProject: React.FC<Props> = props => {
         <Project>
           <Typography variant="h4">{data.project.name}</Typography>
           <Typography variant="h5">{data.project.description}</Typography>
-          {(canManageProject || data?.project?.user?.id === meData?.me?.user?.id) &&
+          { (canManageProject || (canManageOwnProject && isAuthor)) &&
             <div className="add-task-btn">
               <Fab
                 color="secondary"
@@ -209,7 +213,7 @@ export const SingleProject: React.FC<Props> = props => {
             />
           </>
       )}
-      {data && (canManageProject || data.project.user.id === meData?.me?.user?.id) && (
+      { data && (canManageProject || (canManageOwnProject && isAuthor)) && (
         <UpdateProjectModal
           open={modalOpen}
           handleClose={handleModalClose}

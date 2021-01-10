@@ -199,7 +199,7 @@ export const Task: React.FC<Props> = ({
       <div className="tast-due-date">
         {moment(task.dueDate).format('DD. MM. YYYY, dddd')}
       </div>
-      {(canManageProject || dataProject?.project?.user?.id === dataMe?.me?.user?.id) &&
+      { (canManageProject || dataProject?.project.users?.some(author => author.id === dataMe?.me?.user?.id)) &&
         <div className="task-actions">
           {canManageProject &&
             <IconButton onClick={async () => {

@@ -24,45 +24,45 @@ export class ProjectsService {
     user: UserDto,
   ): Promise<ProjectDto> {
     const project = this.projectRepository.create(createProjectDto);
-    project.user = await this.userRepository.findOne({ id: user.id });
+    project.users.push(await this.userRepository.findOne({ id: user.id }));
     const res = await this.projectRepository.save(project);
     return this.projectRepository.findOne(res.id, { relations: ['user', 'supervisor'] });
   }
 
   async getMany(filter: ProjectsFilter): Promise<ProjectDto[]> {
     const query = this.projectRepository.createQueryBuilder('project')
-      .innerJoinAndSelect('project.user', 'user')
+      .leftJoinAndSelect('project.users', 'users')
       .leftJoinAndSelect('project.supervisor', 'supervisor')
       .leftJoinAndSelect('project.tasks', 'tasks')
       .addOrderBy('tasks.createdAt');
 
-    if (filter.user) {
-      query.andWhere('project.user.id = :id', { id: filter.user });
-    }
     if (filter.name && filter.name !== '') {
       query.andWhere('LOWER(project.name) like :name', { name: `%${filter.name}%` });
-    }
-
-    if (filter.authors && filter.authors.length > 0) {
-      query.andWhere('user.id IN (:...userIds)', { userIds: filter.authors });
     }
     if (filter.supervisors && filter.supervisors.length > 0) {
       query.andWhere('supervisor.id IN (:...supervisorIds)', { supervisorIds: filter.supervisors });
     }
 
-    return query.getMany();
+    let projects = await query.getMany();
+
+    // // We cannot use the query here, otherwise, the results would be limited as well
+    if (filter.authors && filter.authors.length > 0) {
+      projects = projects.filter(project => project.users.some(author => filter.authors.includes(author.id)));
+    }
+
+    return projects;
   }
 
   async deleteOne(
     projectId: number,
     user: UserDto,
   ): Promise<ProjectDto> {
-    const project = await this.projectRepository.findOne({ id: projectId }, { relations: ['user', 'supervisor'] });
+    const project = await this.projectRepository.findOne({ id: projectId }, { relations: ['users', 'supervisor'] });
     if (!project) {
       throw new NotFoundException('Project couldn\'t be found.');
     }
 
-    if (project.user.id !== user.id && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
+    if (!this.isAuthor(project, user) && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
       throw new UnauthorizedException('Missing permissions for deleting this project');
     }
 
@@ -75,16 +75,22 @@ export class ProjectsService {
   }
 
   async getOne(projectId: number): Promise<ProjectDto> {
-    return this.projectRepository
+    const project = await this.projectRepository
       .createQueryBuilder('project')
       .where('project.id = :id', { id: projectId })
-      .innerJoinAndSelect('project.user', 'user')
+      .leftJoinAndSelect('project.users', 'users')
       .leftJoinAndSelect('project.supervisor', 'supervisor')
       .leftJoinAndSelect('project.tasks', 'tasks')
       .leftJoinAndSelect('project.classifications', 'classifications')
       .leftJoinAndSelect('classifications.user', 'teacher')
       .orderBy({ 'tasks.createdAt': 'ASC' })
       .getOne();
+
+    if (!project) {
+      throw new NotFoundException('Could not find the project!');
+    }
+
+    return project;
   }
 
   async updateOne(
@@ -92,13 +98,12 @@ export class ProjectsService {
     updates: UpdateProjectDto,
     user: UserDto,
   ): Promise<ProjectDto> {
-    const project = await this.projectRepository.findOne(filter.id, { relations: ['user', 'supervisor'] });
-
+    const project = await this.projectRepository.findOne(filter.id, { relations: ['users', 'supervisor'] });
     if (!project) {
       throw new NotFoundException('Could not find project!');
     }
 
-    if (project.user.id !== user.id && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
+    if (!this.isAuthor(project, user) && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
       throw new UnauthorizedException('Missing permissions for updating this project');
     }
 
@@ -118,14 +123,14 @@ export class ProjectsService {
       throw new InternalServerErrorException('Could not update the project');
     }
 
-    return await this.projectRepository.findOne(filter.id, { relations: ['user', 'supervisor'] });
+    return this.projectRepository.findOne(filter.id, { relations: ['users', 'supervisor'] });
   }
 
   async claim(
     filter: ProjectsFilter,
     user: UserDto,
   ): Promise<ProjectDto> {
-    const project = await this.projectRepository.findOne(filter.id, { relations: ['user', 'supervisor'] });
+    const project = await this.projectRepository.findOne(filter.id, { relations: ['users', 'supervisor'] });
 
     if (!project) {
       throw new NotFoundException('Could not find project!');
@@ -142,6 +147,13 @@ export class ProjectsService {
       throw new InternalServerErrorException('Could not claim the project.');
     }
 
-    return await this.projectRepository.findOne(filter.id, { relations: ['user', 'supervisor'] });
+    return this.projectRepository.findOne(filter.id, { relations: ['users', 'supervisor'] });
+  }
+
+  isAuthor(
+    project: ProjectDto,
+    user: UserDto,
+  ): boolean {
+    return project.users.some(author => author.id === user.id);
   }
 }

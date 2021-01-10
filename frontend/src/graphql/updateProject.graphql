@@ -11,7 +11,7 @@ mutation UpdateProject(
     id
     name
     description
-    user {
+    users {
       id
     }
     supervisor {

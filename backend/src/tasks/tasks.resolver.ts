@@ -17,7 +17,7 @@ export class TasksResolver {
 
   @Mutation(() => TaskDto)
   @UseGuards(GqlAuthGuard)
-  @HasPermissions(PERMISSIONS.PROJECTS_VIEW)
+  @HasPermissions(PERMISSIONS.PROJECTS_CREATE)
   createTask(
     @CurrentUser() user: UserDto,
     @Args('input') input: CreateTaskDto,
@@ -27,7 +27,7 @@ export class TasksResolver {
 
   @Mutation(() => TaskDto)
   @UseGuards(GqlAuthGuard)
-  @HasPermissions(PERMISSIONS.PROJECTS_VIEW)
+  @HasPermissions(PERMISSIONS.PROJECTS_CREATE)
   deleteTask(
     @Args('filter') filter: TasksFilter,
     @CurrentUser() user: UserDto,
@@ -37,7 +37,7 @@ export class TasksResolver {
 
   @Mutation(() => TaskDto)
   @UseGuards(GqlAuthGuard)
-  @HasPermissions(PERMISSIONS.PROJECTS_VIEW)
+  @HasPermissions(PERMISSIONS.PROJECTS_CREATE)
   updateTask(
     @Args('filter') filter: TasksFilter,
     @Args('updates') updates: UpdateTaskDto,
@@ -48,7 +48,7 @@ export class TasksResolver {
 
   @Query(() => TaskDto)
   @UseGuards(GqlAuthGuard)
-  @HasPermissions(PERMISSIONS.PROJECTS_VIEW)
+  @HasPermissions(PERMISSIONS.PROJECTS_CREATE)
   task(@Args('filter') filter: TasksFilter) {
     return this.tasksService.getOne(filter);
   }

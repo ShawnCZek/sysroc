@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useUserQuery } from '../../generated/graphql';
+import { useMyProjectsQuery, useUserQuery } from '../../generated/graphql';
 import { Typography } from '@material-ui/core';
-import { ProjectsList } from '../Project/ProjectsList';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
+import { ProjectsTable } from '../Project/ProjectsTable';
 
 const UserInformation = styled.div`
   & p {
@@ -26,11 +26,11 @@ export const Profile: React.FC<Props> = ({
   forceEmail,
 }) => {
   const { data, loading } = useUserQuery({ variables: { id: userId } });
+  const { data: projectsData, loading: projectsLoading } = useMyProjectsQuery();
 
   const canViewEmail = useHasPermissions(PERMISSIONS.MANAGE_STUDENT_USERS, PERMISSIONS.MANAGE_TEACHER_USERS);
-  const canViewProjects = useHasPermissions(PERMISSIONS.PROJECTS_VIEW);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading || projectsLoading) return <div>Loading...</div>;
 
   return (
     <>
@@ -48,7 +48,8 @@ export const Profile: React.FC<Props> = ({
           </PersonalInformation>
         }
       </UserInformation>
-      {canViewProjects && <ProjectsList userId={data?.user?.id} displayAuthor={false} />}
+      <h2>Projects List</h2>
+      { projectsData?.myProjects && <ProjectsTable projects={projectsData.myProjects} />}
     </>
   );
 };

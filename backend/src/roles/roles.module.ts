@@ -67,9 +67,7 @@ export class RolesModule {
       admin: false,
       teacher: false,
       student: false,
-      permissionSlugs: [
-        PERMISSIONS.PROJECTS_VIEW,
-      ],
+      permissionSlugs: [],
     });
   }
 }

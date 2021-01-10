@@ -10,12 +10,14 @@ import { Project } from '../projects/entities/projects.entity';
 import { UserDto } from '../users/dto/user.dto';
 import { PERMISSIONS } from '../permissions/permissions';
 import { UsersService } from '../users/users.service';
+import { ProjectsService } from '../projects/projects.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
     @InjectRepository(Project) private readonly projectRepository: Repository<Project>,
+    private readonly projectsService: ProjectsService,
     private readonly usersService: UsersService,
   ) {}
 
@@ -28,7 +30,8 @@ export class TasksService {
       { relations: ['tasks', 'user'] },
     );
 
-    if (project.user.id !== user.id && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
+    const canManageProjects = await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE);
+    if (!this.projectsService.isAuthor(project, user) && !canManageProjects) {
       throw new UnauthorizedException('Missing permissions for adding a task to this project');
     }
 
@@ -54,7 +57,8 @@ export class TasksService {
       throw new NotFoundException('Could not find task with given ID!');
     }
 
-    if (task.project.user.id !== user.id && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
+    const canManageProjects = await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE);
+    if (!this.projectsService.isAuthor(task.project, user) && !canManageProjects) {
       throw new UnauthorizedException('Missing permissions for deleting a task of this project');
     }
 
@@ -78,7 +82,7 @@ export class TasksService {
     }
 
     const canManageProjects = await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE);
-    if (!(task.project.user.id === user.id || canManageProjects)) {
+    if (!this.projectsService.isAuthor(task.project, user) && !canManageProjects) {
       throw new UnauthorizedException('Missing permissions for updating a task of this project');
     }
 
@@ -94,7 +98,7 @@ export class TasksService {
     return this.taskRepository.findOne(filter.id);
   }
 
-  async getOne(filter: TasksFilter): Promise<TaskDto> {
+  getOne(filter: TasksFilter): Promise<TaskDto> {
     return this.taskRepository.findOne({ id: filter.id });
   }
 }

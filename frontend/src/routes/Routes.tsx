@@ -27,7 +27,7 @@ export const Routes: React.FC = () => {
 
   if (loading || permissionLoading) return <div>Loading...</div>;
 
-  const projectList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.PROJECTS_CREATE, PERMISSIONS.PROJECTS_VIEW, PERMISSIONS.PROJECTS_MANAGE);
+  const projectList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.PROJECTS_CREATE, PERMISSIONS.PROJECTS_VIEW);
   const userList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.MANAGE_STUDENT_USERS, PERMISSIONS.MANAGE_TEACHER_USERS);
   const classificationList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.CLASSIFICATION_VIEW);
   const groupsList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.GROUP_MANAGE);
@@ -55,8 +55,6 @@ export const Routes: React.FC = () => {
             />
             <ProtectedRoute
               isAuthenticated={!!data?.me}
-              isAllowed={projectList}
-              restrictedPath={'/notallowed'}
               authenticationPath={'/signin'}
               exact
               path="/projects/:projectId"

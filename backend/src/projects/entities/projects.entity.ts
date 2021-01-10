@@ -1,5 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/entities/users.entity';
 import { Task } from '../../tasks/entities/tasks.entity';
 import { Classification } from '../../classification/entities/classification.entity';
@@ -19,9 +19,9 @@ export class Project {
   @Field()
   description: string;
 
-  @ManyToOne(type => User, user => user.projects)
-  @Field(type => User)
-  user: User;
+  @ManyToMany(type => User, user => user.projects)
+  @Field(type => [User])
+  users: User[];
 
   @ManyToOne(type => User, user => user.supervisedProjects, { nullable: true })
   @Field(type => User)

@@ -3,7 +3,7 @@ mutation CreateProject($name: String!, $description: String) {
     id
     name
     description
-    user {
+    users {
       id
       name
     }

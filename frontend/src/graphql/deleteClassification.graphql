@@ -1,20 +1,20 @@
 mutation DeleteClassification($id: Float!) {
-    deleteClassification(filter: {id: $id}) {
+  deleteClassification(filter: {id: $id}) {
+    id
+    mark
+    note
+    project {
+      id
+      name
+      users {
         id
-        mark
-        note
-        project {
-            id
-            name
-            user {
-                id
-                name
-            }
-        }
-        createdAt
-        user {
-            id
-            name
-        }
+        name
+      }
     }
+    createdAt
+    user {
+      id
+      name
+    }
+  }
 }

@@ -8,9 +8,6 @@ export class ProjectsFilter {
   @Field({ nullable: true })
   name?: string;
 
-  @Field({ nullable: true })
-  user?: string;
-
   @Field(type => [Number], { nullable: true, defaultValue: [] })
   authors?: number[];
 

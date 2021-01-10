@@ -1,7 +1,7 @@
 mutation ClaimProject($projectId: Float!) {
   claimProject(filter: { id: $projectId }) {
     id
-    user {
+    users {
       id
       name
     }

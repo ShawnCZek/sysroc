@@ -1,10 +1,10 @@
-query Projects($userId: String, $name: String, $authors: [Float!], $supervisors: [Float!]) {
-  projects(filter: { user: $userId, name: $name, authors: $authors, supervisors: $supervisors }) {
+query Projects($name: String, $authors: [Float!], $supervisors: [Float!]) {
+  projects(filter: { name: $name, authors: $authors, supervisors: $supervisors }) {
     id
     name
     description
     createdAt
-    user {
+    users {
       id
       name
     }

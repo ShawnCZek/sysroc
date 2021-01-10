@@ -110,7 +110,7 @@ type Project {
   name: String!
   supervisor: User!
   tasks: [Task!]!
-  user: User!
+  users: [User!]!
 }
 
 type ProjectDto {
@@ -121,7 +121,7 @@ type ProjectDto {
   name: String!
   supervisor: UserDto
   tasks: [TaskDto!]!
-  user: UserDto!
+  users: [UserDto!]!
 }
 
 type Query {
@@ -131,6 +131,7 @@ type Query {
   groups(filter: GroupFilter!): [GroupDto!]!
   me: UserAuthDto
   myPermissions: [PermissionStateDto!]!
+  myProjects: [ProjectDto!]!
   passwordReset(hash: String!): PasswordResetDto!
   permissions: [PermissionDto!]!
   project(filter: ProjectsFilter!): ProjectDto!
@@ -243,10 +244,10 @@ input BaseUsersFilter {
 }
 
 input ClassificationsFilter {
-  fromDate: DateTime = "2020-12-08T17:50:07.935Z"
+  fromDate: DateTime = "2020-12-10T19:08:36.318Z"
   id: Float
   projects: [Float!] = []
-  toDate: DateTime = "2021-01-08T17:50:07.935Z"
+  toDate: DateTime = "2021-01-10T19:08:36.318Z"
   users: [Float!] = []
 }
 
@@ -301,7 +302,6 @@ input ProjectsFilter {
   id: Float
   name: String
   supervisors: [Float!] = []
-  user: String
 }
 
 input RolesFilter {

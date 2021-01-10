@@ -31,41 +31,29 @@ export class ProjectsResolver {
 
   @Query(() => [ProjectDto])
   @UseGuards(GqlAuthGuard)
-  @HasPermissions(
-    PERMISSIONS.PROJECTS_VIEW,
-    PERMISSIONS.PROJECTS_CREATE,
-    PERMISSIONS.PROJECTS_MANAGE,
-  )
+  @HasPermissions(PERMISSIONS.PROJECTS_VIEW, PERMISSIONS.PROJECTS_CREATE)
   projects(
     @CurrentUser() user: UserDto,
     @Args('filter') filter: ProjectsFilter,
-  ) {
+  ): Promise<ProjectDto[]> {
     return this.projectsService.getMany(filter);
   }
 
-  @Mutation(() => ProjectDto)
+  @Query(() => [ProjectDto])
   @UseGuards(GqlAuthGuard)
-  @HasPermissions(PERMISSIONS.PROJECTS_CREATE)
-  async deleteProject(
-    @CurrentUser() user: UserDto,
-    @Args('projectId') projectId: number,
-  ) {
-    return this.projectsService.deleteOne(projectId, user);
+  myProjects(@CurrentUser() user: UserDto): Promise<ProjectDto[]> {
+    return this.projectsService.getMany({ authors: [user.id] });
   }
 
   @Query(() => ProjectDto)
   @UseGuards(GqlAuthGuard)
-  @HasPermissions(
-    PERMISSIONS.PROJECTS_VIEW,
-    PERMISSIONS.PROJECTS_CREATE
-  )
   async project(
     @CurrentUser() user: UserDto,
     @Args('filter') filter: ProjectsFilter,
-  ) {
+  ): Promise<ProjectDto> {
     const project = await this.projectsService.getOne(filter.id);
 
-    if (!await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_VIEW) && user.id !== project.user.id) {
+    if (!await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_VIEW) && !this.projectsService.isAuthor(project, user)) {
       throw new UnauthorizedException('You cannot view this project.');
     }
 
@@ -79,7 +67,7 @@ export class ProjectsResolver {
     @CurrentUser() user: UserDto,
     @Args('filter') filter: ProjectsFilter,
     @Args('updates') updates: UpdateProjectDto,
-  ) {
+  ): Promise<ProjectDto> {
     return this.projectsService.updateOne(filter, updates, user);
   }
 
@@ -89,7 +77,17 @@ export class ProjectsResolver {
   claimProject(
     @CurrentUser() user: UserDto,
     @Args('filter') filter: ProjectsFilter,
-  ) {
+  ): Promise<ProjectDto> {
     return this.projectsService.claim(filter, user);
+  }
+
+  @Mutation(() => ProjectDto)
+  @UseGuards(GqlAuthGuard)
+  @HasPermissions(PERMISSIONS.PROJECTS_CREATE)
+  deleteProject(
+    @CurrentUser() user: UserDto,
+    @Args('projectId') projectId: number,
+  ): Promise<ProjectDto> {
+    return this.projectsService.deleteOne(projectId, user);
   }
 }
