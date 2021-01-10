@@ -53,7 +53,7 @@ export class ProjectsResolver {
   ): Promise<ProjectDto> {
     const project = await this.projectsService.getOne(filter.id);
 
-    if (!await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_VIEW) && !this.projectsService.isAuthor(project, user)) {
+    if (!this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_VIEW) && !this.projectsService.isAuthor(project, user)) {
       throw new UnauthorizedException('You cannot view this project.');
     }
 

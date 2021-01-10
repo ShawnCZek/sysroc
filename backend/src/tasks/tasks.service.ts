@@ -30,8 +30,7 @@ export class TasksService {
       { relations: ['tasks', 'user'] },
     );
 
-    const canManageProjects = await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE);
-    if (!this.projectsService.isAuthor(project, user) && !canManageProjects) {
+    if (!this.projectsService.isAuthor(project, user) && !this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
       throw new UnauthorizedException('Missing permissions for adding a task to this project');
     }
 
@@ -57,8 +56,7 @@ export class TasksService {
       throw new NotFoundException('Could not find task with given ID!');
     }
 
-    const canManageProjects = await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE);
-    if (!this.projectsService.isAuthor(task.project, user) && !canManageProjects) {
+    if (!this.projectsService.isAuthor(task.project, user) && !this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
       throw new UnauthorizedException('Missing permissions for deleting a task of this project');
     }
 
@@ -81,8 +79,7 @@ export class TasksService {
       throw new NotFoundException('Could not find task with given ID!');
     }
 
-    const canManageProjects = await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE);
-    if (!this.projectsService.isAuthor(task.project, user) && !canManageProjects) {
+    if (!this.projectsService.isAuthor(task.project, user) && !this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
       throw new UnauthorizedException('Missing permissions for updating a task of this project');
     }
 

@@ -62,7 +62,7 @@ export class ProjectsService {
       throw new NotFoundException('Project couldn\'t be found.');
     }
 
-    if (!this.isAuthor(project, user) && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
+    if (!this.isAuthor(project, user) && !this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
       throw new UnauthorizedException('Missing permissions for deleting this project');
     }
 
@@ -103,7 +103,7 @@ export class ProjectsService {
       throw new NotFoundException('Could not find project!');
     }
 
-    if (!this.isAuthor(project, user) && !await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
+    if (!this.isAuthor(project, user) && !this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
       throw new UnauthorizedException('Missing permissions for updating this project');
     }
 
@@ -113,7 +113,7 @@ export class ProjectsService {
       description: updates.description,
     };
 
-    if (await this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_CLAIM_MANAGE)) {
+    if (this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_CLAIM_MANAGE)) {
       updateProject.supervisor = updates.supervisor ? await this.userRepository.findOne({ id: updates.supervisor }) : null;
     }
 

@@ -26,7 +26,7 @@ export class RolesGuard implements CanActivate {
       user = req.user;
     }
 
-    if (!await this.usersService.hasPermissions(user, ...permissions)) {
+    if (!this.usersService.hasPermissions(user, ...permissions)) {
       throw new AuthenticationError('Missing permissions.');
     }
     return true;
