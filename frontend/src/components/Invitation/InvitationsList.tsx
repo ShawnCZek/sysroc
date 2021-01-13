@@ -16,6 +16,7 @@ import { UserLink } from '../UserLink';
 import { useSnackbar } from 'notistack';
 import { AcceptInvitationAlert } from './AcceptInvitationAlert';
 import { DeleteInvitationAlert } from './DeleteInvitationAlert';
+import { ProjectsAuthors } from '../Project/ProjectsAuthors';
 
 export const InvitationsList: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -109,11 +110,7 @@ export const InvitationsList: React.FC = () => {
                 </Item>
                 <Item>
                   <div>
-                    { invitation.project.users.map(author => (
-                      <div>
-                        <UserLink id={author.id} name={author.name} />
-                      </div>
-                    )) }
+                    <ProjectsAuthors authors={invitation.project.users} />
                   </div>
                 </Item>
                 <Item>

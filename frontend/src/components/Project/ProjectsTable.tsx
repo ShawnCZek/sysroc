@@ -10,6 +10,7 @@ import { Item } from '../Layout/Item';
 import { UserLink } from '../UserLink';
 import { Fab } from '@material-ui/core';
 import { DeleteProjectAlert } from './DeleteProjectAlert';
+import { ProjectsAuthors } from './ProjectsAuthors';
 import { ProjectsQuery, useDeleteProjectMutation, useMeQuery } from '../../generated/graphql';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
@@ -81,11 +82,7 @@ export const ProjectsTable: React.FC<Props> = ({ projects }) => {
                 </Item>
                 <Item>
                   <div>
-                    { project.users.map(author => (
-                      <div>
-                        <UserLink id={parseInt(author.id)} name={author.name} />
-                      </div>
-                    )) }
+                    <ProjectsAuthors authors={project.users} />
                   </div>
                 </Item>
                 <Item>
