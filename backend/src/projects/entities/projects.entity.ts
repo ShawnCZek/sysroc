@@ -3,6 +3,7 @@ import { Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, Pri
 import { User } from '../../users/entities/users.entity';
 import { Task } from '../../tasks/entities/tasks.entity';
 import { Classification } from '../../classification/entities/classification.entity';
+import { Invitation } from '../../invitations/entities/invitations.entity';
 
 @Entity()
 @ObjectType()
@@ -19,6 +20,10 @@ export class Project {
   @Field()
   description: string;
 
+  @ManyToOne(type => User)
+  @Field(type => User)
+  owner: User;
+
   @ManyToMany(type => User, user => user.projects)
   @Field(type => [User])
   users: User[];
@@ -34,6 +39,10 @@ export class Project {
   @OneToMany(type => Classification, classification => classification.project)
   @Field(type => [Classification])
   classifications: Classification[];
+
+  @OneToMany(type => Invitation, invitation => invitation.project)
+  @Field(type => [Invitation])
+  invitations: Invitation[];
 
   @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
   @Field(type => Date)

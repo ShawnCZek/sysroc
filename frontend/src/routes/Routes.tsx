@@ -18,6 +18,7 @@ import { Classification } from '../views/Classification';
 import { SingleUser } from '../views/SingleUser';
 import { Roles } from '../views/Roles';
 import { Groups } from '../views/Groups';
+import { AcceptInvitation } from '../views/AcceptInvitation';
 import { hasPermissions } from '../auth/hasPermissions';
 import { isAdmin } from '../auth/roles';
 
@@ -60,6 +61,13 @@ export const Routes: React.FC = () => {
               exact
               path="/projects/:projectId"
               component={SingleProject}
+            />
+            <ProtectedRoute
+              isAuthenticated={authenticated}
+              authenticationPath={'/signin'}
+              exact
+              path="/invitations/:invitationId"
+              component={AcceptInvitation}
             />
             <ProtectedRoute
               isAuthenticated={authenticated}

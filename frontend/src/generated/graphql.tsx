@@ -39,7 +39,7 @@ export type BaseUserDto = {
   __typename?: 'BaseUserDto';
   id: Scalars['ID'];
   name: Scalars['String'];
-  groups: Array<Group>;
+  groups: Array<GroupDto>;
   roles: Array<RoleDto>;
 };
 
@@ -143,6 +143,29 @@ export type GroupFilter = {
   order?: Maybe<Scalars['String']>;
 };
 
+export type Invitation = {
+  __typename?: 'Invitation';
+  id: Scalars['ID'];
+  project: Project;
+  invited: User;
+  user: User;
+  createdAt: Scalars['DateTime'];
+};
+
+export type InvitationDto = {
+  __typename?: 'InvitationDto';
+  id: Scalars['ID'];
+  project: ProjectDto;
+  invited: BaseUserDto;
+  user: BaseUserDto;
+  createdAt: Scalars['DateTime'];
+};
+
+export type InviteDto = {
+  project: Scalars['ID'];
+  user: Scalars['ID'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   deleteGroup: GroupDto;
@@ -168,6 +191,9 @@ export type Mutation = {
   updateClassification: ClassificationDto;
   createPasswordReset: Scalars['Boolean'];
   changePassword: Scalars['Boolean'];
+  invite: InvitationDto;
+  acceptInvitation: InvitationDto;
+  deleteInvitation: InvitationDto;
 };
 
 
@@ -286,6 +312,21 @@ export type MutationChangePasswordArgs = {
   hash: Scalars['String'];
 };
 
+
+export type MutationInviteArgs = {
+  input: InviteDto;
+};
+
+
+export type MutationAcceptInvitationArgs = {
+  invitationId: Scalars['Float'];
+};
+
+
+export type MutationDeleteInvitationArgs = {
+  invitationId: Scalars['Float'];
+};
+
 export type PasswordResetDto = {
   __typename?: 'PasswordResetDto';
   id: Scalars['ID'];
@@ -325,6 +366,7 @@ export type Project = {
   supervisor: User;
   tasks: Array<Task>;
   classifications: Array<Classification>;
+  invitations: Array<Invitation>;
   createdAt: Scalars['DateTime'];
 };
 
@@ -359,11 +401,11 @@ export type Query = {
   permissions: Array<PermissionDto>;
   authUser: AdUser;
   projects: Array<ProjectDto>;
-  myProjects: Array<ProjectDto>;
   project: ProjectDto;
   task: TaskDto;
   classifications: Array<ClassificationDto>;
   passwordReset: PasswordResetDto;
+  myInvitations: Array<InvitationDto>;
 };
 
 
@@ -544,6 +586,7 @@ export type User = {
   projects: Array<Project>;
   classifications: Array<Classification>;
   supervisedProjects: Array<Project>;
+  invitations: Array<Invitation>;
 };
 
 export type UserAuthDto = {
@@ -567,7 +610,7 @@ export type UserDto = {
   adEmail: Scalars['String'];
   password: Scalars['String'];
   projects: Array<ProjectDto>;
-  groups: Array<Group>;
+  groups: Array<GroupDto>;
   roles: Array<RoleDto>;
   permissions: Array<PermissionStateDto>;
 };
@@ -585,6 +628,23 @@ export type UserTempDto = {
   email: Scalars['String'];
 };
 
+export type AcceptInvitationMutationVariables = Exact<{
+  invitationId: Scalars['Float'];
+}>;
+
+
+export type AcceptInvitationMutation = (
+  { __typename?: 'Mutation' }
+  & { acceptInvitation: (
+    { __typename?: 'InvitationDto' }
+    & Pick<InvitationDto, 'id'>
+    & { project: (
+      { __typename?: 'ProjectDto' }
+      & Pick<ProjectDto, 'id'>
+    ) }
+  ) }
+);
+
 export type BaseUsersQueryVariables = Exact<{
   roles?: Maybe<Array<Scalars['Float']>>;
   rolesSlug?: Maybe<Array<Scalars['String']>>;
@@ -601,8 +661,8 @@ export type BaseUsersQuery = (
     { __typename?: 'BaseUserDto' }
     & Pick<BaseUserDto, 'id' | 'name'>
     & { groups: Array<(
-      { __typename?: 'Group' }
-      & Pick<Group, 'id' | 'name'>
+      { __typename?: 'GroupDto' }
+      & Pick<GroupDto, 'id' | 'name'>
     )>, roles: Array<(
       { __typename?: 'RoleDto' }
       & Pick<RoleDto, 'id' | 'name'>
@@ -785,8 +845,8 @@ export type CreateUserMutation = (
     { __typename?: 'UserDto' }
     & Pick<UserDto, 'id' | 'name' | 'adEmail' | 'email'>
     & { groups: Array<(
-      { __typename?: 'Group' }
-      & Pick<Group, 'id' | 'name'>
+      { __typename?: 'GroupDto' }
+      & Pick<GroupDto, 'id' | 'name'>
     )>, roles: Array<(
       { __typename?: 'RoleDto' }
       & Pick<RoleDto, 'id' | 'name' | 'slug' | 'admin'>
@@ -828,6 +888,19 @@ export type DeleteGroupMutation = (
   & { deleteGroup: (
     { __typename?: 'GroupDto' }
     & Pick<GroupDto, 'id' | 'name'>
+  ) }
+);
+
+export type DeleteInvitationMutationVariables = Exact<{
+  invitationId: Scalars['Float'];
+}>;
+
+
+export type DeleteInvitationMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteInvitation: (
+    { __typename?: 'InvitationDto' }
+    & Pick<InvitationDto, 'id'>
   ) }
 );
 
@@ -905,6 +978,20 @@ export type GroupsQuery = (
   )> }
 );
 
+export type InviteMutationVariables = Exact<{
+  userId: Scalars['ID'];
+  projectId: Scalars['ID'];
+}>;
+
+
+export type InviteMutation = (
+  { __typename?: 'Mutation' }
+  & { invite: (
+    { __typename?: 'InvitationDto' }
+    & Pick<InvitationDto, 'id'>
+  ) }
+);
+
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -931,6 +1018,28 @@ export type MeQuery = (
   )> }
 );
 
+export type MyInvitationsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyInvitationsQuery = (
+  { __typename?: 'Query' }
+  & { myInvitations: Array<(
+    { __typename?: 'InvitationDto' }
+    & Pick<InvitationDto, 'id' | 'createdAt'>
+    & { project: (
+      { __typename?: 'ProjectDto' }
+      & Pick<ProjectDto, 'id' | 'name'>
+      & { users: Array<(
+        { __typename?: 'UserDto' }
+        & Pick<UserDto, 'id' | 'name'>
+      )> }
+    ), user: (
+      { __typename?: 'BaseUserDto' }
+      & Pick<BaseUserDto, 'id' | 'name'>
+    ) }
+  )> }
+);
+
 export type MyPermissionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -939,24 +1048,6 @@ export type MyPermissionsQuery = (
   & { myPermissions: Array<(
     { __typename?: 'PermissionStateDto' }
     & Pick<PermissionStateDto, 'slug' | 'permitted'>
-  )> }
-);
-
-export type MyProjectsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type MyProjectsQuery = (
-  { __typename?: 'Query' }
-  & { myProjects: Array<(
-    { __typename?: 'ProjectDto' }
-    & Pick<ProjectDto, 'id' | 'name' | 'description' | 'createdAt'>
-    & { users: Array<(
-      { __typename?: 'UserDto' }
-      & Pick<UserDto, 'id' | 'name'>
-    )>, supervisor?: Maybe<(
-      { __typename?: 'UserDto' }
-      & Pick<UserDto, 'id' | 'name'>
-    )> }
   )> }
 );
 
@@ -1272,8 +1363,8 @@ export type UpdateUserMutation = (
     { __typename?: 'UserDto' }
     & Pick<UserDto, 'id' | 'name' | 'adEmail' | 'email'>
     & { groups: Array<(
-      { __typename?: 'Group' }
-      & Pick<Group, 'id' | 'name'>
+      { __typename?: 'GroupDto' }
+      & Pick<GroupDto, 'id' | 'name'>
     )>, roles: Array<(
       { __typename?: 'RoleDto' }
       & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
@@ -1292,8 +1383,8 @@ export type UserQuery = (
     { __typename?: 'UserDto' }
     & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
     & { groups: Array<(
-      { __typename?: 'Group' }
-      & Pick<Group, 'id' | 'name'>
+      { __typename?: 'GroupDto' }
+      & Pick<GroupDto, 'id' | 'name'>
     )>, roles: Array<(
       { __typename?: 'RoleDto' }
       & Pick<RoleDto, 'id' | 'name'>
@@ -1327,8 +1418,8 @@ export type UsersQuery = (
     { __typename?: 'UserDto' }
     & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
     & { groups: Array<(
-      { __typename?: 'Group' }
-      & Pick<Group, 'id' | 'name'>
+      { __typename?: 'GroupDto' }
+      & Pick<GroupDto, 'id' | 'name'>
     )>, roles: Array<(
       { __typename?: 'RoleDto' }
       & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
@@ -1337,6 +1428,41 @@ export type UsersQuery = (
 );
 
 
+export const AcceptInvitationDocument = gql`
+    mutation AcceptInvitation($invitationId: Float!) {
+  acceptInvitation(invitationId: $invitationId) {
+    id
+    project {
+      id
+    }
+  }
+}
+    `;
+export type AcceptInvitationMutationFn = Apollo.MutationFunction<AcceptInvitationMutation, AcceptInvitationMutationVariables>;
+
+/**
+ * __useAcceptInvitationMutation__
+ *
+ * To run a mutation, you first call `useAcceptInvitationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAcceptInvitationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [acceptInvitationMutation, { data, loading, error }] = useAcceptInvitationMutation({
+ *   variables: {
+ *      invitationId: // value for 'invitationId'
+ *   },
+ * });
+ */
+export function useAcceptInvitationMutation(baseOptions?: Apollo.MutationHookOptions<AcceptInvitationMutation, AcceptInvitationMutationVariables>) {
+        return Apollo.useMutation<AcceptInvitationMutation, AcceptInvitationMutationVariables>(AcceptInvitationDocument, baseOptions);
+      }
+export type AcceptInvitationMutationHookResult = ReturnType<typeof useAcceptInvitationMutation>;
+export type AcceptInvitationMutationResult = Apollo.MutationResult<AcceptInvitationMutation>;
+export type AcceptInvitationMutationOptions = Apollo.BaseMutationOptions<AcceptInvitationMutation, AcceptInvitationMutationVariables>;
 export const BaseUsersDocument = gql`
     query BaseUsers($roles: [Float!], $rolesSlug: [String!], $admin: Boolean, $teacher: Boolean, $student: Boolean, $groups: [Float!]) {
   baseUsers(filter: {roles: $roles, rolesSlug: $rolesSlug, admin: $admin, teacher: $teacher, student: $student, groups: $groups}) {
@@ -1856,6 +1982,38 @@ export function useDeleteGroupMutation(baseOptions?: Apollo.MutationHookOptions<
 export type DeleteGroupMutationHookResult = ReturnType<typeof useDeleteGroupMutation>;
 export type DeleteGroupMutationResult = Apollo.MutationResult<DeleteGroupMutation>;
 export type DeleteGroupMutationOptions = Apollo.BaseMutationOptions<DeleteGroupMutation, DeleteGroupMutationVariables>;
+export const DeleteInvitationDocument = gql`
+    mutation DeleteInvitation($invitationId: Float!) {
+  deleteInvitation(invitationId: $invitationId) {
+    id
+  }
+}
+    `;
+export type DeleteInvitationMutationFn = Apollo.MutationFunction<DeleteInvitationMutation, DeleteInvitationMutationVariables>;
+
+/**
+ * __useDeleteInvitationMutation__
+ *
+ * To run a mutation, you first call `useDeleteInvitationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteInvitationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteInvitationMutation, { data, loading, error }] = useDeleteInvitationMutation({
+ *   variables: {
+ *      invitationId: // value for 'invitationId'
+ *   },
+ * });
+ */
+export function useDeleteInvitationMutation(baseOptions?: Apollo.MutationHookOptions<DeleteInvitationMutation, DeleteInvitationMutationVariables>) {
+        return Apollo.useMutation<DeleteInvitationMutation, DeleteInvitationMutationVariables>(DeleteInvitationDocument, baseOptions);
+      }
+export type DeleteInvitationMutationHookResult = ReturnType<typeof useDeleteInvitationMutation>;
+export type DeleteInvitationMutationResult = Apollo.MutationResult<DeleteInvitationMutation>;
+export type DeleteInvitationMutationOptions = Apollo.BaseMutationOptions<DeleteInvitationMutation, DeleteInvitationMutationVariables>;
 export const DeleteProjectDocument = gql`
     mutation deleteProject($projectId: Float!) {
   deleteProject(projectId: $projectId) {
@@ -2031,6 +2189,39 @@ export function useGroupsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Gro
 export type GroupsQueryHookResult = ReturnType<typeof useGroupsQuery>;
 export type GroupsLazyQueryHookResult = ReturnType<typeof useGroupsLazyQuery>;
 export type GroupsQueryResult = Apollo.QueryResult<GroupsQuery, GroupsQueryVariables>;
+export const InviteDocument = gql`
+    mutation Invite($userId: ID!, $projectId: ID!) {
+  invite(input: {user: $userId, project: $projectId}) {
+    id
+  }
+}
+    `;
+export type InviteMutationFn = Apollo.MutationFunction<InviteMutation, InviteMutationVariables>;
+
+/**
+ * __useInviteMutation__
+ *
+ * To run a mutation, you first call `useInviteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useInviteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [inviteMutation, { data, loading, error }] = useInviteMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      projectId: // value for 'projectId'
+ *   },
+ * });
+ */
+export function useInviteMutation(baseOptions?: Apollo.MutationHookOptions<InviteMutation, InviteMutationVariables>) {
+        return Apollo.useMutation<InviteMutation, InviteMutationVariables>(InviteDocument, baseOptions);
+      }
+export type InviteMutationHookResult = ReturnType<typeof useInviteMutation>;
+export type InviteMutationResult = Apollo.MutationResult<InviteMutation>;
+export type InviteMutationOptions = Apollo.BaseMutationOptions<InviteMutation, InviteMutationVariables>;
 export const LogoutDocument = gql`
     mutation Logout {
   logout
@@ -2106,6 +2297,51 @@ export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const MyInvitationsDocument = gql`
+    query MyInvitations {
+  myInvitations {
+    id
+    project {
+      id
+      name
+      users {
+        id
+        name
+      }
+    }
+    user {
+      id
+      name
+    }
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useMyInvitationsQuery__
+ *
+ * To run a query within a React component, call `useMyInvitationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyInvitationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyInvitationsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMyInvitationsQuery(baseOptions?: Apollo.QueryHookOptions<MyInvitationsQuery, MyInvitationsQueryVariables>) {
+        return Apollo.useQuery<MyInvitationsQuery, MyInvitationsQueryVariables>(MyInvitationsDocument, baseOptions);
+      }
+export function useMyInvitationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyInvitationsQuery, MyInvitationsQueryVariables>) {
+          return Apollo.useLazyQuery<MyInvitationsQuery, MyInvitationsQueryVariables>(MyInvitationsDocument, baseOptions);
+        }
+export type MyInvitationsQueryHookResult = ReturnType<typeof useMyInvitationsQuery>;
+export type MyInvitationsLazyQueryHookResult = ReturnType<typeof useMyInvitationsLazyQuery>;
+export type MyInvitationsQueryResult = Apollo.QueryResult<MyInvitationsQuery, MyInvitationsQueryVariables>;
 export const MyPermissionsDocument = gql`
     query MyPermissions {
   myPermissions {
@@ -2139,49 +2375,6 @@ export function useMyPermissionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type MyPermissionsQueryHookResult = ReturnType<typeof useMyPermissionsQuery>;
 export type MyPermissionsLazyQueryHookResult = ReturnType<typeof useMyPermissionsLazyQuery>;
 export type MyPermissionsQueryResult = Apollo.QueryResult<MyPermissionsQuery, MyPermissionsQueryVariables>;
-export const MyProjectsDocument = gql`
-    query MyProjects {
-  myProjects {
-    id
-    name
-    description
-    createdAt
-    users {
-      id
-      name
-    }
-    supervisor {
-      id
-      name
-    }
-  }
-}
-    `;
-
-/**
- * __useMyProjectsQuery__
- *
- * To run a query within a React component, call `useMyProjectsQuery` and pass it any options that fit your needs.
- * When your component renders, `useMyProjectsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useMyProjectsQuery({
- *   variables: {
- *   },
- * });
- */
-export function useMyProjectsQuery(baseOptions?: Apollo.QueryHookOptions<MyProjectsQuery, MyProjectsQueryVariables>) {
-        return Apollo.useQuery<MyProjectsQuery, MyProjectsQueryVariables>(MyProjectsDocument, baseOptions);
-      }
-export function useMyProjectsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyProjectsQuery, MyProjectsQueryVariables>) {
-          return Apollo.useLazyQuery<MyProjectsQuery, MyProjectsQueryVariables>(MyProjectsDocument, baseOptions);
-        }
-export type MyProjectsQueryHookResult = ReturnType<typeof useMyProjectsQuery>;
-export type MyProjectsLazyQueryHookResult = ReturnType<typeof useMyProjectsLazyQuery>;
-export type MyProjectsQueryResult = Apollo.QueryResult<MyProjectsQuery, MyProjectsQueryVariables>;
 export const PasswordResetDocument = gql`
     query PasswordReset($hash: String!) {
   passwordReset(hash: $hash) {

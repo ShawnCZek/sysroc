@@ -12,7 +12,7 @@ type ADUser {
 }
 
 type BaseUserDto {
-  groups: [Group!]!
+  groups: [GroupDto!]!
   id: ID!
   name: String!
   roles: [RoleDto!]!
@@ -50,7 +50,24 @@ type GroupDto {
   usersCount: Float
 }
 
+type Invitation {
+  createdAt: DateTime!
+  id: ID!
+  invited: User!
+  project: Project!
+  user: User!
+}
+
+type InvitationDto {
+  createdAt: DateTime!
+  id: ID!
+  invited: BaseUserDto!
+  project: ProjectDto!
+  user: BaseUserDto!
+}
+
 type Mutation {
+  acceptInvitation(invitationId: Float!): InvitationDto!
   changePassword(hash: String!, password: String!): Boolean!
   claimProject(filter: ProjectsFilter!): ProjectDto!
   createClassification(input: CreateClassificationDto!): ClassificationDto!
@@ -61,10 +78,12 @@ type Mutation {
   createUser(input: CreateUserDto!): UserDto!
   deleteClassification(filter: ClassificationsFilter!): ClassificationDto!
   deleteGroup(groupId: Float!): GroupDto!
+  deleteInvitation(invitationId: Float!): InvitationDto!
   deleteProject(projectId: Float!): ProjectDto!
   deleteRole(roleId: Float!): RoleDto!
   deleteTask(filter: TasksFilter!): TaskDto!
   deleteUser(userId: Float!): UserDto!
+  invite(input: InviteDto!): InvitationDto!
   logout: Boolean!
   signin(auth: UserAuthInputDto!): UserAuthDto!
   signup(input: SignUpUserDto!): UserAuthDto!
@@ -107,7 +126,9 @@ type Project {
   createdAt: DateTime!
   description: String!
   id: ID!
+  invitations: [Invitation!]!
   name: String!
+  owner: User!
   supervisor: User!
   tasks: [Task!]!
   users: [User!]!
@@ -119,6 +140,7 @@ type ProjectDto {
   description: String!
   id: ID!
   name: String!
+  owner: UserDto!
   supervisor: UserDto
   tasks: [TaskDto!]!
   users: [UserDto!]!
@@ -129,9 +151,10 @@ type Query {
   baseUsers(filter: BaseUsersFilter!): [BaseUserDto!]!
   classifications(filter: ClassificationsFilter!): [ClassificationDto!]!
   groups(filter: GroupFilter!): [GroupDto!]!
+  invitation(invitationId: Float!): InvitationDto!
   me: UserAuthDto
+  myInvitations: [InvitationDto!]!
   myPermissions: [PermissionStateDto!]!
-  myProjects: [ProjectDto!]!
   passwordReset(hash: String!): PasswordResetDto!
   permissions: [PermissionDto!]!
   project(filter: ProjectsFilter!): ProjectDto!
@@ -191,6 +214,7 @@ type User {
   email: String!
   groups: [Group!]!
   id: ID!
+  invitations: [Invitation!]!
   name: String!
   password: String!
   projects: [Project!]!
@@ -208,7 +232,7 @@ type UserAuthDto {
 type UserDto {
   adEmail: String!
   email: String!
-  groups: [Group!]!
+  groups: [GroupDto!]!
   id: ID!
   name: String!
   password: String!
@@ -244,10 +268,10 @@ input BaseUsersFilter {
 }
 
 input ClassificationsFilter {
-  fromDate: DateTime = "2020-12-10T19:08:36.318Z"
+  fromDate: DateTime = "2020-12-13T14:50:59.447Z"
   id: Float
   projects: [Float!] = []
-  toDate: DateTime = "2021-01-10T19:08:36.318Z"
+  toDate: DateTime = "2021-01-13T14:50:59.447Z"
   users: [Float!] = []
 }
 
@@ -295,6 +319,11 @@ input GroupFilter {
   id: Float
   name: String
   order: String
+}
+
+input InviteDto {
+  project: ID!
+  user: ID!
 }
 
 input ProjectsFilter {

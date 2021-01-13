@@ -29,6 +29,7 @@ export const ProjectsTable: React.FC<Props> = ({ projects }) => {
   const [deleteProject, { error, client }] = useDeleteProjectMutation({
     update() {
       client?.resetStore();
+      enqueueSnackbar('Project successfully deleted', { variant: 'success' });
     }
   });
 
@@ -46,7 +47,6 @@ export const ProjectsTable: React.FC<Props> = ({ projects }) => {
     await deleteProject({
       variables: { projectId: id }
     });
-    enqueueSnackbar('Project successfully deleted', { variant: 'success' });
   };
 
   return (

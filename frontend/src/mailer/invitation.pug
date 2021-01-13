@@ -1,0 +1,14 @@
+extends base
+
+block content
+    +header("Hi, " + name + "!")
+    +paragraph
+        | You have been invited to the project "
+        strong=project
+        | "! Click on the following link to accept the invitation:
+    p
+        - const invitationLink = origin + "/invitations/" + id;
+        a(href=invitationLink)=invitationLink
+    +paragraph.
+        To review all your invitations, visit our website dashboard.
+    include signature

@@ -1,8 +1,8 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Group } from '../../groups/entities/groups.entity';
 import { RoleDto } from '../../roles/dto/role.dto';
 import { ProjectDto } from '../../projects/dto/project.dto';
 import { PermissionStateDto } from './permission-state.dto';
+import { GroupDto } from '../../groups/dto/group.dto';
 
 @ObjectType()
 export class UserDto {
@@ -24,8 +24,8 @@ export class UserDto {
   @Field(type => [ProjectDto], { defaultValue: undefined })
   readonly projects?: ProjectDto[];
 
-  @Field(type => [Group], { defaultValue: undefined })
-  readonly groups?: Group[];
+  @Field(type => [GroupDto], { defaultValue: undefined })
+  readonly groups?: GroupDto[];
 
   @Field(type => [RoleDto])
   readonly roles: RoleDto[];

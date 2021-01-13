@@ -57,7 +57,6 @@ export class RolesModule {
       student: true,
       permissionSlugs: [
         PERMISSIONS.PROJECTS_CREATE,
-        PERMISSIONS.PROJECTS_VIEW,
       ],
     });
     await this.rolesService.createOrUpdate({

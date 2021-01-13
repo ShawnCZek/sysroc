@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Group } from '../../groups/entities/groups.entity';
 import { RoleDto } from '../../roles/dto/role.dto';
+import { GroupDto } from '../../groups/dto/group.dto';
 
 @ObjectType()
 export class BaseUserDto {
@@ -10,8 +10,8 @@ export class BaseUserDto {
   @Field()
   readonly name: string;
 
-  @Field(type => [Group], { defaultValue: undefined })
-  readonly groups?: Group[];
+  @Field(type => [GroupDto], { defaultValue: undefined })
+  readonly groups?: GroupDto[];
 
   @Field(type => [RoleDto])
   readonly roles: RoleDto[];

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useMyProjectsQuery, useUserQuery } from '../../generated/graphql';
+import { useProjectsQuery, useUserQuery } from '../../generated/graphql';
 import { Typography } from '@material-ui/core';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
@@ -26,7 +26,7 @@ export const Profile: React.FC<Props> = ({
   forceEmail,
 }) => {
   const { data, loading } = useUserQuery({ variables: { id: userId } });
-  const { data: projectsData, loading: projectsLoading } = useMyProjectsQuery();
+  const { data: projectsData, loading: projectsLoading } = useProjectsQuery({ variables: { authors: [userId] } });
 
   const canViewEmail = useHasPermissions(PERMISSIONS.MANAGE_STUDENT_USERS, PERMISSIONS.MANAGE_TEACHER_USERS);
 
@@ -49,7 +49,7 @@ export const Profile: React.FC<Props> = ({
         }
       </UserInformation>
       <h2>Projects List</h2>
-      { projectsData?.myProjects && <ProjectsTable projects={projectsData.myProjects} />}
+      { projectsData?.projects && <ProjectsTable projects={projectsData.projects} />}
     </>
   );
 };

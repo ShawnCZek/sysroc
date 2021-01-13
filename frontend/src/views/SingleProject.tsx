@@ -13,11 +13,12 @@ import { ProjectClassificationOverview } from '../components/Project/ProjectClas
 import { ClaimProjectFab } from '../components/Project/ClaimProjectFab';
 import { useHasPermissions } from '../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../generated/permissions';
+import { InviteButton } from '../components/Invitation/InviteButton';
 
 const ProjectControls = styled.div`
   display: grid;
   grid-template-rows: 1fr;
-  grid-template-columns: 30rem 1fr 1fr;
+  grid-template-columns: 40rem 1fr 1fr;
 
   margin-bottom: 2rem;
 
@@ -137,6 +138,9 @@ export const SingleProject: React.FC<Props> = props => {
                   Edit
                 </Fab>
               }
+              { canManageOwnProject && isAuthor && data?.project &&
+                <InviteButton projectId={parseInt(data.project.id)} />
+              }
 
               <Fab
                 color="primary"
@@ -150,6 +154,7 @@ export const SingleProject: React.FC<Props> = props => {
             </>
           ) : (
             <>
+              <div />
               <div />
               <div />
             </>

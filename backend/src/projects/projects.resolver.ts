@@ -31,18 +31,11 @@ export class ProjectsResolver {
 
   @Query(() => [ProjectDto])
   @UseGuards(GqlAuthGuard)
-  @HasPermissions(PERMISSIONS.PROJECTS_VIEW, PERMISSIONS.PROJECTS_CREATE)
   projects(
     @CurrentUser() user: UserDto,
     @Args('filter') filter: ProjectsFilter,
   ): Promise<ProjectDto[]> {
     return this.projectsService.getMany(filter);
-  }
-
-  @Query(() => [ProjectDto])
-  @UseGuards(GqlAuthGuard)
-  myProjects(@CurrentUser() user: UserDto): Promise<ProjectDto[]> {
-    return this.projectsService.getMany({ authors: [user.id] });
   }
 
   @Query(() => ProjectDto)

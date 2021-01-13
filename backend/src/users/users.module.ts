@@ -24,10 +24,10 @@ export class UsersModule {
   constructor(private readonly usersService: UsersService) {}
 
   async onModuleInit(): Promise<void> {
-    await this._seedUsers();
+    await this.seedUsers();
   }
 
-  async _seedUsers(): Promise<void> {
+  private async seedUsers(): Promise<void> {
     const adminEmail = 'admin@spsul.cz';
 
     try {

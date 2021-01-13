@@ -14,6 +14,9 @@ export class ProjectDto {
   @Field()
   readonly description: string;
 
+  @Field(type => UserDto)
+  readonly owner: UserDto;
+
   @Field(type => [UserDto])
   readonly users: UserDto[];
 

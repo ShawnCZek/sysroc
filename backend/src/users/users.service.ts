@@ -298,7 +298,7 @@ export class UsersService {
   }
 
   hasPermissions(
-    userDto: UserDto,
+    userDto: BaseUserDto,
     ...permissionSlugs: string[]
   ): boolean {
     if (userDto.roles.length === 0) {
@@ -310,6 +310,7 @@ export class UsersService {
         return true;
       }
     }
+
     return false;
   }
 
@@ -318,7 +319,7 @@ export class UsersService {
    *
    * @param userDto
    */
-  getPermissionStates(userDto: UserDto): PermissionStateDto[] {
+  getPermissionStates(userDto: BaseUserDto): PermissionStateDto[] {
     const permissions = [];
     for (const permission of Object.values(PERMISSIONS)) {
       permissions.push({

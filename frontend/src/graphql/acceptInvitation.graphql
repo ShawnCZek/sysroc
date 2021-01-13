@@ -1,0 +1,8 @@
+mutation AcceptInvitation($invitationId: Float!) {
+  acceptInvitation(invitationId: $invitationId) {
+    id
+    project {
+      id
+    }
+  }
+}

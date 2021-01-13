@@ -14,6 +14,7 @@ import { DatabaseModule } from './database/database.module';
 import { ClassificationModule } from './classification/classification.module';
 import { MailerModule } from './mailer/mailer.module';
 import { PasswordResetModule } from './password-reset/password-reset.module';
+import { InvitationsModule } from './invitations/invitations.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { PasswordResetModule } from './password-reset/password-reset.module';
     MailerModule,
     ClassificationModule,
     PasswordResetModule,
+    InvitationsModule,
   ],
 })
 export class AppModule {

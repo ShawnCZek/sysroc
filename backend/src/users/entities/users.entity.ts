@@ -4,6 +4,7 @@ import { Role } from '../../roles/entities/roles.entity';
 import { Group } from '../../groups/entities/groups.entity';
 import { Project } from '../../projects/entities/projects.entity';
 import { Classification } from '../../classification/entities/classification.entity';
+import { Invitation } from '../../invitations/entities/invitations.entity';
 
 @Entity()
 @ObjectType()
@@ -50,4 +51,8 @@ export class User {
   @OneToMany(type => Project, project => project.supervisor)
   @Field(type => [Project])
   supervisedProjects: Project[];
+
+  @OneToMany(type => Invitation, invitation => invitation.invited)
+  @Field(type => [Invitation])
+  invitations: Invitation[];
 }

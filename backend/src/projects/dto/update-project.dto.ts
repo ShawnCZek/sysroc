@@ -4,8 +4,10 @@ import { Field, InputType } from '@nestjs/graphql';
 export class UpdateProjectDto {
   @Field({ nullable: true })
   readonly name?: string;
+
   @Field({ nullable: true })
   readonly description?: string;
+
   @Field({ nullable: true })
-  readonly supervisor?: number | null;
+  readonly supervisor?: number;
 }

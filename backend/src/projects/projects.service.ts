@@ -1,13 +1,14 @@
 import { Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Project } from './entities/projects.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { UserDto } from '../users/dto/user.dto';
 import { ProjectsFilter } from './filters/project.filter';
 import { ProjectDto } from './dto/project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/users.entity';
+import { UserDto } from '../users/dto/user.dto';
+import { BaseUserDto } from '../users/dto/base-user.dto';
 import { UsersService } from '../users/users.service';
 import { PERMISSIONS } from '../permissions/permissions';
 
@@ -23,14 +24,19 @@ export class ProjectsService {
     createProjectDto: CreateProjectDto,
     user: UserDto,
   ): Promise<ProjectDto> {
+    const owner = await this.userRepository.findOne({ id: user.id });
+
     const project = this.projectRepository.create(createProjectDto);
-    project.users.push(await this.userRepository.findOne({ id: user.id }));
+    project.owner = owner;
+    project.users.push(owner);
+
     const res = await this.projectRepository.save(project);
-    return this.projectRepository.findOne(res.id, { relations: ['user', 'supervisor'] });
+    return this.projectRepository.findOne(res.id, { relations: ['owner', 'users', 'supervisor'] });
   }
 
   async getMany(filter: ProjectsFilter): Promise<ProjectDto[]> {
     const query = this.projectRepository.createQueryBuilder('project')
+      .leftJoinAndSelect('project.owner', 'owner')
       .leftJoinAndSelect('project.users', 'users')
       .leftJoinAndSelect('project.supervisor', 'supervisor')
       .leftJoinAndSelect('project.tasks', 'tasks')
@@ -57,7 +63,7 @@ export class ProjectsService {
     projectId: number,
     user: UserDto,
   ): Promise<ProjectDto> {
-    const project = await this.projectRepository.findOne({ id: projectId }, { relations: ['users', 'supervisor'] });
+    const project = await this.projectRepository.findOne({ id: projectId }, { relations: ['owner', 'users', 'supervisor'] });
     if (!project) {
       throw new NotFoundException('Project couldn\'t be found.');
     }
@@ -98,7 +104,7 @@ export class ProjectsService {
     updates: UpdateProjectDto,
     user: UserDto,
   ): Promise<ProjectDto> {
-    const project = await this.projectRepository.findOne(filter.id, { relations: ['users', 'supervisor'] });
+    const project = await this.projectRepository.findOne(filter.id, { relations: ['owner', 'users', 'supervisor'] });
     if (!project) {
       throw new NotFoundException('Could not find project!');
     }
@@ -123,14 +129,14 @@ export class ProjectsService {
       throw new InternalServerErrorException('Could not update the project');
     }
 
-    return this.projectRepository.findOne(filter.id, { relations: ['users', 'supervisor'] });
+    return this.projectRepository.findOne(filter.id, { relations: ['owner', 'users', 'supervisor'] });
   }
 
   async claim(
     filter: ProjectsFilter,
     user: UserDto,
   ): Promise<ProjectDto> {
-    const project = await this.projectRepository.findOne(filter.id, { relations: ['users', 'supervisor'] });
+    const project = await this.projectRepository.findOne(filter.id, { relations: ['owner', 'users', 'supervisor'] });
 
     if (!project) {
       throw new NotFoundException('Could not find project!');
@@ -147,7 +153,19 @@ export class ProjectsService {
       throw new InternalServerErrorException('Could not claim the project.');
     }
 
-    return this.projectRepository.findOne(filter.id, { relations: ['users', 'supervisor'] });
+    return this.projectRepository.findOne(filter.id, { relations: ['owner', 'users', 'supervisor'] });
+  }
+
+  async addAuthor(
+    project: ProjectDto,
+    author: BaseUserDto,
+  ): Promise<void> {
+    if (!this.usersService.hasPermissions(author, PERMISSIONS.PROJECTS_CREATE)) {
+      throw new UnauthorizedException('The user does not have permissions to be a part of a project.');
+    }
+
+    const updateProject = { ...project, users: [...project.users, author] };
+    await this.projectRepository.save(updateProject);
   }
 
   isAuthor(

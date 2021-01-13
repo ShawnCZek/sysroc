@@ -1,10 +1,9 @@
 import React from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { NewProjectForm } from './NewProjectForm';
-import { useCreateProjectMutation } from '../../generated/graphql';
+import { ProjectsDocument, useCreateProjectMutation } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
-import gql from 'graphql-tag';
 
 function getModalStyle() {
   const top = 50;
@@ -35,23 +34,7 @@ interface Props {
   handleClose: () => void;
 }
 
-export const GET_PROJECTS = gql`
-  query Projects($name: String) {
-    projects(filter: { name: $name }) {
-      id
-      name
-      description
-      user {
-        id
-        name
-      }
-      supervisor {
-        id
-        name
-      }
-    }
-  }
-`;
+const GET_PROJECTS = ProjectsDocument;
 
 export const NewProjectModal: React.FC<Props> = ({
   open,
@@ -60,6 +43,7 @@ export const NewProjectModal: React.FC<Props> = ({
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
   const [modalStyle] = React.useState(getModalStyle);
+
   const [createProject, { error }] = useCreateProjectMutation({
     update(cache, result) {
       try {
@@ -76,7 +60,6 @@ export const NewProjectModal: React.FC<Props> = ({
           }
         });
       } catch (error) {
-        console.log(error);
         if (error instanceof Error) {
           enqueueSnackbar(error.message, { variant: 'error' });
         }
