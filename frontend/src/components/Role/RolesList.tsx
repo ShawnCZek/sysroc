@@ -9,6 +9,7 @@ import { BooleanIcon } from '../Layout/Icon/BooleanIcon';
 import { Fab } from '@material-ui/core';
 import { UpdateRoleModal } from './UpdateRoleModal';
 import { DeleteRoleDialog } from './DeleteRoleDialog';
+import { ComponentLoading } from '../ComponentLoading';
 
 const ItemIcon = styled.div`
   display: flex;
@@ -62,7 +63,7 @@ export const RolesList: React.FC = () => {
     await deleteRole({ variables: { roleId } });
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ComponentLoading />;
 
   return (
     <div>

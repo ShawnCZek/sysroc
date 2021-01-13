@@ -1,7 +1,9 @@
 import React from 'react';
+import { useSnackbar } from 'notistack';
 import { RouteComponentProps, useHistory } from 'react-router';
 import { useAcceptInvitationMutation } from '../generated/graphql';
-import { useSnackbar } from 'notistack';
+import { Loading } from '../components/Loading';
+import { Home } from '../components/Home';
 
 interface Props extends RouteComponentProps<{
   invitationId: string;
@@ -27,5 +29,10 @@ export const AcceptInvitation: React.FC<Props> = props => {
 
   acceptInvite().catch(() => history.push('/'));
 
-  return null;
+  return (
+    <>
+      <Loading transparent={false} />
+      <Home />
+    </>
+  );
 };

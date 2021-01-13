@@ -4,6 +4,7 @@ import { Item } from '../Layout/Item';
 import { List } from '../Layout/List';
 import { useDeleteUserMutation, useMeQuery, useUsersQuery } from '../../generated/graphql';
 import { Fab } from '@material-ui/core';
+import { ComponentLoading } from '../ComponentLoading';
 import { UpdateUserModal } from './UpdateUserModal';
 import { UserFilters, UsersFilter } from './UsersFilter';
 import { DeleteUserDialog } from './DeleteUserDialog';
@@ -64,7 +65,7 @@ export const UsersList: React.FC = () => {
     return !!user && !isAdmin(user) && (!isTeacher(user) || canManageTeachers) && (!isStudent(user) || canManageStudents);
   };
 
-  if (loading || meLoading) return <span>Loading...</span>;
+  if (loading || meLoading) return <ComponentLoading />;
 
   return (
     <div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { PERMISSIONS } from '../generated/permissions';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { Loading } from '../components/Loading';
 import { SignIn } from '../components/SignIn';
 import { Home } from '../components/Home';
 import { SignUp } from '../components/SignUp';
@@ -26,7 +27,7 @@ export const Routes: React.FC = () => {
   const { data, loading } = useMeQuery();
   const { data: permissionData, loading: permissionLoading } = useMyPermissionsQuery();
 
-  if (loading || permissionLoading) return <div>Loading...</div>;
+  if (loading || permissionLoading) return <Loading />;
 
   const authenticated = !!data?.me;
   const projectList = hasPermissions(permissionData?.myPermissions, PERMISSIONS.PROJECTS_CREATE, PERMISSIONS.PROJECTS_VIEW);

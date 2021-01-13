@@ -3,6 +3,7 @@ import { ClassificationHeader } from '../components/Classification/Classificatio
 import { useMeQuery } from '../generated/graphql';
 import { NewClassificationModal } from '../components/Classification/NewClassificationModal';
 import { ClassificationList } from '../components/Classification/ClassificationList';
+import { ComponentLoading } from '../components/ComponentLoading';
 
 export const Classification: React.FC = () => {
   const [open, setOpen] = React.useState(false);
@@ -11,7 +12,7 @@ export const Classification: React.FC = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ComponentLoading />;
 
   return (
     <>

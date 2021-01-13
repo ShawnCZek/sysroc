@@ -4,6 +4,7 @@ import { Field, Form, Formik } from 'formik';
 import { MyField } from '../MyField';
 import { useBaseUsersQuery } from '../../generated/graphql';
 import { Autocomplete } from '@material-ui/lab';
+import { ComponentLoading } from '../ComponentLoading';
 
 const useStyles = makeStyles({
   form: {
@@ -69,7 +70,7 @@ export const ProjectsFilter: React.FC<Props> = ({
     defaultSupervisors = supervisorsData.baseUsers.filter(user => supervisors?.includes(parseInt(user.id))).map(user => user.name);
   }
 
-  if (authorsLoading || supervisorsLoading) return <span>Loading...</span>;
+  if (authorsLoading || supervisorsLoading) return <ComponentLoading />;
 
   return (
     <Formik

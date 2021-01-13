@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRolesQuery } from '../../generated/graphql';
 import { Checkbox, FormControlLabel, FormGroup } from '@material-ui/core';
+import { ComponentLoading } from '../ComponentLoading';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
 
@@ -35,7 +36,7 @@ export const UserRoles: React.FC<Props> = ({
     onRolesStateChange(newRoles);
   };
 
-  if (rolesLoading) return <span>Loading...</span>;
+  if (rolesLoading) return <ComponentLoading />;
 
   return (
     <FormGroup>

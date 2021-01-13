@@ -1,8 +1,9 @@
 import React from 'react';
+import styled from 'styled-components';
 import { useGroupsQuery } from '../../generated/graphql';
 import { TextField } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
-import styled from 'styled-components';
+import { ComponentLoading } from '../ComponentLoading';
 
 const UserGroupStyles = styled.div`
   padding: .5rem 0 1rem 0;
@@ -28,7 +29,7 @@ export const UserGroups: React.FC<Props> = ({
     }
   };
 
-  if (loadingGroups && !loaded) return <span>Loading...</span>;
+  if (loadingGroups && !loaded) return <ComponentLoading />;
 
   if (!loaded && userGroups && groupsData && groupsData.groups) {
     setDefaultValue(groupsData.groups.filter(group => userGroups.includes(parseInt(group.id))).map(group => group.name));

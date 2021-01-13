@@ -1,10 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useProjectsQuery, useUserQuery } from '../../generated/graphql';
 import { Typography } from '@material-ui/core';
+import { useProjectsQuery, useUserQuery } from '../../generated/graphql';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
 import { ProjectsTable } from '../Project/ProjectsTable';
+import { ComponentLoading } from '../ComponentLoading';
 
 const UserInformation = styled.div`
   & p {
@@ -30,7 +31,7 @@ export const Profile: React.FC<Props> = ({
 
   const canViewEmail = useHasPermissions(PERMISSIONS.MANAGE_STUDENT_USERS, PERMISSIONS.MANAGE_TEACHER_USERS);
 
-  if (loading || projectsLoading) return <div>Loading...</div>;
+  if (loading || projectsLoading) return <ComponentLoading />;
 
   return (
     <>

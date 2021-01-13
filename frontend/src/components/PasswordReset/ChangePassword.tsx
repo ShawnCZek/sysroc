@@ -3,6 +3,7 @@ import { RouteComponentProps, useHistory } from 'react-router';
 import { ChangePasswordForm } from './ChangePasswordForm';
 import { useChangePasswordMutation, useMeQuery, usePasswordResetQuery } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
+import { ComponentLoading } from '../ComponentLoading';
 
 interface Props extends RouteComponentProps<{
   hash: string;
@@ -23,7 +24,7 @@ export const ChangePassword: React.FC<Props> = props => {
     }
   });
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ComponentLoading />;
 
   if (queryError || !meError) {
     history.push('/');

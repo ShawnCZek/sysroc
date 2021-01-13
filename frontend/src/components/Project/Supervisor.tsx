@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { makeStyles, TextField } from '@material-ui/core';
 import { useBaseUsersQuery, useRolesQuery } from '../../generated/graphql';
 import { Autocomplete } from '@material-ui/lab';
+import { ComponentLoading } from '../ComponentLoading';
 
 const SupervisorStyles = styled.div`
   padding: .5rem 0 1rem 0;
@@ -41,7 +42,7 @@ export const Supervisor: React.FC<Props> = ({
     }
   };
 
-  if (rolesLoading || usersLoading) return <span>Loading...</span>;
+  if (rolesLoading || usersLoading) return <ComponentLoading />;
 
   if (!loaded) {
     // A little hack to get rid of console errors with not using the default value

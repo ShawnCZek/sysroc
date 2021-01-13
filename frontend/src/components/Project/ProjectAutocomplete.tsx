@@ -1,6 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import { Autocomplete } from '@material-ui/lab';
 import { TextField } from '@material-ui/core';
+import { ComponentLoading } from '../ComponentLoading';
 import { ProjectDto, useProjectsQuery } from '../../generated/graphql';
 
 interface Props {
@@ -12,7 +13,7 @@ interface Props {
 export const ProjectAutocomplete: React.FC<Props> = ({ userId, handleChange, defaultProject }) => {
   const { data, loading } = useProjectsQuery();
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ComponentLoading />;
 
   return (
     <Autocomplete

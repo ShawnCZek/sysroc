@@ -7,6 +7,7 @@ import { Form, Formik } from 'formik';
 import { Autocomplete } from '@material-ui/lab';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
+import { ComponentLoading } from '../ComponentLoading';
 
 const useStyles = makeStyles({
   form: {
@@ -73,7 +74,7 @@ export const ClassificationFilter: React.FC<Props> = ({ defaultValues, onSubmit 
     defaultUsers = usersData.baseUsers.filter(user => users?.includes(parseInt(user.id))).map(user => user.name);
   }
 
-  if (projectsLoading || usersLoading) return <span>Loading...</span>;
+  if (projectsLoading || usersLoading) return <ComponentLoading />;
 
   return (
     <MuiPickersUtilsProvider utils={MomentUtils}>

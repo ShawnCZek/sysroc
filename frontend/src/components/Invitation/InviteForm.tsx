@@ -5,6 +5,7 @@ import { ApolloError } from '@apollo/client';
 import { useBaseUsersQuery } from '../../generated/graphql';
 import { Error } from '../Error';
 import { Autocomplete } from '@material-ui/lab';
+import { ComponentLoading } from '../ComponentLoading';
 
 const useStyles = makeStyles({
   form: {
@@ -38,7 +39,7 @@ export const InviteForm: React.FC<Props> = ({ onSubmit, error }) => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ComponentLoading />;
 
   return (
     <Formik

@@ -18,6 +18,7 @@ import AssignmentIndRoundedIcon from '@material-ui/icons/AssignmentIndRounded';
 import GroupRoundedIcon from '@material-ui/icons/GroupRounded';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Header } from './Header';
+import { Loading } from './Loading';
 import { useHistory } from 'react-router';
 import { useHasPermissions } from '../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../generated/permissions';
@@ -100,7 +101,7 @@ export const PersistentDrawerLeft: React.FC = props => {
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />;
 
   return (
     <div className={classes.root}>

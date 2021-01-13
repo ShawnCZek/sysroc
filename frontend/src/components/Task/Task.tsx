@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { IconButton, Typography } from '@material-ui/core';
 import styled from 'styled-components';
 import moment from 'moment';
 import EditIcon from '@material-ui/icons/Edit';
@@ -7,6 +6,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import CheckIcon from '@material-ui/icons/Check';
 import ClearIcon from '@material-ui/icons/Clear';
 import grey from '@material-ui/core/colors/grey';
+import { IconButton, Typography } from '@material-ui/core';
 import {
   ProjectQuery,
   ProjectTasksDocument,
@@ -19,6 +19,7 @@ import {
 import { useSnackbar } from 'notistack';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
+import { ComponentLoading } from '../ComponentLoading';
 
 const TaskStyles = styled.div`
   padding: 1rem 1.4rem;
@@ -185,7 +186,7 @@ export const Task: React.FC<Props> = ({
     }
   }, [enqueueSnackbar, error, statusError]);
 
-  if (loadingProject || loadingMe) return <div>Loading...</div>;
+  if (loadingProject || loadingMe) return <ComponentLoading />;
 
   return (
     <TaskStyles>

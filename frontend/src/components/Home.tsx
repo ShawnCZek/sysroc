@@ -3,6 +3,7 @@ import { useMeQuery } from '../generated/graphql';
 import { Profile } from './User/Profile';
 import { makeStyles, Typography } from '@material-ui/core';
 import { InvitationsList } from './Invitation/InvitationsList';
+import { ComponentLoading } from './ComponentLoading';
 
 const useStyles = makeStyles({
   mainTitle: {
@@ -20,13 +21,7 @@ export const Home: React.FC<Props> = () => {
   const classes = useStyles();
   const { data, loading } = useMeQuery();
 
-  if (loading) return <div>Loading...</div>;
-
-  if (!data?.me?.user) {
-    return (
-      <div />
-    );
-  }
+  if (loading || !data?.me?.user) return <ComponentLoading />;
 
   return (
     <div>

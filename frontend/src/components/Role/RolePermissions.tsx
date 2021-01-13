@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePermissionsQuery } from '../../generated/graphql';
 import { Checkbox, FormControlLabel, FormGroup } from '@material-ui/core';
+import { ComponentLoading } from '../ComponentLoading';
 
 interface Props {
   rolePermissions?: string[];
@@ -28,7 +29,7 @@ export const RolePermissions: React.FC<Props> = ({
     onPermissionsStateChange(newPermissions);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ComponentLoading />;
 
   return (
     <FormGroup>

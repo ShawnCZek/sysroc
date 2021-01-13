@@ -5,6 +5,7 @@ import { Routes } from './routes/Routes';
 import { Config } from './config/config';
 import { SnackbarProvider } from 'notistack';
 import { ApolloProvider } from '@apollo/client';
+import { Loading } from './components/Loading';
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -21,7 +22,7 @@ const App: React.FC = () => {
   });
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (

@@ -3,6 +3,7 @@ import { MeDocument, MeQuery, useMeQuery, useUpdateProfileMutation } from '../ge
 import { SettingsHeader } from '../components/Settings/SettingsHeader';
 import { SettingsForm } from '../components/Settings/SettingsForm';
 import { useSnackbar } from 'notistack';
+import { ComponentLoading } from '../components/ComponentLoading';
 
 export interface ProfileValues {
   name: string;
@@ -39,7 +40,7 @@ export const Settings: React.FC = () => {
     await updateProfile({ variables: values });
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ComponentLoading />;
 
   return (
     <>

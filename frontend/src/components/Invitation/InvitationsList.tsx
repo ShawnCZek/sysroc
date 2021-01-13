@@ -17,6 +17,7 @@ import { useSnackbar } from 'notistack';
 import { AcceptInvitationAlert } from './AcceptInvitationAlert';
 import { DeleteInvitationAlert } from './DeleteInvitationAlert';
 import { ProjectsAuthors } from '../Project/ProjectsAuthors';
+import { ComponentLoading } from '../ComponentLoading';
 
 export const InvitationsList: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -77,7 +78,7 @@ export const InvitationsList: React.FC = () => {
     });
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ComponentLoading />;
 
   return (
     <>

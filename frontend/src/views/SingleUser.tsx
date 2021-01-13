@@ -3,6 +3,7 @@ import { useUserQuery } from '../generated/graphql';
 import { RouteComponentProps } from 'react-router';
 import { Profile } from '../components/User/Profile';
 import { makeStyles, Typography } from '@material-ui/core';
+import { ComponentLoading } from '../components/ComponentLoading';
 
 const useStyles = makeStyles({
   title: {
@@ -20,7 +21,7 @@ export const SingleUser: React.FC<Props> = props => {
   const classes = useStyles();
   const { data, loading } = useUserQuery({ variables: { id: userId } });
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ComponentLoading />;
 
   return (
     <>

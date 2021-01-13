@@ -1,6 +1,7 @@
 import React from 'react';
 import { useClaimProjectMutation, useMeQuery } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
+import { ComponentLoading } from '../ComponentLoading';
 import { Fab } from '@material-ui/core';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
@@ -28,7 +29,7 @@ export const ClaimProjectFab: React.FC<Props> = ({
     }
   });
 
-  if (loading) return <span>Loading...</span>;
+  if (loading) return <ComponentLoading />;
 
   return (
     <>

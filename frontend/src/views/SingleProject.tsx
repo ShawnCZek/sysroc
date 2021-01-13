@@ -14,6 +14,7 @@ import { ClaimProjectFab } from '../components/Project/ClaimProjectFab';
 import { useHasPermissions } from '../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../generated/permissions';
 import { InviteButton } from '../components/Invitation/InviteButton';
+import { ComponentLoading } from '../components/ComponentLoading';
 
 const ProjectControls = styled.div`
   display: grid;
@@ -110,7 +111,7 @@ export const SingleProject: React.FC<Props> = props => {
     tasksByMonth[key].push(task);
   }
 
-  if (loading || meLoading) return <div>Loading...</div>;
+  if (loading || meLoading) return <ComponentLoading />;
 
   return (
     <>

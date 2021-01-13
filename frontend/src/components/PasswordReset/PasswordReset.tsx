@@ -3,6 +3,7 @@ import { RouteComponentProps, useHistory } from 'react-router';
 import { useCreatePasswordResetMutation, useMeQuery } from '../../generated/graphql';
 import { PasswordResetForm } from './PasswordResetForm';
 import { useSnackbar } from 'notistack';
+import { ComponentLoading } from '../ComponentLoading';
 
 export const PasswordReset: React.FC<RouteComponentProps> = () => {
   const history = useHistory();
@@ -17,7 +18,7 @@ export const PasswordReset: React.FC<RouteComponentProps> = () => {
     }
   });
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ComponentLoading />;
 
   if (!meError) {
     history.push('/');

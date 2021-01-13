@@ -5,6 +5,7 @@ import { Item } from '../Layout/Item';
 import { List } from '../Layout/List';
 import { ClassificationFilter, ClassificationFilters } from './ClassificationFilter';
 import { Fab, Paper } from '@material-ui/core';
+import { ComponentLoading } from '../ComponentLoading';
 import { DeleteClassificationDialog } from './DeleteClassificationDialog';
 import { useSnackbar } from 'notistack';
 import { UpdateClassificationModal } from './UpdateClassificationModal';
@@ -54,7 +55,7 @@ export const ClassificationList: React.FC<Props> = ({ userId }) => {
   const handleUpdateModalOpen = () => setUpdateModalOpen(true);
   const handleUpdateModalClose = () => setUpdateModalOpen(false);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ComponentLoading />;
 
   return (
     <div>

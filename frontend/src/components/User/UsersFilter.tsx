@@ -4,6 +4,7 @@ import { Field, Form, Formik } from 'formik';
 import { MyField } from '../MyField';
 import { Button, makeStyles, TextField } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
+import { ComponentLoading } from '../ComponentLoading';
 
 const useStyles = makeStyles({
   form: {
@@ -68,7 +69,7 @@ export const UsersFilter: React.FC<Props> = ({
     defaultGroups = groupsData.groups.filter(group => groups?.includes(parseInt(group.id))).map(group => group.name);
   }
 
-  if (rolesLoading || groupsLoading) return <span>Loading...</span>;
+  if (rolesLoading || groupsLoading) return <ComponentLoading />;
 
   return (
     <Formik

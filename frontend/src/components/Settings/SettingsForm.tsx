@@ -7,6 +7,7 @@ import { ApolloError } from '@apollo/client';
 import { Error } from '../Error';
 import { useMeQuery } from '../../generated/graphql';
 import { ProfileValues } from '../../views/Settings';
+import { ComponentLoading } from '../ComponentLoading';
 
 const FormBox = styled.div`
   display: flex;
@@ -54,7 +55,7 @@ export const SettingsForm: React.FC<Props> = ({ onSubmit, error }) => {
   const classes = useStyles();
   const { data, loading, refetch } = useMeQuery();
 
-  if (loading) return <span>Loading...</span>;
+  if (loading) return <ComponentLoading />;
 
   return (
     <Formik
