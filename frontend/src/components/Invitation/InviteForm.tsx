@@ -11,14 +11,17 @@ const useStyles = makeStyles({
   form: {
     padding: '0.2rem',
     margin: '0 auto',
-    marginTop: '1.3rem'
+    marginTop: '1.3rem',
   },
   button: {
-    marginTop: '1rem'
+    marginTop: '2rem',
   },
   formTitle: {
-    marginBottom: '0.8rem'
-  }
+    marginBottom: '0.8rem',
+  },
+  field: {
+    maxWidth: '18rem',
+  },
 });
 
 interface Props {
@@ -54,6 +57,7 @@ export const InviteForm: React.FC<Props> = ({ onSubmit, error }) => {
           placeholder="User"
           options={data?.baseUsers?.map(user => user.name) as string[]}
           onChange={handleUserChange}
+          className={classes.field}
           renderInput={params => (
             <TextField
               {...params}

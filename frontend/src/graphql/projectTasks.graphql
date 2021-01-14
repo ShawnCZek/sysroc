@@ -1,5 +1,5 @@
-query ProjectTasks($id: Float) {
-  project(filter: { id: $id }) {
+query ProjectTasks($id: Float!) {
+  project(projectId: $id) {
     id
     name
     description

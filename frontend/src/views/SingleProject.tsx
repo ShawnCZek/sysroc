@@ -1,7 +1,13 @@
 import moment from 'moment';
 import styled from 'styled-components';
 import React, { useState } from 'react';
-import { ClassificationDto, ProjectDto, useMeQuery, useProjectQuery } from '../generated/graphql';
+import {
+  ClassificationDto,
+  ProjectDto,
+  useMeQuery,
+  useProjectDetailsQuery,
+  useProjectQuery,
+} from '../generated/graphql';
 import { RouteComponentProps, useHistory } from 'react-router';
 import { Fab, Typography } from '@material-ui/core';
 import { UpdateProjectModal } from '../components/Project/UpdateProjectModal';
@@ -64,12 +70,13 @@ const TaskLists = styled.div`
   margin: 3rem auto;
 `;
 
-interface Props
-  extends RouteComponentProps<{
-    projectId: string;
-  }> {}
+interface Props extends RouteComponentProps<{
+  projectId: string;
+}> {}
 
 export const SingleProject: React.FC<Props> = props => {
+  const projectId = parseInt(props.match.params.projectId);
+
   const history = useHistory();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -79,9 +86,8 @@ export const SingleProject: React.FC<Props> = props => {
   const [selectedTaskId, setSelectedTaskId] = useState<number>(0);
 
   const { data: meData, loading: meLoading } = useMeQuery();
-  const { data, loading } = useProjectQuery({
-    variables: { id: parseInt(props.match.params.projectId) }
-  });
+  const { data, loading } = useProjectQuery({ variables: { id: projectId } });
+  const { loading: detailsLoading } = useProjectDetailsQuery({ variables: { id: projectId } });
 
   const isAuthor = data?.project?.users?.some(author => author.id === meData?.me?.user?.id);
   const canManageOwnProject = useHasPermissions(PERMISSIONS.PROJECTS_CREATE);
@@ -111,7 +117,7 @@ export const SingleProject: React.FC<Props> = props => {
     tasksByMonth[key].push(task);
   }
 
-  if (loading || meLoading) return <ComponentLoading />;
+  if (loading || meLoading || detailsLoading) return <ComponentLoading />;
 
   return (
     <>
@@ -139,9 +145,7 @@ export const SingleProject: React.FC<Props> = props => {
                   Edit
                 </Fab>
               }
-              { canManageOwnProject && isAuthor && data?.project &&
-                <InviteButton projectId={parseInt(data.project.id)} />
-              }
+              { data?.project && <InviteButton projectId={parseInt(data.project.id)} /> }
 
               <Fab
                 color="primary"
@@ -202,14 +206,14 @@ export const SingleProject: React.FC<Props> = props => {
           )}
         </Project>
       ) : (
-        <div>There is no project with ID {props.match.params.projectId}</div>
+        <div>There is no project with ID {projectId}</div>
       )}
       {data && (
           <>
             <UpdateProjectModal
               open={modalOpen}
               handleClose={handleModalClose}
-              projectId={parseInt(props.match.params.projectId)}
+              projectId={projectId}
               data={data?.project as ProjectDto}
             />
             <ProjectClassificationOverview
@@ -223,7 +227,7 @@ export const SingleProject: React.FC<Props> = props => {
         <UpdateProjectModal
           open={modalOpen}
           handleClose={handleModalClose}
-          projectId={parseInt(props.match.params.projectId)}
+          projectId={projectId}
           data={data?.project as ProjectDto}
         />
       )}

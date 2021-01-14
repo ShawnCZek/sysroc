@@ -1,0 +1,14 @@
+query Invitations($projectId: Float!) {
+  invitations(projectId: $projectId) {
+    id
+    user {
+      id
+      name
+    }
+    invited {
+      id
+      name
+    }
+    createdAt
+  }
+}

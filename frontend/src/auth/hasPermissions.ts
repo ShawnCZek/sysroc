@@ -21,5 +21,6 @@ export const hasPermissions = (permissionData: Array<PermissionStateDto> | undef
       return true;
     }
   }
+
   return false;
 };

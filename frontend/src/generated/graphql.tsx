@@ -362,6 +362,7 @@ export type Project = {
   id: Scalars['ID'];
   name: Scalars['String'];
   description: Scalars['String'];
+  owner: User;
   users: Array<User>;
   supervisor: User;
   tasks: Array<Task>;
@@ -370,11 +371,18 @@ export type Project = {
   createdAt: Scalars['DateTime'];
 };
 
+export type ProjectDetailsDto = {
+  __typename?: 'ProjectDetailsDto';
+  isOwner: Scalars['Boolean'];
+  isAuthor: Scalars['Boolean'];
+};
+
 export type ProjectDto = {
   __typename?: 'ProjectDto';
   id: Scalars['ID'];
   name: Scalars['String'];
   description: Scalars['String'];
+  owner: UserDto;
   users: Array<UserDto>;
   supervisor?: Maybe<UserDto>;
   tasks: Array<TaskDto>;
@@ -402,9 +410,11 @@ export type Query = {
   authUser: AdUser;
   projects: Array<ProjectDto>;
   project: ProjectDto;
+  projectDetails: ProjectDetailsDto;
   task: TaskDto;
   classifications: Array<ClassificationDto>;
   passwordReset: PasswordResetDto;
+  invitations: Array<InvitationDto>;
   myInvitations: Array<InvitationDto>;
 };
 
@@ -445,7 +455,12 @@ export type QueryProjectsArgs = {
 
 
 export type QueryProjectArgs = {
-  filter: ProjectsFilter;
+  projectId: Scalars['Float'];
+};
+
+
+export type QueryProjectDetailsArgs = {
+  projectId: Scalars['Float'];
 };
 
 
@@ -461,6 +476,11 @@ export type QueryClassificationsArgs = {
 
 export type QueryPasswordResetArgs = {
   hash: Scalars['String'];
+};
+
+
+export type QueryInvitationsArgs = {
+  projectId: Scalars['Float'];
 };
 
 export type Role = {
@@ -978,6 +998,26 @@ export type GroupsQuery = (
   )> }
 );
 
+export type InvitationsQueryVariables = Exact<{
+  projectId: Scalars['Float'];
+}>;
+
+
+export type InvitationsQuery = (
+  { __typename?: 'Query' }
+  & { invitations: Array<(
+    { __typename?: 'InvitationDto' }
+    & Pick<InvitationDto, 'id' | 'createdAt'>
+    & { user: (
+      { __typename?: 'BaseUserDto' }
+      & Pick<BaseUserDto, 'id' | 'name'>
+    ), invited: (
+      { __typename?: 'BaseUserDto' }
+      & Pick<BaseUserDto, 'id' | 'name'>
+    ) }
+  )> }
+);
+
 export type InviteMutationVariables = Exact<{
   userId: Scalars['ID'];
   projectId: Scalars['ID'];
@@ -1076,7 +1116,7 @@ export type PermissionsQuery = (
 );
 
 export type ProjectQueryVariables = Exact<{
-  id?: Maybe<Scalars['Float']>;
+  id: Scalars['Float'];
 }>;
 
 
@@ -1105,8 +1145,21 @@ export type ProjectQuery = (
   ) }
 );
 
+export type ProjectDetailsQueryVariables = Exact<{
+  id: Scalars['Float'];
+}>;
+
+
+export type ProjectDetailsQuery = (
+  { __typename?: 'Query' }
+  & { projectDetails: (
+    { __typename?: 'ProjectDetailsDto' }
+    & Pick<ProjectDetailsDto, 'isOwner' | 'isAuthor'>
+  ) }
+);
+
 export type ProjectTasksQueryVariables = Exact<{
-  id?: Maybe<Scalars['Float']>;
+  id: Scalars['Float'];
 }>;
 
 
@@ -2189,6 +2242,48 @@ export function useGroupsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Gro
 export type GroupsQueryHookResult = ReturnType<typeof useGroupsQuery>;
 export type GroupsLazyQueryHookResult = ReturnType<typeof useGroupsLazyQuery>;
 export type GroupsQueryResult = Apollo.QueryResult<GroupsQuery, GroupsQueryVariables>;
+export const InvitationsDocument = gql`
+    query Invitations($projectId: Float!) {
+  invitations(projectId: $projectId) {
+    id
+    user {
+      id
+      name
+    }
+    invited {
+      id
+      name
+    }
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useInvitationsQuery__
+ *
+ * To run a query within a React component, call `useInvitationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useInvitationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useInvitationsQuery({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *   },
+ * });
+ */
+export function useInvitationsQuery(baseOptions: Apollo.QueryHookOptions<InvitationsQuery, InvitationsQueryVariables>) {
+        return Apollo.useQuery<InvitationsQuery, InvitationsQueryVariables>(InvitationsDocument, baseOptions);
+      }
+export function useInvitationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<InvitationsQuery, InvitationsQueryVariables>) {
+          return Apollo.useLazyQuery<InvitationsQuery, InvitationsQueryVariables>(InvitationsDocument, baseOptions);
+        }
+export type InvitationsQueryHookResult = ReturnType<typeof useInvitationsQuery>;
+export type InvitationsLazyQueryHookResult = ReturnType<typeof useInvitationsLazyQuery>;
+export type InvitationsQueryResult = Apollo.QueryResult<InvitationsQuery, InvitationsQueryVariables>;
 export const InviteDocument = gql`
     mutation Invite($userId: ID!, $projectId: ID!) {
   invite(input: {user: $userId, project: $projectId}) {
@@ -2444,8 +2539,8 @@ export type PermissionsQueryHookResult = ReturnType<typeof usePermissionsQuery>;
 export type PermissionsLazyQueryHookResult = ReturnType<typeof usePermissionsLazyQuery>;
 export type PermissionsQueryResult = Apollo.QueryResult<PermissionsQuery, PermissionsQueryVariables>;
 export const ProjectDocument = gql`
-    query Project($id: Float) {
-  project(filter: {id: $id}) {
+    query Project($id: Float!) {
+  project(projectId: $id) {
     id
     name
     description
@@ -2496,7 +2591,7 @@ export const ProjectDocument = gql`
  *   },
  * });
  */
-export function useProjectQuery(baseOptions?: Apollo.QueryHookOptions<ProjectQuery, ProjectQueryVariables>) {
+export function useProjectQuery(baseOptions: Apollo.QueryHookOptions<ProjectQuery, ProjectQueryVariables>) {
         return Apollo.useQuery<ProjectQuery, ProjectQueryVariables>(ProjectDocument, baseOptions);
       }
 export function useProjectLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProjectQuery, ProjectQueryVariables>) {
@@ -2505,9 +2600,43 @@ export function useProjectLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Pr
 export type ProjectQueryHookResult = ReturnType<typeof useProjectQuery>;
 export type ProjectLazyQueryHookResult = ReturnType<typeof useProjectLazyQuery>;
 export type ProjectQueryResult = Apollo.QueryResult<ProjectQuery, ProjectQueryVariables>;
+export const ProjectDetailsDocument = gql`
+    query ProjectDetails($id: Float!) {
+  projectDetails(projectId: $id) {
+    isOwner
+    isAuthor
+  }
+}
+    `;
+
+/**
+ * __useProjectDetailsQuery__
+ *
+ * To run a query within a React component, call `useProjectDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProjectDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useProjectDetailsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useProjectDetailsQuery(baseOptions: Apollo.QueryHookOptions<ProjectDetailsQuery, ProjectDetailsQueryVariables>) {
+        return Apollo.useQuery<ProjectDetailsQuery, ProjectDetailsQueryVariables>(ProjectDetailsDocument, baseOptions);
+      }
+export function useProjectDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProjectDetailsQuery, ProjectDetailsQueryVariables>) {
+          return Apollo.useLazyQuery<ProjectDetailsQuery, ProjectDetailsQueryVariables>(ProjectDetailsDocument, baseOptions);
+        }
+export type ProjectDetailsQueryHookResult = ReturnType<typeof useProjectDetailsQuery>;
+export type ProjectDetailsLazyQueryHookResult = ReturnType<typeof useProjectDetailsLazyQuery>;
+export type ProjectDetailsQueryResult = Apollo.QueryResult<ProjectDetailsQuery, ProjectDetailsQueryVariables>;
 export const ProjectTasksDocument = gql`
-    query ProjectTasks($id: Float) {
-  project(filter: {id: $id}) {
+    query ProjectTasks($id: Float!) {
+  project(projectId: $id) {
     id
     name
     description
@@ -2539,7 +2668,7 @@ export const ProjectTasksDocument = gql`
  *   },
  * });
  */
-export function useProjectTasksQuery(baseOptions?: Apollo.QueryHookOptions<ProjectTasksQuery, ProjectTasksQueryVariables>) {
+export function useProjectTasksQuery(baseOptions: Apollo.QueryHookOptions<ProjectTasksQuery, ProjectTasksQueryVariables>) {
         return Apollo.useQuery<ProjectTasksQuery, ProjectTasksQueryVariables>(ProjectTasksDocument, baseOptions);
       }
 export function useProjectTasksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProjectTasksQuery, ProjectTasksQueryVariables>) {

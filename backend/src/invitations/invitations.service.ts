@@ -13,11 +13,13 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '../config/config.service';
 import { ProjectDto } from '../projects/dto/project.dto';
 import { ObjectLiteral } from 'typeorm/common/ObjectLiteral';
+import { Project } from '../projects/entities/projects.entity';
 
 @Injectable()
 export class InvitationsService {
   constructor(
     @InjectRepository(Invitation) private readonly invitationRepository: Repository<Invitation>,
+    @InjectRepository(Project) private readonly projectRepository: Repository<Project>,
     private readonly usersService: UsersService,
     private readonly projectsService: ProjectsService,
     private readonly mailerService: MailerService,
@@ -41,7 +43,7 @@ export class InvitationsService {
     user: UserDto,
   ): Promise<InvitationDto> {
     const invitation = await this.getOne(invitationId);
-    if (invitation.invited.id !== user.id) {
+    if (invitation.invited.id !== user.id && !this.projectsService.isAuthor(invitation.project, user)) {
       throw new NotFoundException();
     }
 
@@ -59,12 +61,24 @@ export class InvitationsService {
     });
   }
 
+  async getManyForProject(
+    projectId: number,
+    user: UserDto,
+  ): Promise<InvitationDto[]> {
+    const project = await this.projectRepository.findOne(projectId, { relations: ['owner', 'users'] });
+    if (!this.projectsService.isAuthor(project, user)) {
+      throw new UnauthorizedException();
+    }
+
+    return this.getMany({ project: projectId });
+  }
+
   async create(
     input: InviteDto,
     user: UserDto,
   ): Promise<InvitationDto> {
     const project = await this.projectsService.getOne(input.project);
-    if (!this.projectsService.isAuthor(project, user)) {
+    if (!this.projectsService.isOwner(project, user)) {
       throw new UnauthorizedException('You cannot invite users to this project!');
     }
 

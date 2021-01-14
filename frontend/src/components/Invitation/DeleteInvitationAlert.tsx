@@ -18,6 +18,7 @@ export const DeleteInvitationAlert: React.FC<Props> = ({
   handleClose,
   handleDeleteInvitation,
   invitationId,
+  children,
 }) => {
   return (
     <Dialog
@@ -30,7 +31,7 @@ export const DeleteInvitationAlert: React.FC<Props> = ({
       <DialogTitle id="alert-dialog-title">Delete Invitation</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          Are you sure you want to cancel the project invitation by deleting it?
+          {children}
         </DialogContentText>
       </DialogContent>
       <DialogActions>

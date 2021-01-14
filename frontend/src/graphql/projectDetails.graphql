@@ -1,0 +1,6 @@
+query ProjectDetails($id: Float!) {
+  projectDetails(projectId: $id) {
+    isOwner
+    isAuthor
+  }
+}

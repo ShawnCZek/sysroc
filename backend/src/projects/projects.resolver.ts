@@ -11,6 +11,7 @@ import { HasPermissions } from '../users/decorators/has-permissions.decorator';
 import { PERMISSIONS } from '../permissions/permissions';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { UsersService } from '../users/users.service';
+import { ProjectDetailsDto } from './dto/project-details.dto';
 
 @Resolver('Projects')
 export class ProjectsResolver {
@@ -41,16 +42,25 @@ export class ProjectsResolver {
   @Query(() => ProjectDto)
   @UseGuards(GqlAuthGuard)
   async project(
+    @Args('projectId') projectId: number,
     @CurrentUser() user: UserDto,
-    @Args('filter') filter: ProjectsFilter,
   ): Promise<ProjectDto> {
-    const project = await this.projectsService.getOne(filter.id);
+    const project = await this.projectsService.getOne(projectId);
 
     if (!this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_VIEW) && !this.projectsService.isAuthor(project, user)) {
       throw new UnauthorizedException('You cannot view this project.');
     }
 
     return project;
+  }
+
+  @Query(() => ProjectDetailsDto)
+  @UseGuards(GqlAuthGuard)
+  projectDetails(
+    @Args('projectId') projectId: number,
+    @CurrentUser() user: UserDto,
+  ): Promise<ProjectDetailsDto> {
+    return this.projectsService.getDetails(projectId, user);
   }
 
   @Mutation(() => ProjectDto)

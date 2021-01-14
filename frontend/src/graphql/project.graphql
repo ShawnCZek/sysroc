@@ -1,5 +1,5 @@
-query Project($id: Float) {
-  project(filter: { id: $id }) {
+query Project($id: Float!) {
+  project(projectId: $id) {
     id
     name
     description

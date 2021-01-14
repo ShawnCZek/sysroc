@@ -7,10 +7,11 @@ import { UsersModule } from '../users/users.module';
 import { ProjectsModule } from '../projects/projects.module';
 import { MailerModule } from '../mailer/mailer.module';
 import { ConfigModule } from '../config/config.module';
+import { Project } from '../projects/entities/projects.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Invitation]),
+    TypeOrmModule.forFeature([Invitation, Project]),
     UsersModule,
     ProjectsModule,
     MailerModule,

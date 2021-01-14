@@ -167,7 +167,9 @@ export const InvitationsList: React.FC = () => {
         handleClose={handleDeleteAlertClose}
         handleDeleteInvitation={handleDeleteInvitation}
         invitationId={invitationId}
-      />
+      >
+        Are you sure you want to cancel the project invitation by deleting it?
+      </DeleteInvitationAlert>
     </>
   );
 };

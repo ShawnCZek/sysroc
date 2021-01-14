@@ -17,6 +17,15 @@ export class InvitationsResolver {
 
   @Query(() => [InvitationDto])
   @UseGuards(GqlAuthGuard)
+  invitations(
+    @Args('projectId') projectId: number,
+    @CurrentUser() user: UserDto,
+  ): Promise<InvitationDto[]> {
+    return this.invitationsService.getManyForProject(projectId, user);
+  }
+
+  @Query(() => [InvitationDto])
+  @UseGuards(GqlAuthGuard)
   myInvitations(
     @CurrentUser() user: UserDto,
   ): Promise<InvitationDto[]> {

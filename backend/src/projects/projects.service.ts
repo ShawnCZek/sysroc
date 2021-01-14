@@ -4,6 +4,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { ProjectsFilter } from './filters/project.filter';
 import { ProjectDto } from './dto/project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectDetailsDto } from './dto/project-details.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/users.entity';
@@ -84,6 +85,7 @@ export class ProjectsService {
     const project = await this.projectRepository
       .createQueryBuilder('project')
       .where('project.id = :id', { id: projectId })
+      .leftJoinAndSelect('project.owner', 'owner')
       .leftJoinAndSelect('project.users', 'users')
       .leftJoinAndSelect('project.supervisor', 'supervisor')
       .leftJoinAndSelect('project.tasks', 'tasks')
@@ -97,6 +99,22 @@ export class ProjectsService {
     }
 
     return project;
+  }
+
+  async getDetails(
+    projectId: number,
+    user: UserDto,
+  ): Promise<ProjectDetailsDto> {
+    const project = await this.projectRepository.findOne(projectId, { relations: ['owner', 'users'] });
+
+    if (!project) {
+      throw new NotFoundException('Could not find the project!');
+    }
+
+    return {
+      isOwner: this.isOwner(project, user),
+      isAuthor: this.isAuthor(project, user),
+    };
   }
 
   async updateOne(
@@ -170,8 +188,15 @@ export class ProjectsService {
 
   isAuthor(
     project: ProjectDto,
-    user: UserDto,
+    user: BaseUserDto,
   ): boolean {
     return project.users.some(author => author.id === user.id);
+  }
+
+  isOwner(
+    project: ProjectDto,
+    user: BaseUserDto,
+  ): boolean {
+    return this.isAuthor(project, user) && (project.owner.id === user.id || !this.isAuthor(project, project.owner));
   }
 }

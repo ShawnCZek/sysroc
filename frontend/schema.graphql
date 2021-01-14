@@ -134,6 +134,11 @@ type Project {
   users: [User!]!
 }
 
+type ProjectDetailsDto {
+  isAuthor: Boolean!
+  isOwner: Boolean!
+}
+
 type ProjectDto {
   classifications: [ClassificationDto!]!
   createdAt: DateTime!
@@ -151,13 +156,14 @@ type Query {
   baseUsers(filter: BaseUsersFilter!): [BaseUserDto!]!
   classifications(filter: ClassificationsFilter!): [ClassificationDto!]!
   groups(filter: GroupFilter!): [GroupDto!]!
-  invitation(invitationId: Float!): InvitationDto!
+  invitations(projectId: Float!): [InvitationDto!]!
   me: UserAuthDto
   myInvitations: [InvitationDto!]!
   myPermissions: [PermissionStateDto!]!
   passwordReset(hash: String!): PasswordResetDto!
   permissions: [PermissionDto!]!
-  project(filter: ProjectsFilter!): ProjectDto!
+  project(projectId: Float!): ProjectDto!
+  projectDetails(projectId: Float!): ProjectDetailsDto!
   projects(filter: ProjectsFilter!): [ProjectDto!]!
   roles(filter: RolesFilter!): [RoleDto!]!
   task(filter: TasksFilter!): TaskDto!
@@ -268,10 +274,10 @@ input BaseUsersFilter {
 }
 
 input ClassificationsFilter {
-  fromDate: DateTime = "2020-12-13T14:50:59.447Z"
+  fromDate: DateTime = "2020-12-14T16:57:03.016Z"
   id: Float
   projects: [Float!] = []
-  toDate: DateTime = "2021-01-13T14:50:59.447Z"
+  toDate: DateTime = "2021-01-14T16:57:03.016Z"
   users: [Float!] = []
 }
 

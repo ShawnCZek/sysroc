@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useMyPermissionsQuery } from '../generated/graphql';
+import { hasPermissions } from '../auth/hasPermissions';
 
 /**
  * Check whether the user is permitted to do this action.
@@ -15,12 +16,8 @@ export function useHasPermissions(...permissions: string[]): boolean {
 
   useEffect(() => {
     if (!loading && data) {
-      for (const slug of permissions) {
-        if (data.myPermissions.some(permission => permission.slug === slug && permission.permitted)) {
-          setAuthorized(true);
-          return;
-        }
-      }
+      const hasAccess = hasPermissions(data.myPermissions, ...permissions);
+      if (hasAccess) setAuthorized(true);
     }
   }, [data, loading, permissions]);
 

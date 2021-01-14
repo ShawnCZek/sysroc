@@ -9,12 +9,12 @@ interface Props {
 
 const ErrorStyles = styled.div`
   font-size: 1.2rem;
-  padding: 1.5rem 2.5rem;
+  padding: 1rem 0;
   width: 100%;
-  margin: 2rem auto;
+  margin: 1rem auto;
   color: #8e0404;
   strong {
-    margin-right: 1.5rem;
+    margin-right: 1.2rem;
   }
   p {
     margin: 0;
