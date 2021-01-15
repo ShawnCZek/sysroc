@@ -1,6 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { InvitationDto } from './dto/invitation.dto';
 import { UseGuards } from '@nestjs/common';
+import { Throttle, ThrottlerGuard } from 'nestjs-throttler';
+import { InvitationDto } from './dto/invitation.dto';
 import { GqlAuthGuard } from '../auth/graphql-auth.guard';
 import { InviteDto } from './dto/invite.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -33,8 +34,9 @@ export class InvitationsResolver {
   }
 
   @Mutation(() => InvitationDto)
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard, ThrottlerGuard)
   @HasPermissions(PERMISSIONS.PROJECTS_CREATE)
+  @Throttle(5, 300)
   invite(
     @Args('input') input: InviteDto,
     @CurrentUser() user: UserDto,

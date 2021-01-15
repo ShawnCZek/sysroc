@@ -8,10 +8,12 @@ import { ProjectsModule } from '../projects/projects.module';
 import { MailerModule } from '../mailer/mailer.module';
 import { ConfigModule } from '../config/config.module';
 import { Project } from '../projects/entities/projects.entity';
+import { ThrottlerModule } from 'nestjs-throttler';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Invitation, Project]),
+    ThrottlerModule.forRoot({}),
     UsersModule,
     ProjectsModule,
     MailerModule,

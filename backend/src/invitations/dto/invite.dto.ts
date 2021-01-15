@@ -5,6 +5,6 @@ export class InviteDto {
   @Field(type => ID)
   readonly project: number;
 
-  @Field(type => ID)
-  readonly user: number;
+  @Field()
+  readonly email: string;
 }

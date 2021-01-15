@@ -163,7 +163,7 @@ export type InvitationDto = {
 
 export type InviteDto = {
   project: Scalars['ID'];
-  user: Scalars['ID'];
+  email: Scalars['String'];
 };
 
 export type Mutation = {
@@ -1019,7 +1019,7 @@ export type InvitationsQuery = (
 );
 
 export type InviteMutationVariables = Exact<{
-  userId: Scalars['ID'];
+  email: Scalars['String'];
   projectId: Scalars['ID'];
 }>;
 
@@ -2285,8 +2285,8 @@ export type InvitationsQueryHookResult = ReturnType<typeof useInvitationsQuery>;
 export type InvitationsLazyQueryHookResult = ReturnType<typeof useInvitationsLazyQuery>;
 export type InvitationsQueryResult = Apollo.QueryResult<InvitationsQuery, InvitationsQueryVariables>;
 export const InviteDocument = gql`
-    mutation Invite($userId: ID!, $projectId: ID!) {
-  invite(input: {user: $userId, project: $projectId}) {
+    mutation Invite($email: String!, $projectId: ID!) {
+  invite(input: {email: $email, project: $projectId}) {
     id
   }
 }
@@ -2306,7 +2306,7 @@ export type InviteMutationFn = Apollo.MutationFunction<InviteMutation, InviteMut
  * @example
  * const [inviteMutation, { data, loading, error }] = useInviteMutation({
  *   variables: {
- *      userId: // value for 'userId'
+ *      email: // value for 'email'
  *      projectId: // value for 'projectId'
  *   },
  * });

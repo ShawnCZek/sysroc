@@ -65,7 +65,7 @@ export class InvitationsService {
     projectId: number,
     user: UserDto,
   ): Promise<InvitationDto[]> {
-    const project = await this.projectRepository.findOne(projectId, { relations: ['owner', 'users'] });
+    const project = await this.getProject(projectId);
     if (!this.projectsService.isAuthor(project, user)) {
       throw new UnauthorizedException();
     }
@@ -77,12 +77,21 @@ export class InvitationsService {
     input: InviteDto,
     user: UserDto,
   ): Promise<InvitationDto> {
-    const project = await this.projectsService.getOne(input.project);
+    const project = await this.getProject(input.project);
     if (!this.projectsService.isOwner(project, user)) {
       throw new UnauthorizedException('You cannot invite users to this project!');
     }
 
-    const invited = await this.usersService.findOne({ id: input.user });
+    const invitationsCount = await this.invitationRepository.count({ where: { project: input.project } });
+    if (invitationsCount >= 5) {
+      throw new Error('This project has too many invitations! Before creating a new one, delete the previous ones.');
+    }
+
+    const invited = await this.usersService.findOneByEmail(input.email);
+    if (!invited) {
+      throw new NotFoundException('There is not a user with this email address.');
+    }
+
     if (this.projectsService.isAuthor(project, invited)) {
       throw new Error('This user is already an author of this project!');
     }
@@ -101,7 +110,7 @@ export class InvitationsService {
 
     const invitation = await this.getOne(createInvitation.id);
     // Ignore the promise here so sending an email does not slow down the process
-    this.sendInviteEmail(invitation, invitation.project, invited).then(() => {})
+    this.sendInviteEmail(invitation, invitation.project, invited).then(() => {});
 
     return invitation;
   }
@@ -140,5 +149,9 @@ export class InvitationsService {
         origin: this.configService.get('APP_URL'),
       },
     });
+  }
+
+  private getProject(id: number): Promise<ProjectDto> {
+    return this.projectRepository.findOneOrFail(id, { relations: ['owner', 'users'] });
   }
 }

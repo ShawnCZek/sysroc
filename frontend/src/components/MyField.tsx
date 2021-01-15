@@ -27,8 +27,8 @@ export const MyField: React.FC<Props> = ({
   multiline,
   rows,
   rowsMax,
-    min,
-    max
+  min,
+  max,
 }) => {
   return (
     <TextField

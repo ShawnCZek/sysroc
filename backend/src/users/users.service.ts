@@ -85,35 +85,45 @@ export class UsersService {
     return this.applyAfterQueryFilters(users, filter);
   }
 
-  async findOne(filter: UsersFilter): Promise<UserDto> {
+  findOne(filter: UsersFilter): Promise<UserDto> {
     // Fix issues with null prototype objects which do not work as filters
     filter = JSON.parse(JSON.stringify(filter));
 
-    const user = await this.userRepository
-      .findOne(filter, { relations: ['roles', 'roles.permissions', 'groups', 'projects'] });
-
-    if (!user) {
-      throw new Error('User not found!');
-    }
-
-    return user;
+    return this.userRepository.findOneOrFail(filter, {
+      relations: ['roles', 'roles.permissions', 'groups', 'projects'],
+    });
   }
 
-  async getADUser(
+  findOneByEmail(
+    email: string,
+    searchAdEmail: boolean = true,
+  ): Promise<UserDto | undefined> {
+    const query = this.userRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.roles', 'roles')
+      .leftJoinAndSelect('roles.permissions', 'permissions')
+      .leftJoinAndSelect('user.groups', 'groups')
+      .leftJoinAndSelect('user.projects', 'projects')
+      .where('user.email = :email', { email });
+
+    if (searchAdEmail) {
+      query.orWhere('user.adEmail = :adEmail', { adEmail: email });
+    }
+
+    return query.getOne();
+  }
+
+  getADUser(
     authInputDto: UserAuthInputDto,
   ): Promise<ADResponse> {
     const { email: username, password } = authInputDto;
 
-    let response: ADResponse = null;
-    await this.httpService
+    return this.httpService
       .post(`${this.ADEndpoint}/auth/login`, {
         username,
         password,
       })
       .toPromise()
-      .then(res => (response = res.data));
-
-    return response;
+      .then(res => res.data);
   }
 
   async register(registerUserDto: RegisterUserDto): Promise<UserDto> {

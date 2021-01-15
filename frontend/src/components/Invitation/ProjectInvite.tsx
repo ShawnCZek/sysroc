@@ -33,9 +33,9 @@ export const ProjectInvite: React.FC<Props> = ({ handleClose, projectId }) => {
       <p>Invite a user to your project as an author.</p>
       <InviteForm
         error={error}
-        onSubmit={async (userId) => {
+        onSubmit={async (email: string) => {
           await invite({
-            variables: { userId: userId.toString(), projectId: projectId.toString() },
+            variables: { email, projectId: projectId.toString() },
           });
         }}
       />

@@ -1,5 +1,5 @@
-mutation Invite($userId: ID!, $projectId: ID!) {
-  invite(input: { user: $userId, project: $projectId }) {
+mutation Invite($email: String!, $projectId: ID!) {
+  invite(input: { email: $email, project: $projectId }) {
     id
   }
 }
