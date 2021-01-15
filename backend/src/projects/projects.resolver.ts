@@ -12,6 +12,7 @@ import { PERMISSIONS } from '../permissions/permissions';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { UsersService } from '../users/users.service';
 import { ProjectDetailsDto } from './dto/project-details.dto';
+import { RemoveAuthorDto } from './dto/remove-author.dto';
 
 @Resolver('Projects')
 export class ProjectsResolver {
@@ -92,5 +93,15 @@ export class ProjectsResolver {
     @Args('projectId') projectId: number,
   ): Promise<ProjectDto> {
     return this.projectsService.deleteOne(projectId, user);
+  }
+
+  @Mutation(() => ProjectDto)
+  @UseGuards(GqlAuthGuard)
+  @HasPermissions(PERMISSIONS.PROJECTS_CREATE)
+  deleteProjectAuthor(
+    @Args('input') input: RemoveAuthorDto,
+    @CurrentUser() user: UserDto,
+  ): Promise<ProjectDto> {
+    return this.projectsService.deleteAuthor(input, user);
   }
 }

@@ -12,6 +12,7 @@ import { UserDto } from '../users/dto/user.dto';
 import { BaseUserDto } from '../users/dto/base-user.dto';
 import { UsersService } from '../users/users.service';
 import { PERMISSIONS } from '../permissions/permissions';
+import { RemoveAuthorDto } from './dto/remove-author.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -81,8 +82,8 @@ export class ProjectsService {
     return project;
   }
 
-  async getOne(projectId: number): Promise<ProjectDto> {
-    const project = await this.projectRepository
+  getOne(projectId: number): Promise<ProjectDto> {
+    return this.projectRepository
       .createQueryBuilder('project')
       .where('project.id = :id', { id: projectId })
       .leftJoinAndSelect('project.owner', 'owner')
@@ -91,14 +92,9 @@ export class ProjectsService {
       .leftJoinAndSelect('project.tasks', 'tasks')
       .leftJoinAndSelect('project.classifications', 'classifications')
       .leftJoinAndSelect('classifications.user', 'teacher')
-      .orderBy({ 'tasks.createdAt': 'ASC' })
-      .getOne();
-
-    if (!project) {
-      throw new NotFoundException('Could not find the project!');
-    }
-
-    return project;
+      .addOrderBy('tasks.createdAt', 'ASC' )
+      .addOrderBy('users.id', 'ASC')
+      .getOneOrFail();
   }
 
   async getDetails(
@@ -184,6 +180,23 @@ export class ProjectsService {
 
     const updateProject = { ...project, users: [...project.users, author] };
     await this.projectRepository.save(updateProject);
+  }
+
+  async deleteAuthor(
+    input: RemoveAuthorDto,
+    user: UserDto,
+  ): Promise<ProjectDto> {
+    const project = await this.projectRepository.findOneOrFail(input.projectId, { relations: ['owner', 'users'] });
+    if (!this.isOwner(project, user)) {
+      throw new UnauthorizedException('You do not have permissions to manage authors of this project.');
+    }
+
+    if (project.owner.id === input.userId) {
+      throw new Error('You cannot remove the owner from the project.');
+    }
+
+    project.users = project.users.filter(author => author.id !== input.userId);
+    return this.projectRepository.save(project);
   }
 
   isAuthor(

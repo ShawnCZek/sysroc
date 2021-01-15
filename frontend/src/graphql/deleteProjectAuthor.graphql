@@ -1,0 +1,9 @@
+mutation DeleteProjectAuthor($projectId: Float!, $userId: Float!) {
+  deleteProjectAuthor(input: { projectId: $projectId, userId: $userId }) {
+    id
+    users {
+      id
+      name
+    }
+  }
+}

@@ -1,9 +1,9 @@
 import React from 'react';
-import { ProjectQuery } from '../../generated/graphql';
+import { BaseUserDto } from '../../generated/graphql';
 import { UserLink } from '../UserLink';
 
 interface Props {
-  authors: ProjectQuery['project']['users'];
+  authors: Array<Pick<BaseUserDto, 'id' | 'name'>>;
 }
 
 export const ProjectsAuthors: React.FC<Props> = ({ authors }) => {

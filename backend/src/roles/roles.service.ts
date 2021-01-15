@@ -144,6 +144,7 @@ export class RolesService {
         return true;
       }
     }
+
     return false;
   }
 

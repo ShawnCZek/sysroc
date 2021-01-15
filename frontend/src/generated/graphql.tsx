@@ -183,6 +183,7 @@ export type Mutation = {
   updateProject: ProjectDto;
   claimProject: ProjectDto;
   deleteProject: ProjectDto;
+  deleteProjectAuthor: ProjectDto;
   createTask: TaskDto;
   deleteTask: TaskDto;
   updateTask: TaskDto;
@@ -267,6 +268,11 @@ export type MutationClaimProjectArgs = {
 
 export type MutationDeleteProjectArgs = {
   projectId: Scalars['Float'];
+};
+
+
+export type MutationDeleteProjectAuthorArgs = {
+  input: RemoveAuthorDto;
 };
 
 
@@ -481,6 +487,11 @@ export type QueryPasswordResetArgs = {
 
 export type QueryInvitationsArgs = {
   projectId: Scalars['Float'];
+};
+
+export type RemoveAuthorDto = {
+  projectId: Scalars['Float'];
+  userId: Scalars['Float'];
 };
 
 export type Role = {
@@ -944,6 +955,24 @@ export type DeleteProjectMutation = (
   ) }
 );
 
+export type DeleteProjectAuthorMutationVariables = Exact<{
+  projectId: Scalars['Float'];
+  userId: Scalars['Float'];
+}>;
+
+
+export type DeleteProjectAuthorMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteProjectAuthor: (
+    { __typename?: 'ProjectDto' }
+    & Pick<ProjectDto, 'id'>
+    & { users: Array<(
+      { __typename?: 'UserDto' }
+      & Pick<UserDto, 'id' | 'name'>
+    )> }
+  ) }
+);
+
 export type DeleteRoleMutationVariables = Exact<{
   roleId: Scalars['Float'];
 }>;
@@ -1135,7 +1164,10 @@ export type ProjectQuery = (
         { __typename?: 'UserDto' }
         & Pick<UserDto, 'id' | 'name'>
       ) }
-    )>, users: Array<(
+    )>, owner: (
+      { __typename?: 'UserDto' }
+      & Pick<UserDto, 'id' | 'name'>
+    ), users: Array<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
     )>, supervisor?: Maybe<(
@@ -2108,6 +2140,43 @@ export function useDeleteProjectMutation(baseOptions?: Apollo.MutationHookOption
 export type DeleteProjectMutationHookResult = ReturnType<typeof useDeleteProjectMutation>;
 export type DeleteProjectMutationResult = Apollo.MutationResult<DeleteProjectMutation>;
 export type DeleteProjectMutationOptions = Apollo.BaseMutationOptions<DeleteProjectMutation, DeleteProjectMutationVariables>;
+export const DeleteProjectAuthorDocument = gql`
+    mutation DeleteProjectAuthor($projectId: Float!, $userId: Float!) {
+  deleteProjectAuthor(input: {projectId: $projectId, userId: $userId}) {
+    id
+    users {
+      id
+      name
+    }
+  }
+}
+    `;
+export type DeleteProjectAuthorMutationFn = Apollo.MutationFunction<DeleteProjectAuthorMutation, DeleteProjectAuthorMutationVariables>;
+
+/**
+ * __useDeleteProjectAuthorMutation__
+ *
+ * To run a mutation, you first call `useDeleteProjectAuthorMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteProjectAuthorMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteProjectAuthorMutation, { data, loading, error }] = useDeleteProjectAuthorMutation({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useDeleteProjectAuthorMutation(baseOptions?: Apollo.MutationHookOptions<DeleteProjectAuthorMutation, DeleteProjectAuthorMutationVariables>) {
+        return Apollo.useMutation<DeleteProjectAuthorMutation, DeleteProjectAuthorMutationVariables>(DeleteProjectAuthorDocument, baseOptions);
+      }
+export type DeleteProjectAuthorMutationHookResult = ReturnType<typeof useDeleteProjectAuthorMutation>;
+export type DeleteProjectAuthorMutationResult = Apollo.MutationResult<DeleteProjectAuthorMutation>;
+export type DeleteProjectAuthorMutationOptions = Apollo.BaseMutationOptions<DeleteProjectAuthorMutation, DeleteProjectAuthorMutationVariables>;
 export const DeleteRoleDocument = gql`
     mutation DeleteRole($roleId: Float!) {
   deleteRole(roleId: $roleId) {
@@ -2562,6 +2631,10 @@ export const ProjectDocument = gql`
         id
         name
       }
+    }
+    owner {
+      id
+      name
     }
     users {
       id

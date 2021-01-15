@@ -22,6 +22,10 @@ query Project($id: Float!) {
         name
       }
     }
+    owner {
+      id
+      name
+    }
     users {
       id
       name

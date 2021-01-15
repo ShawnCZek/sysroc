@@ -1,24 +1,23 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogActions from '@material-ui/core/DialogActions';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
 
 interface Props {
   open: boolean;
   handleClose: () => void;
-  handleDeleteInvitation: (invitationId: number) => Promise<void>;
-  invitationId: number | null;
+  handleDeleteAuthor: (authorId: number) => Promise<void>;
+  authorId: number | null;
 }
 
-export const DeleteInvitationAlert: React.FC<Props> = ({
+export const DeleteProjectAuthorAlert: React.FC<Props> = ({
   open,
   handleClose,
-  handleDeleteInvitation,
-  invitationId,
-  children,
+  handleDeleteAuthor,
+  authorId,
 }) => (
   <Dialog
     open={open}
@@ -27,10 +26,10 @@ export const DeleteInvitationAlert: React.FC<Props> = ({
     aria-labelledby="alert-dialog-title"
     aria-describedby="alert-dialog-description"
   >
-    <DialogTitle id="alert-dialog-title">Delete Invitation</DialogTitle>
+    <DialogTitle id="alert-dialog-title">Revoke Access</DialogTitle>
     <DialogContent>
       <DialogContentText id="alert-dialog-description">
-        {children}
+        Are you sure you want to remove the access for the user?
       </DialogContentText>
     </DialogContent>
     <DialogActions>
@@ -39,13 +38,13 @@ export const DeleteInvitationAlert: React.FC<Props> = ({
       </Button>
       <Button
         onClick={() => {
-          if (invitationId) {
-            handleDeleteInvitation(invitationId).then(handleClose);
+          if (authorId) {
+            handleDeleteAuthor(authorId).then(handleClose);
           }
         }}
         color="secondary"
       >
-        Delete
+        Revoke
       </Button>
     </DialogActions>
   </Dialog>

@@ -1,35 +1,10 @@
 import React from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
+import { ModalBody } from '../Layout/Modal/ModalBody';
 import { UpdateProjectForm } from './UpdateProjectForm';
 import { ProjectDto, ProjectTasksDocument, useUpdateProjectMutation } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
-
-function getModalStyle() {
-  const top = 50;
-  const left = 50;
-
-  return {
-    top: `${top}%`,
-    left: `${left}%`,
-    transform: `translate(-${top}%, -${left}%)`
-  };
-}
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    paper: {
-      position: 'absolute',
-      width: 600,
-      backgroundColor: theme.palette.background.paper,
-      border: '2px solid #000',
-      boxShadow: theme.shadows[5],
-      padding: theme.spacing(2, 4, 3),
-      maxHeight: '95%',
-      overflowY: 'auto'
-    }
-  })
-);
+import { ProjectAuthorsOverview } from './Author/ProjectAuthorsOverview';
 
 const GET_PROJECT = ProjectTasksDocument;
 
@@ -46,9 +21,7 @@ export const UpdateProjectModal: React.FC<Props> = ({
   projectId,
   data,
 }) => {
-  const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
-  const [modalStyle] = React.useState(getModalStyle);
   const [updateProject, { error }] = useUpdateProjectMutation({
     update(cache, result) {
       try {
@@ -59,6 +32,9 @@ export const UpdateProjectModal: React.FC<Props> = ({
             project: result.data?.updateProject
           }
         });
+
+        enqueueSnackbar('Project updated!', { variant: 'success' });
+        handleClose();
       } catch (e) {
         if (e instanceof Error) {
           enqueueSnackbar(e.message, { variant: 'error' });
@@ -74,23 +50,18 @@ export const UpdateProjectModal: React.FC<Props> = ({
       open={open}
       onClose={handleClose}
     >
-      <div style={modalStyle} className={classes.paper}>
-        <h2 id="new-project-modal-title">New Project</h2>
-        <p id="new-project-modal-description">Create something great</p>
+      <ModalBody width={600}>
         <UpdateProjectForm
           data={data}
           error={error}
           onSubmit={async ({ name, description, supervisor }) => {
-            const res = await updateProject({
+            await updateProject({
               variables: { name, description, supervisor, projectId }
             });
-            if (res.data) {
-              enqueueSnackbar('Project updated!', { variant: 'success' });
-              handleClose();
-            }
           }}
         />
-      </div>
+        <ProjectAuthorsOverview projectId={projectId} />
+      </ModalBody>
     </Modal>
   );
 };

@@ -80,6 +80,7 @@ type Mutation {
   deleteGroup(groupId: Float!): GroupDto!
   deleteInvitation(invitationId: Float!): InvitationDto!
   deleteProject(projectId: Float!): ProjectDto!
+  deleteProjectAuthor(input: RemoveAuthorDto!): ProjectDto!
   deleteRole(roleId: Float!): RoleDto!
   deleteTask(filter: TasksFilter!): TaskDto!
   deleteUser(userId: Float!): UserDto!
@@ -337,6 +338,11 @@ input ProjectsFilter {
   id: Float
   name: String
   supervisors: [Float!] = []
+}
+
+input RemoveAuthorDto {
+  projectId: Float!
+  userId: Float!
 }
 
 input RolesFilter {

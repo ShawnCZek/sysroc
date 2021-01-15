@@ -10,7 +10,6 @@ import {
 } from '../generated/graphql';
 import { RouteComponentProps, useHistory } from 'react-router';
 import { Fab, Typography } from '@material-ui/core';
-import { UpdateProjectModal } from '../components/Project/UpdateProjectModal';
 import { TasksList } from '../components/Task/TasksList';
 import { CreateTaskModal } from '../components/Task/CreateTaskModal';
 import { ITask } from '../components/Task/Task';
@@ -21,24 +20,21 @@ import { useHasPermissions } from '../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../generated/permissions';
 import { InviteButton } from '../components/Invitation/InviteButton';
 import { ComponentLoading } from '../components/ComponentLoading';
+import { UpdateProjectButton } from '../components/Project/UpdateProjectButton';
 
 const ProjectControls = styled.div`
-  display: grid;
-  grid-template-rows: 1fr;
-  grid-template-columns: 40rem 1fr 1fr;
-
+  display: flex;
   margin-bottom: 2rem;
 
   button {
     width: auto;
+    margin: 0 .8rem;
   }
 `;
 
 const Actions = styled.div`
   display: flex;
   justify-content: space-around;
-  grid-column: 1 / 1;
-  grid-row: 1 / 1;
 `;
 
 const Project = styled.div`
@@ -79,7 +75,6 @@ export const SingleProject: React.FC<Props> = props => {
 
   const history = useHistory();
 
-  const [modalOpen, setModalOpen] = useState(false);
   const [classOverviewOpen, setClassOverviewOpen] = useState(false);
   const [upTaskModalOpen, setUpTaskModalOpen] = useState(false);
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
@@ -92,9 +87,6 @@ export const SingleProject: React.FC<Props> = props => {
   const isAuthor = data?.project?.users?.some(author => author.id === meData?.me?.user?.id);
   const canManageOwnProject = useHasPermissions(PERMISSIONS.PROJECTS_CREATE);
   const canManageProject = useHasPermissions(PERMISSIONS.PROJECTS_MANAGE);
-
-  const handleModalOpen = () => setModalOpen(true);
-  const handleModalClose = () => setModalOpen(false);
 
   const handleCreateTaskOpen = () => setCreateTaskOpen(true);
   const handleCreateTaskClose = () => setCreateTaskOpen(false);
@@ -132,19 +124,9 @@ export const SingleProject: React.FC<Props> = props => {
           >
             Back
           </Fab>
-          { (canManageProject || isAuthor) ? (
+          { (canManageProject || isAuthor) && (
             <>
-              { (canManageProject || (canManageOwnProject && isAuthor)) &&
-                <Fab
-                  color="secondary"
-                  variant="extended"
-                  onClick={() => {
-                    handleModalOpen();
-                  }}
-                >
-                  Edit
-                </Fab>
-              }
+              { data?.project && <UpdateProjectButton project={data.project as ProjectDto} /> }
               { data?.project && <InviteButton projectId={parseInt(data.project.id)} /> }
 
               <Fab
@@ -157,13 +139,7 @@ export const SingleProject: React.FC<Props> = props => {
                 Classification
               </Fab>
             </>
-          ) : (
-            <>
-              <div />
-              <div />
-              <div />
-            </>
-          )}
+          ) }
           { data && (
             <ClaimProjectFab
               projectId={parseInt(data.project.id)}
@@ -208,29 +184,15 @@ export const SingleProject: React.FC<Props> = props => {
       ) : (
         <div>There is no project with ID {projectId}</div>
       )}
-      {data && (
-          <>
-            <UpdateProjectModal
-              open={modalOpen}
-              handleClose={handleModalClose}
-              projectId={projectId}
-              data={data?.project as ProjectDto}
-            />
-            <ProjectClassificationOverview
-              open={classOverviewOpen}
-              handleClose={handleClassOverviewClose}
-              classification={data?.project.classifications as ClassificationDto[]}
-            />
-          </>
-      )}
-      { data && (canManageProject || (canManageOwnProject && isAuthor)) && (
-        <UpdateProjectModal
-          open={modalOpen}
-          handleClose={handleModalClose}
-          projectId={projectId}
-          data={data?.project as ProjectDto}
-        />
-      )}
+      { data && (
+        <>
+          <ProjectClassificationOverview
+            open={classOverviewOpen}
+            handleClose={handleClassOverviewClose}
+            classification={data?.project.classifications as ClassificationDto[]}
+          />
+        </>
+      ) }
       <CreateTaskModal
         open={createTaskOpen}
         handleClose={handleCreateTaskClose}
