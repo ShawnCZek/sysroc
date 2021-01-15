@@ -1,12 +1,10 @@
-import { Module } from '@nestjs/common';
+import { CACHE_MANAGER, CacheModule, Inject, Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { GroupsModule } from './groups/groups.module';
 import { ConfigModule } from './config/config.module';
 import { ActiveDirectoryModule } from './active-directory/active-directory.module';
 import { UsersModule } from './users/users.module';
-import { RedisModule, RedisService } from 'nestjs-redis';
-import { Redis } from 'ioredis';
-import { redisConstants } from './redis/constants';
+import { Cache } from 'cache-manager';
 import { ProjectsModule } from './projects/projects.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { TasksModule } from './tasks/tasks.module';
@@ -30,14 +28,7 @@ import { InvitationsModule } from './invitations/invitations.module';
       installSubscriptionHandlers: true,
       context: ({ req, res }) => ({ req, res }),
     }),
-    RedisModule.register([
-      {
-        name: redisConstants.name,
-        host: 'localhost',
-        port: 6379,
-        keyPrefix: redisConstants.keyPrefix,
-      },
-    ]),
+    CacheModule.register(),
     GroupsModule,
     ConfigModule,
     PermissionsModule,
@@ -53,13 +44,9 @@ import { InvitationsModule } from './invitations/invitations.module';
   ],
 })
 export class AppModule {
-  private redisClient: Redis;
-
-  constructor(private readonly redisService: RedisService) {
-    this.redisClient = redisService.getClient(redisConstants.name);
-  }
+  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
   async onModuleInit(): Promise<void> {
-    await this.redisClient.flushdb();
+    await this.cacheManager.reset();
   }
 }

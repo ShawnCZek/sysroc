@@ -6,18 +6,22 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
 import { UsersFilter } from './filters/users.filter';
 import { GqlAuthGuard } from '../auth/graphql-auth.guard';
-import { ConflictException, HttpService, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  ConflictException,
+  HttpService,
+  Inject,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { UserAuthDto } from './dto/user-auth.dto';
 import { AuthService } from '../auth/auth.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { MyContext } from '../context';
 import { jwtConstants } from '../auth/constants';
-import { RedisService } from 'nestjs-redis';
-import { Redis } from 'ioredis';
 import { ConfigService } from '../config/config.service';
 import { SignUpUserDto } from './dto/sign-up-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { redisConstants } from '../redis/constants';
 import { User } from './entities/users.entity';
 import { HasPermissions } from './decorators/has-permissions.decorator';
 import { PERMISSIONS } from '../permissions/permissions';
@@ -30,22 +34,21 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { PermissionStateDto } from './dto/permission-state.dto';
 import { BaseUserDto } from './dto/base-user.dto';
 import { BaseUsersFilter } from './filters/base-users.filter';
+import { Cache } from 'cache-manager';
 
 @Resolver()
 export class UsersResolver {
   private ADEndpoint: string;
-  private redisClient: Redis;
 
   constructor(
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly usersService: UsersService,
     private readonly rolesService: RolesService,
     private readonly authService: AuthService,
-    private readonly redisService: RedisService,
     private readonly httpService: HttpService,
     private readonly config: ConfigService,
   ) {
     this.ADEndpoint = config.get('AD_ENDPOINT');
-    this.redisClient = redisService.getClient(redisConstants.name);
   }
 
   @Query(() => UserDto)
@@ -106,7 +109,7 @@ export class UsersResolver {
 
     const registerToken = cookies['register-token'];
     const registerUserDto: RegisterUserDto = JSON.parse(
-      await this.redisClient.get(registerToken),
+      await this.cacheManager.get(registerToken),
     );
     if (registerUserDto === undefined) {
       throw new UnauthorizedException('No or expired token for registration.');
@@ -144,7 +147,7 @@ export class UsersResolver {
       registeredUser.id,
     );
 
-    await this.redisClient.del(registerToken);
+    await this.cacheManager.del(registerToken);
 
     const refreshToken = await this.authService.createRefreshToken(
       registeredUser.adEmail,
@@ -229,10 +232,11 @@ export class UsersResolver {
     const password = await this.usersService.hashPassword(auth.password);
     const registerToken = crypto.randomBytes(32).toString('hex');
 
+    const ttl = 5 * 60 * 1000;
     res.cookie('register-token', registerToken, {
       httpOnly: true,
       path: '/',
-      maxAge: 5 * 60 * 1000,
+      maxAge: ttl,
     });
 
     const registerUserDto: RegisterUserDto = {
@@ -243,10 +247,7 @@ export class UsersResolver {
       dn: response.user.dn,
     };
 
-    await this.redisClient.append(
-      registerToken,
-      JSON.stringify(registerUserDto),
-    );
+    await this.cacheManager.set(registerToken, JSON.stringify(registerUserDto), ttl);
 
     return {
       accessToken: null,
