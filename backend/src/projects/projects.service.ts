@@ -30,7 +30,7 @@ export class ProjectsService {
 
     const project = this.projectRepository.create(createProjectDto);
     project.owner = owner;
-    project.users.push(owner);
+    project.users = [owner];
 
     const res = await this.projectRepository.save(project);
     return this.projectRepository.findOne(res.id, { relations: ['owner', 'users', 'supervisor'] });
