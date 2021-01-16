@@ -28,7 +28,7 @@ export const Home: React.FC<Props> = () => {
   return (
     <div>
       <Typography variant="h4" className={classes.mainTitle}>My Profile</Typography>
-      <Profile userId={parseInt(data.me.user.id)} forceEmail={true} />
+      <Profile userId={parseInt(data.me.user.id)} forceEmail={true} projectsCreate={true} />
       <Typography variant="h4" className={classes.title}>Invitations</Typography>
       <InvitationsList />
     </div>

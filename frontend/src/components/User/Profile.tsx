@@ -6,6 +6,10 @@ import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
 import { ProjectsTable } from '../Project/ProjectsTable';
 import { ComponentLoading } from '../ComponentLoading';
+import { PageHeader } from '../Layout/Header/PageHeader';
+import { PageHeaderContent } from '../Layout/Header/PageHeaderContent';
+import { PageHeaderActions } from '../Layout/Header/PageHeaderActions';
+import { NewProjectFab } from '../Project/NewProjectFab';
 
 const UserInformation = styled.div`
   & p {
@@ -20,11 +24,13 @@ const PersonalInformation = styled.div`
 interface Props {
   userId: number;
   forceEmail?: boolean;
+  projectsCreate?: boolean;
 }
 
 export const Profile: React.FC<Props> = ({
   userId,
   forceEmail,
+  projectsCreate,
 }) => {
   const { data, loading } = useUserQuery({ variables: { id: userId } });
   const { data: projectsData, loading: projectsLoading } = useProjectsQuery({ variables: { authors: [userId] } });
@@ -50,8 +56,15 @@ export const Profile: React.FC<Props> = ({
           </PersonalInformation>
         }
       </UserInformation>
-      <h2>Projects List</h2>
-      { projectsData?.projects && <ProjectsTable projects={projectsData.projects} />}
+      <PageHeader>
+        <PageHeaderContent>
+          <h2>Projects List</h2>
+        </PageHeaderContent>
+        <PageHeaderActions>
+          { (projectsCreate ?? false) && <NewProjectFab /> }
+        </PageHeaderActions>
+      </PageHeader>
+      { projectsData?.projects && <ProjectsTable projects={projectsData.projects} /> }
     </>
   );
 };

@@ -6,10 +6,8 @@ const HeaderStyles = styled.div`
   justify-content: space-between;
 `;
 
-export const PageHeader: React.FC = ({ children }) => {
+export const PageHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = props => {
   return (
-    <HeaderStyles>
-      {children}
-    </HeaderStyles>
+    <HeaderStyles {...props} />
   );
 };
