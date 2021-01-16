@@ -1,40 +1,26 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { BeforeInsert, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Project } from '../../projects/entities/projects.entity';
 
 @Entity()
-@ObjectType()
 export class Task {
   @PrimaryGeneratedColumn()
-  @Field(type => ID)
   readonly id: number;
 
-  @Column({nullable: false})
-  @Field()
+  @Column({ nullable: false })
   name: string;
 
-  @Column({nullable: true, default: ''})
-  @Field()
+  @Column({ nullable: true, default: '' })
   description?: string;
 
-  @Column({ type: 'timestamp with time zone', name: 'due_date', nullable: false, default: () => 'now()'})
-  @Field(type => Date)
+  @Column({ type: 'timestamp with time zone', name: 'due_date', nullable: false, default: () => 'now()' })
   dueDate: Date;
 
-  @CreateDateColumn({type: 'timestamp with time zone', name: 'created_at'})
-  @Field(type => Date)
-  createdAt: Date;
+  @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
+  readonly createdAt: Date;
 
-  @Column({nullable: false, default: false})
-  @Field(type => Boolean)
+  @Column({ nullable: false, default: false })
   completed: boolean;
 
   @ManyToOne(type => Project, project => project.tasks)
-  @Field(type => Project)
   project: Project;
-
-  @BeforeInsert()
-  updateDateCreation() {
-    this.createdAt = new Date();
-  }
 }

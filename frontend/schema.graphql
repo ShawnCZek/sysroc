@@ -18,15 +18,6 @@ type BaseUserDto {
   roles: [RoleDto!]!
 }
 
-type Classification {
-  createdAt: DateTime!
-  id: ID!
-  mark: Float!
-  note: String!
-  project: Project!
-  user: User!
-}
-
 type ClassificationDto {
   createdAt: DateTime!
   id: Float!
@@ -36,26 +27,11 @@ type ClassificationDto {
   user: UserDto!
 }
 
-type Group {
-  id: ID!
-  name: String!
-  users: [User!]!
-  usersCount: Float
-}
-
 type GroupDto {
   id: ID!
   name: String!
   users: [UserDto!]!
   usersCount: Float
-}
-
-type Invitation {
-  createdAt: DateTime!
-  id: ID!
-  invited: User!
-  project: Project!
-  user: User!
 }
 
 type InvitationDto {
@@ -104,13 +80,6 @@ type PasswordResetDto {
   user: UserDto!
 }
 
-type Permission {
-  id: ID!
-  name: String!
-  roles: [Role!]!
-  slug: String!
-}
-
 type PermissionDto {
   id: ID!
   name: String!
@@ -120,19 +89,6 @@ type PermissionDto {
 type PermissionStateDto {
   permitted: Boolean!
   slug: String!
-}
-
-type Project {
-  classifications: [Classification!]!
-  createdAt: DateTime!
-  description: String!
-  id: ID!
-  invitations: [Invitation!]!
-  name: String!
-  owner: User!
-  supervisor: User!
-  tasks: [Task!]!
-  users: [User!]!
 }
 
 type ProjectDetailsDto {
@@ -172,18 +128,6 @@ type Query {
   users(filter: AllUsersFilter!): [UserDto!]!
 }
 
-type Role {
-  admin: Boolean!
-  id: ID!
-  name: String!
-  permissions: [Permission!]!
-  slug: String!
-  student: Boolean!
-  system: Boolean!
-  teacher: Boolean!
-  users: [User!]!
-}
-
 type RoleDto {
   admin: Boolean!
   id: ID!
@@ -195,16 +139,6 @@ type RoleDto {
   teacher: Boolean!
 }
 
-type Task {
-  completed: Boolean!
-  createdAt: DateTime!
-  description: String!
-  dueDate: DateTime!
-  id: ID!
-  name: String!
-  project: Project!
-}
-
 type TaskDto {
   completed: Boolean!
   createdAt: DateTime!
@@ -213,20 +147,6 @@ type TaskDto {
   id: Float!
   name: String!
   project: ProjectDto!
-}
-
-type User {
-  adEmail: String!
-  classifications: [Classification!]!
-  email: String!
-  groups: [Group!]!
-  id: ID!
-  invitations: [Invitation!]!
-  name: String!
-  password: String!
-  projects: [Project!]!
-  roles: [Role!]!
-  supervisedProjects: [Project!]!
 }
 
 type UserAuthDto {
@@ -275,10 +195,10 @@ input BaseUsersFilter {
 }
 
 input ClassificationsFilter {
-  fromDate: DateTime = "2020-12-15T18:41:01.124Z"
+  fromDate: DateTime = "2020-12-16T18:09:43.538Z"
   id: Float
   projects: [Float!] = []
-  toDate: DateTime = "2021-01-15T18:41:01.124Z"
+  toDate: DateTime = "2021-01-16T18:09:43.538Z"
   users: [Float!] = []
 }
 

@@ -52,16 +52,6 @@ export type BaseUsersFilter = {
   groups?: Maybe<Array<Scalars['Float']>>;
 };
 
-export type Classification = {
-  __typename?: 'Classification';
-  id: Scalars['ID'];
-  mark: Scalars['Float'];
-  note: Scalars['String'];
-  createdAt: Scalars['DateTime'];
-  project: Project;
-  user: User;
-};
-
 export type ClassificationDto = {
   __typename?: 'ClassificationDto';
   id: Scalars['Float'];
@@ -121,14 +111,6 @@ export type CreateUserDto = {
 };
 
 
-export type Group = {
-  __typename?: 'Group';
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  users: Array<User>;
-  usersCount?: Maybe<Scalars['Float']>;
-};
-
 export type GroupDto = {
   __typename?: 'GroupDto';
   id: Scalars['ID'];
@@ -141,15 +123,6 @@ export type GroupFilter = {
   id?: Maybe<Scalars['Float']>;
   name?: Maybe<Scalars['String']>;
   order?: Maybe<Scalars['String']>;
-};
-
-export type Invitation = {
-  __typename?: 'Invitation';
-  id: Scalars['ID'];
-  project: Project;
-  invited: User;
-  user: User;
-  createdAt: Scalars['DateTime'];
 };
 
 export type InvitationDto = {
@@ -342,14 +315,6 @@ export type PasswordResetDto = {
   createdAt: Scalars['DateTime'];
 };
 
-export type Permission = {
-  __typename?: 'Permission';
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  slug: Scalars['String'];
-  roles: Array<Role>;
-};
-
 export type PermissionDto = {
   __typename?: 'PermissionDto';
   id: Scalars['ID'];
@@ -361,20 +326,6 @@ export type PermissionStateDto = {
   __typename?: 'PermissionStateDto';
   slug: Scalars['String'];
   permitted: Scalars['Boolean'];
-};
-
-export type Project = {
-  __typename?: 'Project';
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  description: Scalars['String'];
-  owner: User;
-  users: Array<User>;
-  supervisor: User;
-  tasks: Array<Task>;
-  classifications: Array<Classification>;
-  invitations: Array<Invitation>;
-  createdAt: Scalars['DateTime'];
 };
 
 export type ProjectDetailsDto = {
@@ -494,19 +445,6 @@ export type RemoveAuthorDto = {
   userId: Scalars['Float'];
 };
 
-export type Role = {
-  __typename?: 'Role';
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  slug: Scalars['String'];
-  system: Scalars['Boolean'];
-  admin: Scalars['Boolean'];
-  teacher: Scalars['Boolean'];
-  student: Scalars['Boolean'];
-  permissions: Array<Permission>;
-  users: Array<User>;
-};
-
 export type RoleDto = {
   __typename?: 'RoleDto';
   id: Scalars['ID'];
@@ -534,17 +472,6 @@ export type SignUpUserDto = {
   name?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   password?: Maybe<Scalars['String']>;
-};
-
-export type Task = {
-  __typename?: 'Task';
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  description: Scalars['String'];
-  dueDate: Scalars['DateTime'];
-  createdAt: Scalars['DateTime'];
-  completed: Scalars['Boolean'];
-  project: Project;
 };
 
 export type TaskDto = {
@@ -603,21 +530,6 @@ export type UpdateUserDto = {
   email: Scalars['String'];
   roleSlugs?: Maybe<Array<Scalars['String']>>;
   groups?: Maybe<Array<Scalars['Float']>>;
-};
-
-export type User = {
-  __typename?: 'User';
-  id: Scalars['ID'];
-  name: Scalars['String'];
-  password: Scalars['String'];
-  email: Scalars['String'];
-  adEmail: Scalars['String'];
-  roles: Array<Role>;
-  groups: Array<Group>;
-  projects: Array<Project>;
-  classifications: Array<Classification>;
-  supervisedProjects: Array<Project>;
-  invitations: Array<Invitation>;
 };
 
 export type UserAuthDto = {
