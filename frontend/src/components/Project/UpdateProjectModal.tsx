@@ -2,11 +2,9 @@ import React from 'react';
 import Modal from '@material-ui/core/Modal';
 import { ModalBody } from '../Layout/Modal/ModalBody';
 import { UpdateProjectForm } from './UpdateProjectForm';
-import { ProjectDto, ProjectTasksDocument, useUpdateProjectMutation } from '../../generated/graphql';
+import { ProjectDto, useUpdateProjectMutation } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
 import { ProjectAuthorsOverview } from './Author/ProjectAuthorsOverview';
-
-const GET_PROJECT = ProjectTasksDocument;
 
 interface Props {
   open: boolean;
@@ -22,24 +20,11 @@ export const UpdateProjectModal: React.FC<Props> = ({
   data,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
-  const [updateProject, { error }] = useUpdateProjectMutation({
-    update(cache, result) {
-      try {
-        cache.writeQuery({
-          query: GET_PROJECT,
-          variables: { _id: projectId },
-          data: {
-            project: result.data?.updateProject
-          }
-        });
-
-        enqueueSnackbar('Project updated!', { variant: 'success' });
-        handleClose();
-      } catch (e) {
-        if (e instanceof Error) {
-          enqueueSnackbar(e.message, { variant: 'error' });
-        }
-      }
+  const [updateProject, { error, client }] = useUpdateProjectMutation({
+    async update() {
+      await client.resetStore();
+      enqueueSnackbar('Project updated!', { variant: 'success' });
+      handleClose();
     }
   });
 
