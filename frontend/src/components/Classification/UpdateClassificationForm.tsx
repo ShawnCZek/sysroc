@@ -1,4 +1,4 @@
-import { Button, makeStyles, Typography } from '@material-ui/core';
+import { Button, makeStyles } from '@material-ui/core';
 import { ApolloError } from '@apollo/client';
 import React, { useState } from 'react';
 import { Field, Form, Formik } from 'formik';
@@ -9,15 +9,15 @@ import { ProjectDto } from '../../generated/graphql';
 
 const useStyles = makeStyles({
   form: {
-    padding: '2rem',
+    padding: '1rem 2rem 2rem',
     margin: '0 auto',
     marginTop: '1.3rem',
   },
   button: {
     marginTop: '1rem',
   },
-  formTitle: {
-    marginBottom: '0.8rem',
+  field: {
+    width: '13rem',
   },
 });
 
@@ -63,10 +63,7 @@ export const UpdateClassificationForm: React.FC<Props> = ({ onSubmit, error, dat
     >
       {() => (
         <Form className={classes.form}>
-          <Typography className={classes.formTitle} variant="h4">
-            Update Classification
-          </Typography>
-          {error && <Error error={error}/>}
+          { error && <Error error={error} /> }
           <div>
             <Field
               name="mark"
@@ -90,8 +87,11 @@ export const UpdateClassificationForm: React.FC<Props> = ({ onSubmit, error, dat
               {() => (
                 <div style={{ marginTop: 10 }}>
                   {projectError && <div style={{ color: 'red' }}>{projectError}</div>}
-                  <ProjectAutocomplete userId={userId} handleChange={handleAutocompleteChange}
-                                       defaultProject={data.project}/>
+                  <ProjectAutocomplete
+                    userId={userId}
+                    handleChange={handleAutocompleteChange}
+                    defaultProject={data.project}
+                  />
                 </div>
               )}
             </Field>
@@ -104,6 +104,7 @@ export const UpdateClassificationForm: React.FC<Props> = ({ onSubmit, error, dat
               label="Note"
               multiline={true}
               component={MyField}
+              className={classes.field}
               rows={4}
               rowsMax={8}
               value={data.note}

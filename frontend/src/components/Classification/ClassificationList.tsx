@@ -37,8 +37,8 @@ export const ClassificationList: React.FC<Props> = ({ userId }) => {
         return;
       }
 
+      await client.resetStore();
       enqueueSnackbar('Classification deleted!', { variant: 'success' });
-      client?.resetStore();
     },
   });
 
@@ -59,9 +59,12 @@ export const ClassificationList: React.FC<Props> = ({ userId }) => {
 
   return (
     <div>
-      <ClassificationFilter defaultValues={filters} onSubmit={(filter) => {
-        setFilters(filter);
-      }}/>
+      <ClassificationFilter
+        defaultValues={filters}
+        onSubmit={(filter) => {
+          setFilters(filter);
+        }}
+      />
       <h2>Classification List</h2>
       <Paper>
         <List>

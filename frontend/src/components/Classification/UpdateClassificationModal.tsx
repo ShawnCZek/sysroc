@@ -1,33 +1,9 @@
 import React from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { useSnackbar } from 'notistack';
 import { Modal } from '@material-ui/core';
+import { ModalBody } from '../Layout/Modal/ModalBody';
 import { UpdateClassificationForm } from './UpdateClassificationForm';
 import { useUpdateClassificationMutation } from '../../generated/graphql';
-
-function getModalStyle() {
-  const top = 50;
-  const left = 50;
-
-  return {
-    top: `${top}%`,
-    left: `${left}%`,
-    transform: `translate(-${top}%, -${left}%)`,
-  };
-}
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    paper: {
-      position: 'absolute',
-      width: 400,
-      backgroundColor: theme.palette.background.paper,
-      border: '2px solid #000',
-      boxShadow: theme.shadows[5],
-      padding: theme.spacing(2, 4, 3),
-    },
-  }),
-);
 
 interface Props {
   open: boolean;
@@ -48,10 +24,14 @@ export const UpdateClassificationModal: React.FC<Props> = ({
   userId,
   data,
 }) => {
-  const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
-  const [modalStyle] = React.useState(getModalStyle);
-  const [updateClassification] = useUpdateClassificationMutation();
+  const [updateClassification, { error, client }] = useUpdateClassificationMutation({
+    async update() {
+      await client.resetStore();
+      enqueueSnackbar('Classification updated!', { variant: 'success' });
+      handleClose();
+    }
+  });
 
   return (
     <Modal
@@ -60,24 +40,20 @@ export const UpdateClassificationModal: React.FC<Props> = ({
       open={open}
       onClose={handleClose}
     >
-      <div style={modalStyle} className={classes.paper}>
-        <h2 id="new-project-modal-title">Update classification</h2>
-        <p id="new-project-modal-description">Be gentle</p>
+      <ModalBody>
+        <h2>Update classification</h2>
+        <p>Be gentle.</p>
         <UpdateClassificationForm
           data={data}
-          error={''}
+          error={error}
           onSubmit={async ({ mark, note, project }) => {
-            const res = await updateClassification({
+            await updateClassification({
               variables: { id: classificationId, mark, note, project: parseInt(project) },
             });
-            if (res.data) {
-              enqueueSnackbar('Classification updated!', { variant: 'success' });
-              handleClose();
-            }
           }}
           userId={userId}
         />
-      </div>
+      </ModalBody>
     </Modal>
   );
 };
