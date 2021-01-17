@@ -427,7 +427,7 @@ export class UsersService {
   async addGroups(user: User, groups: number[]): Promise<void> {
     for (const groupId of groups) {
       const group = await this.groupsService.findOne({ id: groupId });
-      user.groups.push(group);
+      if (group) user.groups.push(group);
     }
   }
 

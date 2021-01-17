@@ -12,6 +12,6 @@ export class GroupDto {
   @Field(type => [UserDto], { defaultValue: [] })
   readonly users: UserDto[];
 
-  @Field({ nullable: true })
-  readonly usersCount?: number;
+  @Field({ defaultValue: -1 })
+  readonly usersCount: number;
 }

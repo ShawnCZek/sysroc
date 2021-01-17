@@ -7,14 +7,16 @@ import { Fab, Paper } from '@material-ui/core';
 import { List } from '../Layout/List';
 import { Item } from '../Layout/Item';
 import { DeleteGroupDialog } from './DeleteGroupDialog';
-import { GroupsFilter } from './GroupsFilter';
+import { GroupsFilter, GroupsSort } from './GroupsFilter';
+import { ComponentLoading } from '../ComponentLoading';
 
 export const GroupsList: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedGroupId, setSelectedGroupId] = React.useState<number | null>(null);
-  const [filters, setFilters] = React.useState<GroupFilter>({ id: 0, order: '', name: '' });
+  const [filters, setFilters] = React.useState<GroupFilter>({ name: '' });
+  const [order, setOrder] = React.useState<GroupsSort | undefined>();
 
   const { data, loading } = useGroupsQuery({ variables: filters });
 
@@ -39,14 +41,27 @@ export const GroupsList: React.FC = () => {
     await deleteGroup({ variables: { id: groupId } });
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading || !data?.groups) return <ComponentLoading />;
+
+  let groups = data.groups.slice().sort((a, b) => a.name > b.name ? 1 : (b.name > a.name ? -1 : 0));
+  groups = groups.sort((a, b) => {
+    if (order === 'name_desc') {
+      return b.name > a.name ? 1 : (a.name > b.name ? -1 : 0);
+    } else if (order === 'users_asc') {
+      return a.usersCount - b.usersCount;
+    } else if (order === 'users_desc') {
+      return b.usersCount - a.usersCount;
+    }
+    return 0;
+  });
 
   return (
     <div>
       <GroupsFilter
         defaultValues={filters}
-        onSubmit={filter => {
+        onSubmit={(filter: GroupFilter, order: GroupsSort) => {
           setFilters(filter);
+          setOrder(order);
         }}
       />
       <h2>Groups List</h2>
@@ -63,7 +78,7 @@ export const GroupsList: React.FC = () => {
               <div>Action</div>
             </Item>
           </div>
-          { data?.groups && data.groups.map(group => (
+          { groups.map(group => (
             <div key={group.id} className="flex">
               <Item>
                 <div>{group.name}</div>

@@ -116,13 +116,12 @@ export type GroupDto = {
   id: Scalars['ID'];
   name: Scalars['String'];
   users: Array<UserDto>;
-  usersCount?: Maybe<Scalars['Float']>;
+  usersCount: Scalars['Float'];
 };
 
 export type GroupFilter = {
   id?: Maybe<Scalars['Float']>;
   name?: Maybe<Scalars['String']>;
-  order?: Maybe<Scalars['String']>;
 };
 
 export type InvitationDto = {
@@ -927,7 +926,6 @@ export type DeleteUserMutation = (
 export type GroupsQueryVariables = Exact<{
   id?: Maybe<Scalars['Float']>;
   name?: Maybe<Scalars['String']>;
-  order?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -2187,8 +2185,8 @@ export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutati
 export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
 export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
 export const GroupsDocument = gql`
-    query Groups($id: Float, $name: String, $order: String) {
-  groups(filter: {id: $id, name: $name, order: $order}) {
+    query Groups($id: Float, $name: String) {
+  groups(filter: {id: $id, name: $name}) {
     id
     name
     usersCount
@@ -2210,7 +2208,6 @@ export const GroupsDocument = gql`
  *   variables: {
  *      id: // value for 'id'
  *      name: // value for 'name'
- *      order: // value for 'order'
  *   },
  * });
  */

@@ -3,6 +3,7 @@ import { GroupFilter, useGroupsQuery } from '../../generated/graphql';
 import { Form, Formik } from 'formik';
 import { Button, FormControl, InputLabel, makeStyles, MenuItem, Select, TextField } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
+import { ComponentLoading } from '../ComponentLoading';
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -24,9 +25,11 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+export type GroupsSort = 'name_asc' | 'name_desc' | 'users_asc' | 'users_desc';
+
 interface Props {
   defaultValues: GroupFilter;
-  onSubmit: (filter: GroupFilter) => void;
+  onSubmit: (filter: GroupFilter, order: GroupsSort) => void;
 }
 
 export const GroupsFilter: React.FC<Props> = ({
@@ -36,17 +39,19 @@ export const GroupsFilter: React.FC<Props> = ({
   const classes = useStyles();
 
   const [name, setName] = React.useState(defaultValues.name);
-  const [order, setOrder] = React.useState(defaultValues.order);
+  const [order, setOrder] = React.useState<GroupsSort>('name_asc');
 
-  const { data, loading } = useGroupsQuery();
+  // The empty name parameter is forwarded not to run another query
+  // (as the parent already runs such a query, therefore, the cache will be used)
+  const { data, loading } = useGroupsQuery({ variables: { name: '' } });
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <ComponentLoading />;
 
   return (
     <Formik
       initialValues={defaultValues}
       onSubmit={values => {
-        onSubmit({ ...values, order, name });
+        onSubmit({ ...values, name }, order);
       }}
     >
       <Form className={classes.form}>
@@ -73,7 +78,7 @@ export const GroupsFilter: React.FC<Props> = ({
             labelId="groups-filter-order-label"
             id="groups-filter-order"
             value={order}
-            onChange={event => setOrder(event.target.value as string)}
+            onChange={event => setOrder(event.target.value as GroupsSort)}
             autoWidth
           >
             <MenuItem value="name_asc">Name - Ascending</MenuItem>

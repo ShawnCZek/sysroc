@@ -13,15 +13,14 @@ export class GroupsService {
   findOne(filter: GroupFilter): Promise<Group> {
     // Fix issues with null prototype objects which do not work as filters
     filter = JSON.parse(JSON.stringify(filter));
-    // The order cannot be used on finding one entity
-    delete filter.order;
     return this.groupRepository.findOne(filter, { relations: ['users'] });
   }
 
-  async findAll(filter: GroupFilter): Promise<GroupDto[]> {
+  findAll(filter: GroupFilter): Promise<GroupDto[]> {
     const query = this.groupRepository
       .createQueryBuilder('group')
-      .loadRelationCountAndMap('group.usersCount', 'group.users');
+      .loadRelationCountAndMap('group.usersCount', 'group.users')
+      .addOrderBy('group.name', 'ASC');
 
     if (filter.id) {
       query.where('group.id = :id', { id: filter.id });
@@ -30,23 +29,7 @@ export class GroupsService {
       query.where('LOWER(group.name) LIKE :name', { name: `%${filter.name.toLowerCase()}%` });
     }
 
-    if (filter.order === 'name_desc') {
-      query.addOrderBy('group.name', 'DESC');
-    } else {
-      // This order by will always be used
-      query.addOrderBy('group.name', 'ASC');
-    }
-
-    let groups = await query.getMany();
-
-    // As it is not possible to order by a relationship in TypeORM, it must be done manually
-    if (filter.order === 'users_asc') {
-      groups = groups.sort((a: GroupDto, b: GroupDto) => a.usersCount - b.usersCount);
-    } else if (filter.order === 'users_desc') {
-      groups = groups.sort((a: GroupDto, b: GroupDto) => b.usersCount - a.usersCount);
-    }
-
-    return groups;
+    return query.getMany();
   }
 
   createMany(groups: CreateGroupDto[]): Promise<Group[]> {
@@ -68,7 +51,7 @@ export class GroupsService {
 
   async delete(group: GroupDto): Promise<GroupDto> {
     const result = await this.groupRepository.delete({ id: group.id });
-    if (result.affected < 1) {
+    if (!result || result.affected < 1) {
       throw new InternalServerErrorException('An error occurred while deleting the group.');
     }
 

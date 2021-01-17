@@ -1,12 +1,10 @@
 query Groups(
   $id: Float
   $name: String
-  $order: String
 ) {
   groups(filter: {
     id: $id
     name: $name
-    order: $order
   }) {
     id
     name

@@ -12,5 +12,5 @@ export class Group {
   @ManyToMany(type => User, user => user.groups)
   users: User[];
 
-  usersCount?: number;
+  usersCount: number;
 }
