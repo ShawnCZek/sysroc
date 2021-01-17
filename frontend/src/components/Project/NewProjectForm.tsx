@@ -7,16 +7,20 @@ import { Error } from '../Error';
 
 const useStyles = makeStyles({
   form: {
-    padding: '2rem',
+    padding: '1rem 2rem 2rem',
     margin: '0 auto',
-    marginTop: '1.3rem'
+    marginTop: '1.3rem',
   },
   button: {
-    marginTop: '1rem'
+    marginTop: '1rem',
   },
   formTitle: {
-    marginBottom: '0.8rem'
-  }
+    marginBottom: '.8rem',
+  },
+  field: {
+    width: '28rem',
+    marginBottom: '1rem',
+  },
 });
 
 interface Values {
@@ -44,7 +48,8 @@ export const NewProjectForm: React.FC<Props> = ({ onSubmit, error }) => {
           <Typography className={classes.formTitle} variant="h4">
             New Project
           </Typography>
-          {error && <Error error={error} />}
+          <p id="new-project-modal-description">Create something great</p>
+          { error && <Error error={error} /> }
           <div>
             <Field
               name="name"
@@ -52,6 +57,7 @@ export const NewProjectForm: React.FC<Props> = ({ onSubmit, error }) => {
               placeholder="Project Name"
               label="Project Name"
               component={MyField}
+              className={classes.field}
               required
             />
           </div>
@@ -63,6 +69,7 @@ export const NewProjectForm: React.FC<Props> = ({ onSubmit, error }) => {
               label="Project Description"
               multiline={true}
               component={MyField}
+              className={classes.field}
               rows={4}
               rowsMax={8}
             />

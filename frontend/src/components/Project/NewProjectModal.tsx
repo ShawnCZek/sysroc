@@ -31,9 +31,7 @@ export const NewProjectModal: React.FC<Props> = ({
       open={open}
       onClose={handleClose}
     >
-      <ModalBody>
-        <h2 id="new-project-modal-title">New Project</h2>
-        <p id="new-project-modal-description">Create something great</p>
+      <ModalBody width={600}>
         <NewProjectForm
           error={error}
           onSubmit={async ({ name, description }) => {
