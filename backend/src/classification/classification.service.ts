@@ -42,7 +42,7 @@ export class ClassificationService {
     });
   }
 
-  async getOne(filter: ClassificationsFilter): Promise<ClassificationDto> {
+  getOne(filter: ClassificationsFilter): Promise<ClassificationDto> {
     return this.classificationRepository.findOne({ id: filter.id }, {
       relations: [
         'project',
@@ -53,10 +53,11 @@ export class ClassificationService {
   }
 
   getMany(filter: ClassificationsFilter): Promise<ClassificationDto[]> {
-    const query = this.classificationRepository.createQueryBuilder('classification')
+    const query = this.classificationRepository
+      .createQueryBuilder('classification')
       .leftJoinAndSelect('classification.project', 'project')
       .leftJoinAndSelect('classification.user', 'user')
-      .leftJoinAndSelect('project.user', 'projectUser')
+      .leftJoinAndSelect('project.users', 'projectUsers')
       .andWhere(
         'DATE(classification.createdAt) >= DATE(:fromDate) AND DATE(classification.createdAt) <= DATE(:toDate)',
         { fromDate: filter.fromDate, toDate: filter.toDate })
