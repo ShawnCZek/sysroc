@@ -122,7 +122,7 @@ type Query {
   project(projectId: Float!): ProjectDto!
   projectDetails(projectId: Float!): ProjectDetailsDto!
   projects(filter: ProjectsFilter!): [ProjectDto!]!
-  roles(filter: RolesFilter!): [RoleDto!]!
+  roles(filter: AllRolesFilter!): [RoleDto!]!
   task(filter: TasksFilter!): TaskDto!
   user(filter: UsersFilter!): UserDto!
   users(filter: AllUsersFilter!): [UserDto!]!
@@ -134,9 +134,7 @@ type RoleDto {
   name: String!
   permissions: [PermissionDto!]!
   slug: String!
-  student: Boolean!
   system: Boolean!
-  teacher: Boolean!
 }
 
 type TaskDto {
@@ -173,12 +171,20 @@ type UserTempDto {
   name: String!
 }
 
+input AllRolesFilter {
+  admin: Boolean
+  name: String
+  permissions: [String!]
+  slug: String
+}
+
 input AllUsersFilter {
   adEmail: String
   admin: Boolean
   email: String
   groups: [Float!]
   name: String
+  permissions: [String!]
   roles: [Float!]
   rolesSlug: [String!]
   student: Boolean
@@ -188,6 +194,7 @@ input AllUsersFilter {
 input BaseUsersFilter {
   admin: Boolean
   groups: [Float!]
+  permissions: [String!]
   roles: [Float!]
   rolesSlug: [String!]
   student: Boolean
@@ -195,10 +202,10 @@ input BaseUsersFilter {
 }
 
 input ClassificationsFilter {
-  fromDate: DateTime = "2020-12-17T10:32:45.435Z"
+  fromDate: DateTime = "2020-12-17T16:20:14.328Z"
   id: Float
   projects: [Float!] = []
-  toDate: DateTime = "2021-01-17T10:32:45.435Z"
+  toDate: DateTime = "2021-01-17T16:20:14.328Z"
   users: [Float!] = []
 }
 
@@ -222,8 +229,6 @@ input CreateRoleDto {
   admin: Boolean = false
   name: String!
   permissionSlugs: [String!]
-  student: Boolean = false
-  teacher: Boolean = false
 }
 
 input CreateTaskDto {
@@ -265,14 +270,9 @@ input RemoveAuthorDto {
 }
 
 input RolesFilter {
-  admin: Boolean
   id: Float
   name: String
-  permission: String
   slug: String
-  student: Boolean
-  teacher: Boolean
-  user: String
 }
 
 input SignUpUserDto {
@@ -310,8 +310,6 @@ input UpdateRoleDto {
   admin: Boolean = false
   name: String!
   permissionSlugs: [String!]
-  student: Boolean = false
-  teacher: Boolean = false
 }
 
 input UpdateTaskDto {

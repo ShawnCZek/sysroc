@@ -8,12 +8,6 @@ export class CreateRoleDto {
   @Field({ defaultValue: false })
   admin: boolean;
 
-  @Field({ defaultValue: false })
-  teacher: boolean;
-
-  @Field({ defaultValue: false })
-  student: boolean;
-
   @Field(type => [String], { nullable: true })
   permissionSlugs: string[];
 }

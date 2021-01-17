@@ -81,12 +81,6 @@ export const RolesList: React.FC = () => {
               <div>Administrator</div>
             </Item>
             <Item>
-              <div>Teacher</div>
-            </Item>
-            <Item>
-              <div>Student</div>
-            </Item>
-            <Item>
               <div>Permissions</div>
             </Item>
             <Item>
@@ -105,12 +99,6 @@ export const RolesList: React.FC = () => {
                 <ItemIcon><BooleanIcon check={role.admin} /></ItemIcon>
               </Item>
               <Item>
-                <ItemIcon><BooleanIcon check={role.teacher} /></ItemIcon>
-              </Item>
-              <Item>
-                <ItemIcon><BooleanIcon check={role.student} /></ItemIcon>
-              </Item>
-              <Item>
                 <div>{role.admin ? <strong>All</strong> : role.permissions.map(permission => permission.name).join(', ')}</div>
               </Item>
               <Item className="actions">
@@ -122,8 +110,6 @@ export const RolesList: React.FC = () => {
                     setRoleData({
                       name: role.name,
                       admin: role.admin,
-                      teacher: role.teacher,
-                      student: role.student,
                       permissions: role.permissions.map(permission => permission.slug),
                     });
                     handleOpenEditModal();

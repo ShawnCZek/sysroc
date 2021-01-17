@@ -1,21 +1,20 @@
 mutation UpdateRole(
   $id: Float!
   $name: String!
-  $teacher: Boolean!
-  $student: Boolean!
   $permissions: [String!]
 ) {
   updateRole(
     filter: { id: $id }
-    input: { name: $name, teacher: $teacher, student: $student, permissionSlugs: $permissions }
+    input: {
+      name: $name
+      permissionSlugs: $permissions
+    }
   ) {
     id
     name
     slug
     system
     admin
-    teacher
-    student
     permissions {
       name
       slug

@@ -13,6 +13,7 @@ import { BaseUserDto } from '../users/dto/base-user.dto';
 import { UsersService } from '../users/users.service';
 import { PERMISSIONS } from '../permissions/permissions';
 import { RemoveAuthorDto } from './dto/remove-author.dto';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 @Injectable()
 export class ProjectsService {
@@ -127,8 +128,7 @@ export class ProjectsService {
       throw new UnauthorizedException('Missing permissions for updating this project');
     }
 
-    const updateProject: Project = {
-      ...project,
+    const updateProject: QueryDeepPartialEntity<Project> = {
       name: updates.name,
       description: updates.description,
     };
@@ -150,7 +150,7 @@ export class ProjectsService {
     filter: ProjectsFilter,
     user: UserDto,
   ): Promise<ProjectDto> {
-    const project = await this.projectRepository.findOne(filter.id, { relations: ['owner', 'users', 'supervisor'] });
+    const project = await this.projectRepository.findOne(filter.id, { relations: ['supervisor'] });
 
     if (!project) {
       throw new NotFoundException('Could not find project!');
@@ -160,8 +160,7 @@ export class ProjectsService {
       throw new UnauthorizedException('You cannot claim this project.');
     }
 
-    project.supervisor = project.supervisor ? null : await this.userRepository.findOne({ id: user.id });
-    const res = await this.projectRepository.update(filter.id, project);
+    const res = await this.projectRepository.update(filter.id, { supervisor: project.supervisor ? null : user });
 
     if (!res || res.affected < 1) {
       throw new InternalServerErrorException('Could not claim the project.');

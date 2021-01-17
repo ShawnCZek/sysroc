@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Paper from '@material-ui/core/Paper';
 import { Item } from '../Layout/Item';
 import { List } from '../Layout/List';
-import { useDeleteUserMutation, useMeQuery, useUsersQuery } from '../../generated/graphql';
+import { PermissionDto, useDeleteUserMutation, useMeQuery, useUsersQuery } from '../../generated/graphql';
 import { Fab } from '@material-ui/core';
 import { ComponentLoading } from '../ComponentLoading';
 import { UpdateUserModal } from './UpdateUserModal';
@@ -18,8 +18,7 @@ interface CanManageUserDto {
   id: string;
   roles: Array<{
     admin: boolean;
-    teacher: boolean;
-    student: boolean;
+    permissions?: Array<Pick<PermissionDto, 'slug'>>;
   }>;
 }
 

@@ -1,7 +1,9 @@
+import { PermissionDto } from '../generated/graphql';
+import { PERMISSIONS } from '../generated/permissions';
+
 interface UserRoleDto {
   admin: boolean;
-  teacher: boolean;
-  student: boolean;
+  permissions?: Array<Pick<PermissionDto, 'slug'>>;
 }
 
 interface UserWithRolesDto {
@@ -24,29 +26,33 @@ export function isAdmin(user: UserWithRolesDto | undefined | null): boolean {
 /**
  * Determine whether the user is a teacher.
  *
- * The user must have at least one role with the teacher attribute.
- *
  * @param user
  */
 export function isTeacher(user: UserWithRolesDto | undefined | null): boolean {
+  if (isAdmin(user)) {
+    return true;
+  }
+
   if (!user) {
     return false;
   }
 
-  return user.roles.some(role => role.teacher);
+  return user.roles.some(role => role.permissions && role.permissions.map(permission => permission.slug).includes(PERMISSIONS.PROJECTS_CLAIM));
 }
 
 /**
  * Determine whether the user is a student.
  *
- * The user must have at least one role with the student attribute.
- *
  * @param user
  */
 export function isStudent(user: UserWithRolesDto | undefined | null): boolean {
+  if (isAdmin(user)) {
+    return true;
+  }
+
   if (!user) {
     return false;
   }
 
-  return user.roles.some(role => role.student);
+  return user.roles.some(role => role.permissions && role.permissions.map(permission => permission.slug).includes(PERMISSIONS.PROJECTS_CREATE));
 }

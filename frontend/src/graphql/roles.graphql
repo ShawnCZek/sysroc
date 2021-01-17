@@ -1,12 +1,10 @@
-query Roles($admin: Boolean, $permission: String) {
-  roles(filter: { admin: $admin, permission: $permission }) {
+query Roles($admin: Boolean, $permissions: [String!]) {
+  roles(filter: { admin: $admin, permissions: $permissions }) {
     id
     name
     slug
     system
     admin
-    teacher
-    student
     permissions {
       name
       slug

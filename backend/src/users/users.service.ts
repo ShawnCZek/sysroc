@@ -53,6 +53,7 @@ export class UsersService {
     const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.roles', 'roles')
+      .leftJoinAndSelect('roles.permissions', 'permissions')
       .leftJoinAndSelect('user.groups', 'groups')
       .addOrderBy('user.name')
       .addOrderBy('groups.name', 'DESC');
@@ -73,10 +74,11 @@ export class UsersService {
   }
 
   async findAllBase(filter: BaseUsersFilter): Promise<BaseUserDto[]> {
-    let users = await this.userRepository
+    const users = await this.userRepository
       .createQueryBuilder('user')
       .select(['user.id', 'user.name'])
       .leftJoinAndSelect('user.roles', 'roles')
+      .leftJoinAndSelect('roles.permissions', 'permissions')
       .leftJoinAndSelect('user.groups', 'groups')
       .addOrderBy('user.name')
       .addOrderBy('groups.name', 'DESC')
@@ -353,10 +355,10 @@ export class UsersService {
     const canManageTeachers = this.hasPermissions(userDto, PERMISSIONS.MANAGE_TEACHER_USERS);
     const canManageStudents = this.hasPermissions(userDto, PERMISSIONS.MANAGE_STUDENT_USERS);
 
-    const manageTeachers = !roles.find(role => role.teacher) || canManageTeachers;
-    const manageStudents = !roles.find(role => role.student) || canManageStudents;
+    const manageTeachers = !roles.some(role => this.rolesService.hasPermissions(role, PERMISSIONS.PROJECTS_CLAIM)) || canManageTeachers;
+    const manageStudents = !roles.some(role => this.rolesService.hasPermissions(role, PERMISSIONS.PROJECTS_CREATE)) || canManageStudents;
 
-    return !roles.find(role => role.admin) && manageTeachers && manageStudents;
+    return !roles.some(role => role.admin) && manageTeachers && manageStudents;
   }
 
   async delete(user: UserDto): Promise<UserDto> {
@@ -447,23 +449,12 @@ export class UsersService {
     if (filter.groups && filter.groups.length > 0) {
       users = users.filter(user => user.groups.some(group => filter.groups.includes(group.id)));
     }
-
-    const roleAttributes = ['admin', 'teacher', 'student'];
-    users = users.filter(user => user.roles.length === 0 || user.roles.some(role => {
-      for (const attribute of roleAttributes) {
-        if (filter[attribute] !== null && filter[attribute] !== undefined) {
-          // The role needs only one of the attributes
-          if (filter[attribute] && role[attribute]) {
-            return true;
-          }
-          // The role must not have any of the restricted attributes
-          if (!filter[attribute] && role[attribute]) {
-            return false;
-          }
-        }
-      }
-      return true;
-    }));
+    if (filter.permissions && filter.permissions.length > 0) {
+      users = users.filter(user => this.hasPermissions(user, ...filter.permissions));
+    }
+    if (filter.admin !== undefined) {
+      users = users.filter(user => user.roles.some(role => role.admin));
+    }
 
     return users;
   }

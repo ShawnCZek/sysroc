@@ -25,8 +25,6 @@ export class RolesModule {
       slug: ROLES.ADMIN,
       system: true,
       admin: true,
-      teacher: true,
-      student: false,
       permissionSlugs: [],
     });
     await this.rolesService.createOrUpdate({
@@ -34,12 +32,11 @@ export class RolesModule {
       slug: ROLES.TEACHER,
       system: true,
       admin: false,
-      teacher: true,
-      student: false,
       permissionSlugs: [
         PERMISSIONS.PROJECTS_MANAGE,
         PERMISSIONS.PROJECTS_CREATE,
         PERMISSIONS.PROJECTS_VIEW,
+        PERMISSIONS.PROJECTS_CLAIM,
         PERMISSIONS.MANAGE_STUDENT_USERS,
         PERMISSIONS.DELETE_USERS,
         PERMISSIONS.CLASSIFICATION_CREATE,
@@ -53,8 +50,6 @@ export class RolesModule {
       slug: ROLES.STUDENT,
       system: true,
       admin: false,
-      teacher: false,
-      student: true,
       permissionSlugs: [
         PERMISSIONS.PROJECTS_CREATE,
       ],
@@ -64,8 +59,6 @@ export class RolesModule {
       slug: ROLES.GUEST,
       system: true,
       admin: false,
-      teacher: false,
-      student: false,
       permissionSlugs: [],
     });
   }

@@ -89,7 +89,7 @@ export const UsersFilter: React.FC<Props> = ({
         />
         <Field
           name="email"
-          type="email"
+          type="text"
           placeholder="Email"
           label="Email"
           component={MyField}
@@ -97,7 +97,7 @@ export const UsersFilter: React.FC<Props> = ({
         />
         <Field
           name="adEmail"
-          type="email"
+          type="text"
           placeholder="AD Email"
           label="AD Email"
           component={MyField}

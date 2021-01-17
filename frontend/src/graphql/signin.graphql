@@ -12,8 +12,6 @@ mutation SignIn($email: String!, $password: String!) {
         slug
         system
         admin
-        teacher
-        student
       }
     }
     userTemp {

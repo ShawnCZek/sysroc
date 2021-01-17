@@ -5,6 +5,7 @@ import { MyField } from '../MyField';
 import { useBaseUsersQuery } from '../../generated/graphql';
 import { Autocomplete } from '@material-ui/lab';
 import { ComponentLoading } from '../ComponentLoading';
+import { PERMISSIONS } from '../../generated/permissions';
 
 const useStyles = makeStyles({
   form: {
@@ -43,7 +44,7 @@ export const ProjectsFilter: React.FC<Props> = ({
   const classes = useStyles();
 
   const { data: authorsData, loading: authorsLoading } = useBaseUsersQuery();
-  const { data: supervisorsData, loading: supervisorsLoading } = useBaseUsersQuery({ variables: { admin: true, teacher: true } });
+  const { data: supervisorsData, loading: supervisorsLoading } = useBaseUsersQuery({ variables: { permissions: [PERMISSIONS.PROJECTS_CLAIM] } });
 
   let authors: number[] | undefined = defaultValues.authors;
   let supervisors: number[] | undefined = defaultValues.supervisors;

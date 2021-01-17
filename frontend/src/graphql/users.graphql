@@ -5,8 +5,6 @@ query Users(
   $roles: [Float!]
   $rolesSlug: [String!]
   $admin: Boolean
-  $teacher: Boolean
-  $student: Boolean
   $groups: [Float!]
 ) {
   users(
@@ -17,8 +15,6 @@ query Users(
       roles: $roles
       rolesSlug: $rolesSlug
       admin: $admin
-      teacher: $teacher
-      student: $student
       groups: $groups
     }
   ) {
@@ -36,8 +32,9 @@ query Users(
       slug
       system
       admin
-      teacher
-      student
+      permissions {
+        slug
+      }
     }
   }
 }

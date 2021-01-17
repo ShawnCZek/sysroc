@@ -18,12 +18,6 @@ export class RoleDto {
   @Field()
   readonly admin: boolean;
 
-  @Field()
-  readonly teacher: boolean;
-
-  @Field()
-  readonly student: boolean;
-
   @Field(type => [PermissionDto])
   readonly permissions: PermissionDto[];
 }

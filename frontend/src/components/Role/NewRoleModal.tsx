@@ -47,11 +47,11 @@ export const NewRoleModal: React.FC<Props> = ({
       onClose={handleClose}
     >
       <ModalBody>
-        <h2 id="new-user-modal-title">New Role</h2>
-        <p id="new-user-modal-description">Create a new user role.</p>
+        <h2>New Role</h2>
+        <p>Create a new user role.</p>
         <RoleForm
           error={error}
-          roleData={{ name: '', admin: false, teacher: false, student: false, permissions: [] }}
+          roleData={{ name: '', admin: false, permissions: [] }}
           onSubmit={async (values) => {
             await createRole({ variables: values });
             handleClose();

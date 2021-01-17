@@ -1,13 +1,9 @@
 mutation CreateRole(
   $name: String!
-  $teacher: Boolean!
-  $student: Boolean!
   $permissions: [String!]
 ) {
   createRole(input: {
     name: $name
-    teacher: $teacher
-    student: $student
     permissionSlugs: $permissions
   }) {
     id
@@ -15,8 +11,6 @@ mutation CreateRole(
     slug
     system
     admin
-    teacher
-    student
     permissions {
       name
       slug

@@ -11,7 +11,7 @@ const useStyles = makeStyles({
     margin: '0 auto'
   },
   formControl: {
-    marginTop: '1rem'
+    marginTop: '.5rem'
   },
   button: {
     marginTop: '1rem'
@@ -24,8 +24,6 @@ const useStyles = makeStyles({
 interface Values {
   name: string;
   admin: boolean;
-  student: boolean;
-  teacher: boolean;
   permissions: string[];
 }
 
@@ -42,8 +40,6 @@ export const RoleForm: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
 
-  const [teacher, setTeacher] = React.useState(roleData.teacher);
-  const [student, setStudent] = React.useState(roleData.student);
   const [permissions, setPermissions] = React.useState(roleData.permissions);
 
   const handleRoleChange = (permissionSlugs: string[]): void => setPermissions(permissionSlugs);
@@ -52,7 +48,7 @@ export const RoleForm: React.FC<Props> = ({
     <Formik
       initialValues={roleData}
       onSubmit={values => {
-        onSubmit({ name: values.name, admin: false, teacher, student, permissions });
+        onSubmit({ name: values.name, admin: false, permissions });
       }}
     >
       <Form className={classes.form}>
@@ -79,30 +75,6 @@ export const RoleForm: React.FC<Props> = ({
               />
             }
             label="Administrator"
-          />
-          <FormControlLabel
-            key="teacher"
-            control={
-              <Checkbox
-                checked={teacher}
-                onChange={event => setTeacher(event.target.checked)}
-                value="teacher"
-                color="primary"
-              />
-            }
-            label="Teacher"
-          />
-          <FormControlLabel
-            key="student"
-            control={
-              <Checkbox
-                checked={student}
-                onChange={event => setStudent(event.target.checked)}
-                value="student"
-                color="primary"
-              />
-            }
-            label="Student"
           />
         </FormGroup>
         { !roleData.admin &&

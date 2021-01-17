@@ -3,13 +3,11 @@ import { useSnackbar } from 'notistack';
 import Modal from '@material-ui/core/Modal';
 import { ModalBody } from '../Layout/Modal/ModalBody';
 import { RoleForm } from './RoleForm';
-import { RolesDocument, RolesQuery, useUpdateRoleMutation } from '../../generated/graphql';
+import { useUpdateRoleMutation } from '../../generated/graphql';
 
 interface Values {
   name: string;
   admin: boolean;
-  teacher: boolean;
-  student: boolean;
   permissions: string[];
 }
 
@@ -28,32 +26,19 @@ export const UpdateRoleModal: React.FC<Props> = ({
 }) => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const [updateRole, { error }] = useUpdateRoleMutation({
-    update(cache, result) {
-      try {
-        if (result.data?.updateRole) {
-          const { roles }: any = cache.readQuery({ query: RolesDocument });
-
-          const index = roles.findIndex(
-            (role: any) => role.id === result.data?.updateRole.id
-          );
-
-          roles[index] = result.data?.updateRole;
-
-          cache.writeQuery<RolesQuery>({
-            query: RolesDocument,
-            data: { roles },
-          });
-
-          enqueueSnackbar('Successfully updated the role!', { variant: 'success' });
-        }
-      } catch (e) {
-        if (e instanceof Error) {
-          enqueueSnackbar(e.message, { variant: 'error' });
-        }
+  const [updateRole, { error, client }] = useUpdateRoleMutation({
+    async update(cache, result) {
+      if (result.data?.updateRole) {
+        await client.resetStore();
+        enqueueSnackbar('Successfully updated the role!', { variant: 'success' });
+        handleClose();
       }
     }
   });
+
+  if (error) {
+    enqueueSnackbar(error.message, { variant: 'error' })
+  }
 
   return (
     <Modal
@@ -63,14 +48,13 @@ export const UpdateRoleModal: React.FC<Props> = ({
       onClose={handleClose}
     >
       <ModalBody>
-        <h2 id="update-user-modal-title">Edit Role</h2>
-        <p id="update-user-modal-description">Edit the existing role.</p>
+        <h2>Edit Role</h2>
+        <p>Edit the existing role.</p>
         <RoleForm
           error={error}
           roleData={data}
           onSubmit={async (values) => {
             await updateRole({ variables: { id: roleId, ...values } });
-            handleClose();
           }}
         />
       </ModalBody>

@@ -23,8 +23,6 @@ mutation UpdateUser(
       slug
       system
       admin
-      teacher
-      student
     }
   }
 }

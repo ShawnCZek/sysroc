@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { makeStyles, TextField } from '@material-ui/core';
-import { useBaseUsersQuery, useRolesQuery } from '../../generated/graphql';
+import { useBaseUsersQuery } from '../../generated/graphql';
 import { Autocomplete } from '@material-ui/lab';
 import { ComponentLoading } from '../ComponentLoading';
+import { PERMISSIONS } from '../../generated/permissions';
 
 const SupervisorStyles = styled.div`
   padding: .5rem 0 1rem 0;
@@ -11,8 +12,8 @@ const SupervisorStyles = styled.div`
 
 const useStyles = makeStyles({
   field: {
-    width: '28rem'
-  }
+    width: '28rem',
+  },
 });
 
 interface Props {
@@ -20,54 +21,37 @@ interface Props {
   onSupervisorStateChange: (supervisor: number | null) => void;
 }
 
-export const Supervisor: React.FC<Props> = ({
-  defaultValue,
-  onSupervisorStateChange,
-}) => {
+export const Supervisor: React.FC<Props> = ({ defaultValue, onSupervisorStateChange }) => {
   const classes = useStyles();
-  const [loaded, setLoaded] = React.useState(false);
   const [value, setValue] = React.useState(defaultValue);
 
-  const { data: rolesData, loading: rolesLoading } = useRolesQuery({ variables: { permission: "projects.claim" } });
-  const { data: usersData, loading: usersLoading } = useBaseUsersQuery({ variables: { roles: rolesData?.roles.map(role => parseInt(role.id)) } });
+  const { data, loading } = useBaseUsersQuery({ variables: { permissions: [PERMISSIONS.PROJECTS_CLAIM] } });
 
   const handleChange = (event: React.ChangeEvent<{}>, value: any) => {
     setValue(value);
-    updateSupervisor(value);
-  };
-
-  const updateSupervisor = (value: any) => {
-    if (usersData?.baseUsers) {
-      onSupervisorStateChange(value ? parseInt(usersData.baseUsers.filter(user => user.name === value)[0].id) : null);
+    if (data?.baseUsers) {
+      onSupervisorStateChange(value ? parseInt(data.baseUsers.find(user => user.name === value)!.id) : null);
     }
   };
 
-  if (rolesLoading || usersLoading) return <ComponentLoading />;
-
-  if (!loaded) {
-    // A little hack to get rid of console errors with not using the default value
-    updateSupervisor(defaultValue);
-    setLoaded(true);
-  }
+  if (loading) return <ComponentLoading/>;
 
   return (
     <SupervisorStyles>
-      {usersData?.baseUsers &&
-        <Autocomplete
-          placeholder="Supervisor"
-          options={usersData.baseUsers.map(user => user.name)}
-          value={value}
-          onChange={handleChange}
-          renderInput={params => (
-            <TextField
-              {...params}
-              label="Supervisor"
-              variant="standard"
-              className={classes.field}
-            />
-          )}
-        />
-      }
+      <Autocomplete
+        placeholder="Supervisor"
+        options={data?.baseUsers ? data.baseUsers.map(user => user.name) : []}
+        value={value}
+        onChange={handleChange}
+        renderInput={params => (
+          <TextField
+            {...params}
+            label="Supervisor"
+            variant="standard"
+            className={classes.field}
+          />
+        )}
+      />
     </SupervisorStyles>
   );
 };

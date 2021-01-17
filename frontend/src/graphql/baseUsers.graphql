@@ -2,18 +2,16 @@ query BaseUsers(
   $roles: [Float!]
   $rolesSlug: [String!]
   $admin: Boolean
-  $teacher: Boolean
-  $student: Boolean
   $groups: [Float!]
+  $permissions: [String!]
 ) {
   baseUsers(
     filter: {
       roles: $roles
       rolesSlug: $rolesSlug
       admin: $admin
-      teacher: $teacher
-      student: $student
       groups: $groups
+      permissions: $permissions
     }
   ) {
     id

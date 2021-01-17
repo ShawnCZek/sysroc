@@ -19,4 +19,7 @@ export class BaseUsersFilter {
 
   @Field(type => [Number], { nullable: true })
   groups?: number[];
+
+  @Field(type => [String], { nullable: true })
+  permissions?: string[];
 }

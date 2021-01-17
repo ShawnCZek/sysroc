@@ -2,6 +2,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { RolesService } from './roles.service';
 import { RoleDto } from './dto/role.dto';
 import { RolesFilter } from './filters/role.filter';
+import { AllRolesFilter } from './filters/all-roles.filter';
 import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../auth/graphql-auth.guard';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -18,7 +19,7 @@ export class RolesResolver {
 
   @Query(() => [RoleDto])
   roles(
-    @Args('filter') filter: RolesFilter,
+    @Args('filter') filter: AllRolesFilter,
   ): Promise<RoleDto[]> {
     return this.rolesService.findAll(filter);
   }
@@ -66,6 +67,7 @@ export class RolesResolver {
     @Args('roleId') roleId: number,
   ): Promise<RoleDto> {
     const role = await this.rolesService.findOne({ id: roleId });
+
     if (role.admin || role.system) {
       throw new UnauthorizedException('You cannot manage this role.');
     }

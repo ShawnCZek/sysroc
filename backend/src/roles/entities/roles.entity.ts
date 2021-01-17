@@ -19,12 +19,6 @@ export class Role {
   @Column({ default: false })
   admin: boolean;
 
-  @Column({ default: false })
-  teacher: boolean;
-
-  @Column({ default: false })
-  student: boolean;
-
   @ManyToMany(type => Permission, permission => permission.roles, { cascade: true })
   @JoinTable()
   permissions: Permission[];

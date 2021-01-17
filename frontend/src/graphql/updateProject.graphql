@@ -13,6 +13,7 @@ mutation UpdateProject(
     description
     users {
       id
+      name
     }
     supervisor {
       id

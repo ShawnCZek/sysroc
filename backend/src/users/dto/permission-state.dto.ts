@@ -4,6 +4,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 export class PermissionStateDto {
   @Field()
   readonly slug: string;
+
   @Field()
   readonly permitted: boolean;
 }

@@ -23,6 +23,13 @@ export type AdUser = {
   cn: Scalars['String'];
 };
 
+export type AllRolesFilter = {
+  name?: Maybe<Scalars['String']>;
+  slug?: Maybe<Scalars['String']>;
+  admin?: Maybe<Scalars['Boolean']>;
+  permissions?: Maybe<Array<Scalars['String']>>;
+};
+
 export type AllUsersFilter = {
   roles?: Maybe<Array<Scalars['Float']>>;
   rolesSlug?: Maybe<Array<Scalars['String']>>;
@@ -30,6 +37,7 @@ export type AllUsersFilter = {
   teacher?: Maybe<Scalars['Boolean']>;
   student?: Maybe<Scalars['Boolean']>;
   groups?: Maybe<Array<Scalars['Float']>>;
+  permissions?: Maybe<Array<Scalars['String']>>;
   email?: Maybe<Scalars['String']>;
   adEmail?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
@@ -50,6 +58,7 @@ export type BaseUsersFilter = {
   teacher?: Maybe<Scalars['Boolean']>;
   student?: Maybe<Scalars['Boolean']>;
   groups?: Maybe<Array<Scalars['Float']>>;
+  permissions?: Maybe<Array<Scalars['String']>>;
 };
 
 export type ClassificationDto = {
@@ -89,8 +98,6 @@ export type CreateProjectDto = {
 export type CreateRoleDto = {
   name: Scalars['String'];
   admin?: Maybe<Scalars['Boolean']>;
-  teacher?: Maybe<Scalars['Boolean']>;
-  student?: Maybe<Scalars['Boolean']>;
   permissionSlugs?: Maybe<Array<Scalars['String']>>;
 };
 
@@ -396,7 +403,7 @@ export type QueryBaseUsersArgs = {
 
 
 export type QueryRolesArgs = {
-  filter: RolesFilter;
+  filter: AllRolesFilter;
 };
 
 
@@ -451,8 +458,6 @@ export type RoleDto = {
   slug: Scalars['String'];
   system: Scalars['Boolean'];
   admin: Scalars['Boolean'];
-  teacher: Scalars['Boolean'];
-  student: Scalars['Boolean'];
   permissions: Array<PermissionDto>;
 };
 
@@ -460,11 +465,6 @@ export type RolesFilter = {
   id?: Maybe<Scalars['Float']>;
   name?: Maybe<Scalars['String']>;
   slug?: Maybe<Scalars['String']>;
-  admin?: Maybe<Scalars['Boolean']>;
-  teacher?: Maybe<Scalars['Boolean']>;
-  student?: Maybe<Scalars['Boolean']>;
-  permission?: Maybe<Scalars['String']>;
-  user?: Maybe<Scalars['String']>;
 };
 
 export type SignUpUserDto = {
@@ -512,8 +512,6 @@ export type UpdateProjectDto = {
 export type UpdateRoleDto = {
   name: Scalars['String'];
   admin?: Maybe<Scalars['Boolean']>;
-  teacher?: Maybe<Scalars['Boolean']>;
-  student?: Maybe<Scalars['Boolean']>;
   permissionSlugs?: Maybe<Array<Scalars['String']>>;
 };
 
@@ -591,9 +589,8 @@ export type BaseUsersQueryVariables = Exact<{
   roles?: Maybe<Array<Scalars['Float']>>;
   rolesSlug?: Maybe<Array<Scalars['String']>>;
   admin?: Maybe<Scalars['Boolean']>;
-  teacher?: Maybe<Scalars['Boolean']>;
-  student?: Maybe<Scalars['Boolean']>;
   groups?: Maybe<Array<Scalars['Float']>>;
+  permissions?: Maybe<Array<Scalars['String']>>;
 }>;
 
 
@@ -730,8 +727,6 @@ export type CreateProjectMutation = (
 
 export type CreateRoleMutationVariables = Exact<{
   name: Scalars['String'];
-  teacher: Scalars['Boolean'];
-  student: Scalars['Boolean'];
   permissions?: Maybe<Array<Scalars['String']>>;
 }>;
 
@@ -740,7 +735,7 @@ export type CreateRoleMutation = (
   { __typename?: 'Mutation' }
   & { createRole: (
     { __typename?: 'RoleDto' }
-    & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
+    & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin'>
     & { permissions: Array<(
       { __typename?: 'PermissionDto' }
       & Pick<PermissionDto, 'name' | 'slug'>
@@ -991,7 +986,7 @@ export type MeQuery = (
       & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
       & { roles: Array<(
         { __typename?: 'RoleDto' }
-        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin'>
       )> }
     )> }
   )> }
@@ -1141,7 +1136,7 @@ export type ProjectsQuery = (
 
 export type RolesQueryVariables = Exact<{
   admin?: Maybe<Scalars['Boolean']>;
-  permission?: Maybe<Scalars['String']>;
+  permissions?: Maybe<Array<Scalars['String']>>;
 }>;
 
 
@@ -1149,7 +1144,7 @@ export type RolesQuery = (
   { __typename?: 'Query' }
   & { roles: Array<(
     { __typename?: 'RoleDto' }
-    & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
+    & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin'>
     & { permissions: Array<(
       { __typename?: 'PermissionDto' }
       & Pick<PermissionDto, 'name' | 'slug'>
@@ -1173,7 +1168,7 @@ export type SignInMutation = (
       & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
       & { roles: Array<(
         { __typename?: 'RoleDto' }
-        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin'>
       )> }
     )>, userTemp?: Maybe<(
       { __typename?: 'UserTempDto' }
@@ -1199,7 +1194,7 @@ export type SignUpMutation = (
       & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
       & { roles: Array<(
         { __typename?: 'RoleDto' }
-        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin'>
       )> }
     )> }
   ) }
@@ -1277,7 +1272,7 @@ export type UpdateProfileMutation = (
       & Pick<UserDto, 'id' | 'name' | 'email' | 'adEmail'>
       & { roles: Array<(
         { __typename?: 'RoleDto' }
-        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
+        & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin'>
       )> }
     )> }
   ) }
@@ -1298,7 +1293,7 @@ export type UpdateProjectMutation = (
     & Pick<ProjectDto, 'id' | 'name' | 'description'>
     & { users: Array<(
       { __typename?: 'UserDto' }
-      & Pick<UserDto, 'id'>
+      & Pick<UserDto, 'id' | 'name'>
     )>, supervisor?: Maybe<(
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
@@ -1309,8 +1304,6 @@ export type UpdateProjectMutation = (
 export type UpdateRoleMutationVariables = Exact<{
   id: Scalars['Float'];
   name: Scalars['String'];
-  teacher: Scalars['Boolean'];
-  student: Scalars['Boolean'];
   permissions?: Maybe<Array<Scalars['String']>>;
 }>;
 
@@ -1319,7 +1312,7 @@ export type UpdateRoleMutation = (
   { __typename?: 'Mutation' }
   & { updateRole: (
     { __typename?: 'RoleDto' }
-    & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
+    & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin'>
     & { permissions: Array<(
       { __typename?: 'PermissionDto' }
       & Pick<PermissionDto, 'name' | 'slug'>
@@ -1362,7 +1355,7 @@ export type UpdateUserMutation = (
       & Pick<GroupDto, 'id' | 'name'>
     )>, roles: Array<(
       { __typename?: 'RoleDto' }
-      & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
+      & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin'>
     )> }
   ) }
 );
@@ -1401,8 +1394,6 @@ export type UsersQueryVariables = Exact<{
   roles?: Maybe<Array<Scalars['Float']>>;
   rolesSlug?: Maybe<Array<Scalars['String']>>;
   admin?: Maybe<Scalars['Boolean']>;
-  teacher?: Maybe<Scalars['Boolean']>;
-  student?: Maybe<Scalars['Boolean']>;
   groups?: Maybe<Array<Scalars['Float']>>;
 }>;
 
@@ -1417,7 +1408,11 @@ export type UsersQuery = (
       & Pick<GroupDto, 'id' | 'name'>
     )>, roles: Array<(
       { __typename?: 'RoleDto' }
-      & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin' | 'teacher' | 'student'>
+      & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin'>
+      & { permissions: Array<(
+        { __typename?: 'PermissionDto' }
+        & Pick<PermissionDto, 'slug'>
+      )> }
     )> }
   )> }
 );
@@ -1459,8 +1454,8 @@ export type AcceptInvitationMutationHookResult = ReturnType<typeof useAcceptInvi
 export type AcceptInvitationMutationResult = Apollo.MutationResult<AcceptInvitationMutation>;
 export type AcceptInvitationMutationOptions = Apollo.BaseMutationOptions<AcceptInvitationMutation, AcceptInvitationMutationVariables>;
 export const BaseUsersDocument = gql`
-    query BaseUsers($roles: [Float!], $rolesSlug: [String!], $admin: Boolean, $teacher: Boolean, $student: Boolean, $groups: [Float!]) {
-  baseUsers(filter: {roles: $roles, rolesSlug: $rolesSlug, admin: $admin, teacher: $teacher, student: $student, groups: $groups}) {
+    query BaseUsers($roles: [Float!], $rolesSlug: [String!], $admin: Boolean, $groups: [Float!], $permissions: [String!]) {
+  baseUsers(filter: {roles: $roles, rolesSlug: $rolesSlug, admin: $admin, groups: $groups, permissions: $permissions}) {
     id
     name
     groups {
@@ -1490,9 +1485,8 @@ export const BaseUsersDocument = gql`
  *      roles: // value for 'roles'
  *      rolesSlug: // value for 'rolesSlug'
  *      admin: // value for 'admin'
- *      teacher: // value for 'teacher'
- *      student: // value for 'student'
  *      groups: // value for 'groups'
+ *      permissions: // value for 'permissions'
  *   },
  * });
  */
@@ -1751,15 +1745,13 @@ export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProject
 export type CreateProjectMutationResult = Apollo.MutationResult<CreateProjectMutation>;
 export type CreateProjectMutationOptions = Apollo.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
 export const CreateRoleDocument = gql`
-    mutation CreateRole($name: String!, $teacher: Boolean!, $student: Boolean!, $permissions: [String!]) {
-  createRole(input: {name: $name, teacher: $teacher, student: $student, permissionSlugs: $permissions}) {
+    mutation CreateRole($name: String!, $permissions: [String!]) {
+  createRole(input: {name: $name, permissionSlugs: $permissions}) {
     id
     name
     slug
     system
     admin
-    teacher
-    student
     permissions {
       name
       slug
@@ -1783,8 +1775,6 @@ export type CreateRoleMutationFn = Apollo.MutationFunction<CreateRoleMutation, C
  * const [createRoleMutation, { data, loading, error }] = useCreateRoleMutation({
  *   variables: {
  *      name: // value for 'name'
- *      teacher: // value for 'teacher'
- *      student: // value for 'student'
  *      permissions: // value for 'permissions'
  *   },
  * });
@@ -2338,8 +2328,6 @@ export const MeDocument = gql`
         slug
         system
         admin
-        teacher
-        student
       }
     }
   }
@@ -2706,15 +2694,13 @@ export type ProjectsQueryHookResult = ReturnType<typeof useProjectsQuery>;
 export type ProjectsLazyQueryHookResult = ReturnType<typeof useProjectsLazyQuery>;
 export type ProjectsQueryResult = Apollo.QueryResult<ProjectsQuery, ProjectsQueryVariables>;
 export const RolesDocument = gql`
-    query Roles($admin: Boolean, $permission: String) {
-  roles(filter: {admin: $admin, permission: $permission}) {
+    query Roles($admin: Boolean, $permissions: [String!]) {
+  roles(filter: {admin: $admin, permissions: $permissions}) {
     id
     name
     slug
     system
     admin
-    teacher
-    student
     permissions {
       name
       slug
@@ -2736,7 +2722,7 @@ export const RolesDocument = gql`
  * const { data, loading, error } = useRolesQuery({
  *   variables: {
  *      admin: // value for 'admin'
- *      permission: // value for 'permission'
+ *      permissions: // value for 'permissions'
  *   },
  * });
  */
@@ -2764,8 +2750,6 @@ export const SignInDocument = gql`
         slug
         system
         admin
-        teacher
-        student
       }
     }
     userTemp {
@@ -2817,8 +2801,6 @@ export const SignUpDocument = gql`
         slug
         system
         admin
-        teacher
-        student
       }
     }
   }
@@ -2987,8 +2969,6 @@ export const UpdateProfileDocument = gql`
         slug
         system
         admin
-        teacher
-        student
       }
     }
   }
@@ -3031,6 +3011,7 @@ export const UpdateProjectDocument = gql`
     description
     users {
       id
+      name
     }
     supervisor {
       id
@@ -3068,15 +3049,13 @@ export type UpdateProjectMutationHookResult = ReturnType<typeof useUpdateProject
 export type UpdateProjectMutationResult = Apollo.MutationResult<UpdateProjectMutation>;
 export type UpdateProjectMutationOptions = Apollo.BaseMutationOptions<UpdateProjectMutation, UpdateProjectMutationVariables>;
 export const UpdateRoleDocument = gql`
-    mutation UpdateRole($id: Float!, $name: String!, $teacher: Boolean!, $student: Boolean!, $permissions: [String!]) {
-  updateRole(filter: {id: $id}, input: {name: $name, teacher: $teacher, student: $student, permissionSlugs: $permissions}) {
+    mutation UpdateRole($id: Float!, $name: String!, $permissions: [String!]) {
+  updateRole(filter: {id: $id}, input: {name: $name, permissionSlugs: $permissions}) {
     id
     name
     slug
     system
     admin
-    teacher
-    student
     permissions {
       name
       slug
@@ -3101,8 +3080,6 @@ export type UpdateRoleMutationFn = Apollo.MutationFunction<UpdateRoleMutation, U
  *   variables: {
  *      id: // value for 'id'
  *      name: // value for 'name'
- *      teacher: // value for 'teacher'
- *      student: // value for 'student'
  *      permissions: // value for 'permissions'
  *   },
  * });
@@ -3170,8 +3147,6 @@ export const UpdateUserDocument = gql`
       slug
       system
       admin
-      teacher
-      student
     }
   }
 }
@@ -3259,8 +3234,8 @@ export type UserQueryHookResult = ReturnType<typeof useUserQuery>;
 export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
 export type UserQueryResult = Apollo.QueryResult<UserQuery, UserQueryVariables>;
 export const UsersDocument = gql`
-    query Users($name: String, $email: String, $adEmail: String, $roles: [Float!], $rolesSlug: [String!], $admin: Boolean, $teacher: Boolean, $student: Boolean, $groups: [Float!]) {
-  users(filter: {name: $name, email: $email, adEmail: $adEmail, roles: $roles, rolesSlug: $rolesSlug, admin: $admin, teacher: $teacher, student: $student, groups: $groups}) {
+    query Users($name: String, $email: String, $adEmail: String, $roles: [Float!], $rolesSlug: [String!], $admin: Boolean, $groups: [Float!]) {
+  users(filter: {name: $name, email: $email, adEmail: $adEmail, roles: $roles, rolesSlug: $rolesSlug, admin: $admin, groups: $groups}) {
     id
     name
     email
@@ -3275,8 +3250,9 @@ export const UsersDocument = gql`
       slug
       system
       admin
-      teacher
-      student
+      permissions {
+        slug
+      }
     }
   }
 }
@@ -3300,8 +3276,6 @@ export const UsersDocument = gql`
  *      roles: // value for 'roles'
  *      rolesSlug: // value for 'rolesSlug'
  *      admin: // value for 'admin'
- *      teacher: // value for 'teacher'
- *      student: // value for 'student'
  *      groups: // value for 'groups'
  *   },
  * });

@@ -1,9 +1,10 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Role } from './entities/roles.entity';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { PermissionsService } from '../permissions/permissions.service';
 import { Permission } from '../permissions/entities/permissions.entity';
 import { RolesFilter } from './filters/role.filter';
+import { AllRolesFilter } from './filters/all-roles.filter';
 import { RoleDto } from './dto/role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
@@ -18,31 +19,58 @@ export class RolesService {
     private readonly permissionsService: PermissionsService,
   ) {}
 
-  async findOne(rolesFilter: RolesFilter): Promise<Role> {
-    // As the filter is a null prototype and TypeORM has issues with such objects, we need to recreate the filter instance
-    const filter = JSON.parse(JSON.stringify(rolesFilter));
-    const role = await this.roleRepository.findOne({ relations: ['permissions', 'users'], where: filter });
+  async findOne(filter: RolesFilter): Promise<Role> {
+    const query = this.roleRepository
+      .createQueryBuilder('role')
+      .leftJoinAndSelect('role.permissions', 'permissions')
+      .leftJoinAndSelect('role.users', 'users');
+
+    if (filter.id) {
+      query.whereInIds(filter.id);
+    }
+    if (filter.name) {
+      query.where('role.name like :name', { name: `%${filter.name}%` });
+    }
+    if (filter.slug) {
+      query.where('role.slug like :slug', { slug: `%${filter.slug}%` });
+    }
+
+    const role = await query.getOne();
     if (!role) {
-      throw new Error('Role not found!');
+      throw new NotFoundException('Role not found!');
     }
 
     return role;
   }
 
-  findOneBySlug(
-    slug: string,
-  ): Promise<Role> {
+  findOneBySlug(slug: string): Promise<Role> {
     return this.findOne({ slug });
   }
 
-  findAll(rolesFilter: RolesFilter): Promise<RoleDto[]> {
-    // As the filter is a null prototype and TypeORM has issues with such objects, we need to recreate the filter instance
-    const filter = JSON.parse(JSON.stringify(rolesFilter));
-    return this.roleRepository.find({
-      relations: ['permissions'],
-      where: filter,
-      order: { admin: 'DESC', teacher: 'DESC', student: 'DESC', name: 'ASC' },
-    });
+  async findAll(filter: AllRolesFilter): Promise<RoleDto[]> {
+    const query = this.roleRepository
+      .createQueryBuilder('role')
+      .leftJoinAndSelect('role.permissions', 'permissions')
+      .addOrderBy('role.admin', 'DESC')
+      .addOrderBy('role.name', 'ASC');
+
+    if (filter.name) {
+      query.where('role.name like :name', { name: `%${filter.name}%` });
+    }
+    if (filter.slug) {
+      query.where('role.slug like :slug', { slug: `%${filter.slug}%` });
+    }
+    if (filter.admin) {
+      query.where('role.admin = true');
+    }
+
+    let roles = await query.getMany();
+
+    if (filter.permissions && filter.permissions.length > 0) {
+      roles = roles.filter(role => this.hasPermissions(role, ...filter.permissions));
+    }
+
+    return roles;
   }
 
   fetchAll(roleSlugs: string[]): Promise<RoleDto[]> {
@@ -71,8 +99,6 @@ export class RolesService {
     role.slug = createFullRoleDto.slug;
     role.system = createFullRoleDto.system;
     role.admin = createFullRoleDto.admin;
-    role.teacher = createFullRoleDto.teacher;
-    role.student = createFullRoleDto.student;
     const newRole = await this.roleRepository.save(role);
 
     return this.updatePermissions(newRole, createFullRoleDto.permissionSlugs);
@@ -95,8 +121,6 @@ export class RolesService {
     await this.roleRepository.update(role.id, {
       name: updateRole.name,
       admin: updateRole.admin,
-      teacher: updateRole.teacher,
-      student: updateRole.student,
     });
 
     return this.updatePermissions(role, updateRole.permissionSlugs, overridePermissions);
@@ -107,11 +131,7 @@ export class RolesService {
     permissions: string[],
     override = false,
   ): Promise<Role> {
-    role = await this.roleRepository
-      .createQueryBuilder('role')
-      .whereInIds(role.id)
-      .leftJoinAndSelect('role.permissions', 'permissions')
-      .getOne();
+    role = await this.roleRepository.findOne(role.id, { relations: ['permissions'] });
 
     if (override) {
       role.permissions = [];
@@ -132,7 +152,7 @@ export class RolesService {
   }
 
   hasPermissions(
-    role: Role,
+    role: RoleDto,
     ...permissionSlugs: string[]
   ): boolean {
     if (role.admin) {
@@ -150,7 +170,8 @@ export class RolesService {
 
   async deleteRole(role: RoleDto): Promise<RoleDto> {
     const result = await this.roleRepository.delete({ id: role.id });
-    if (result.affected < 1) {
+
+    if (!result || result.affected < 1) {
       throw new InternalServerErrorException('An error occurred while deleting the role.');
     }
 

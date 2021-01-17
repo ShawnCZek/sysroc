@@ -11,8 +11,6 @@ query Me {
         slug
         system
         admin
-        teacher
-        student
       }
     }
   }
