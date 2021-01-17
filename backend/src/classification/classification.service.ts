@@ -33,20 +33,15 @@ export class ClassificationService {
       { relations: ['projects'] },
     );
     await this.classificationRepository.save(newClassification);
-    return this.classificationRepository.findOne(newClassification.id, {
-      relations: [
-        'project',
-        'user',
-        'project.user',
-      ],
-    });
+
+    return this.getOne({ id: newClassification.id });
   }
 
   getOne(filter: ClassificationsFilter): Promise<ClassificationDto> {
     return this.classificationRepository.findOne({ id: filter.id }, {
       relations: [
         'project',
-        'project.user',
+        'project.users',
         'user',
       ],
     });
@@ -98,13 +93,12 @@ export class ClassificationService {
     }
 
     const updateClassification = { ...classification, ...updates };
-
     const res = await this.classificationRepository.update(filter.id, updateClassification);
 
     if (!res || res.affected < 1) {
       throw new InternalServerErrorException('Could not update the classification!');
     }
 
-    return this.classificationRepository.findOne(filter.id, { relations: ['user', 'project', 'project.user'] });
+    return this.getOne({ id: filter.id });
   }
 }
