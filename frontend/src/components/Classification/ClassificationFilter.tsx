@@ -130,6 +130,7 @@ export const ClassificationFilter: React.FC<Props> = ({ defaultValues, onSubmit 
             value={fromDate}
             maxDate={toDate}
             onChange={handleFromDateChange}
+            format="MMMM Do, yyyy"
             KeyboardButtonProps={{
               'aria-label': 'change date',
             }}
@@ -141,6 +142,7 @@ export const ClassificationFilter: React.FC<Props> = ({ defaultValues, onSubmit 
             value={toDate}
             minDate={fromDate}
             onChange={handleToDateChange}
+            format="MMMM Do, yyyy"
             KeyboardButtonProps={{
               'aria-label': 'change date',
             }}
