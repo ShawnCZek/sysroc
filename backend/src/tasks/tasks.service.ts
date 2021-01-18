@@ -27,7 +27,7 @@ export class TasksService {
   ): Promise<TaskDto> {
     const project = await this.projectRepository.findOne(
       createTaskDto.project,
-      { relations: ['tasks', 'user'] },
+      { relations: ['tasks', 'users'] },
     );
 
     if (!this.projectsService.isAuthor(project, user) && !this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
@@ -51,7 +51,8 @@ export class TasksService {
     filter: TasksFilter,
     user: UserDto,
   ): Promise<TaskDto> {
-    const task = await this.taskRepository.findOne(filter.id, { relations: ['project', 'project.user'] });
+    const task = await this.taskRepository.findOne(filter.id, { relations: ['project', 'project.users'] });
+
     if (!task) {
       throw new NotFoundException('Could not find task with given ID!');
     }
@@ -73,7 +74,7 @@ export class TasksService {
     updates: UpdateTaskDto,
     user: UserDto,
   ): Promise<TaskDto> {
-    const task = await this.taskRepository.findOne(filter.id, { relations: ['project', 'project.user'] });
+    const task = await this.taskRepository.findOne(filter.id, { relations: ['project', 'project.users'] });
 
     if (!task) {
       throw new NotFoundException('Could not find task with given ID!');
@@ -92,10 +93,10 @@ export class TasksService {
       );
     }
 
-    return this.taskRepository.findOne(filter.id);
+    return this.getOne(filter);
   }
 
   getOne(filter: TasksFilter): Promise<TaskDto> {
-    return this.taskRepository.findOne({ id: filter.id });
+    return this.taskRepository.findOne(filter.id, { relations: ['project', 'project.users'] });
   }
 }
