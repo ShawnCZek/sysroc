@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, makeStyles, Typography } from '@material-ui/core';
+import { Button, makeStyles } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
 import { MyField } from '../MyField';
 import { ApolloError } from '@apollo/client';
@@ -11,16 +11,17 @@ import { ITask } from './Task';
 
 const useStyles = makeStyles({
   form: {
-    padding: '2rem',
+    padding: '1rem 2rem 2rem',
     margin: '0 auto',
-    marginTop: '1.3rem'
+    marginTop: '1.3rem',
   },
   button: {
-    marginTop: '1rem'
+    marginTop: '1rem',
   },
-  formTitle: {
-    marginBottom: '0.8rem'
-  }
+  field: {
+    width: '15rem',
+    marginBottom: '1rem',
+  },
 });
 
 interface Values {
@@ -52,9 +53,6 @@ export const UpdateTaskForm: React.FC<Props> = ({ onSubmit, error, task }) => {
       >
         {() => (
           <Form className={classes.form}>
-            <Typography className={classes.formTitle} variant="h4">
-              Update Task
-            </Typography>
             {error && <Error error={error} />}
             <div>
               <Field
@@ -63,6 +61,7 @@ export const UpdateTaskForm: React.FC<Props> = ({ onSubmit, error, task }) => {
                 placeholder="Task Name"
                 label="Task Name"
                 component={MyField}
+                className={classes.field}
                 required
               />
             </div>
@@ -74,6 +73,7 @@ export const UpdateTaskForm: React.FC<Props> = ({ onSubmit, error, task }) => {
                 label="Task Description"
                 multiline={true}
                 component={MyField}
+                className={classes.field}
                 rows={4}
                 rowsMax={8}
               />
@@ -82,10 +82,12 @@ export const UpdateTaskForm: React.FC<Props> = ({ onSubmit, error, task }) => {
               <Field name="dueDate">
                 {({ field, form }: { field: any; form: any }) => (
                   <DatePicker
-                    format="D.M.YYYY"
+                    disableToolbar
+                    format="DD.MM.YYYY"
                     label="Due To"
                     name={field.name}
                     value={field.value}
+                    className={classes.field}
                     onChange={value =>
                       form.setFieldValue('dueDate', value, true)
                     }

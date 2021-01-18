@@ -1,25 +1,26 @@
 import React from 'react';
-import { Button, makeStyles, Typography } from '@material-ui/core';
+import MomentUtils from '@date-io/moment';
+import moment, { Moment } from 'moment';
+import { Button, makeStyles } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik';
 import { MyField } from '../MyField';
 import { ApolloError } from '@apollo/client';
 import { Error } from '../Error';
-import moment, { Moment } from 'moment';
 import { DatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
 
 const useStyles = makeStyles({
   form: {
-    padding: '2rem',
+    padding: '1rem 2rem 2rem',
     margin: '0 auto',
-    marginTop: '1.3rem'
+    marginTop: '1.3rem',
   },
   button: {
-    marginTop: '1rem'
+    marginTop: '1rem',
   },
-  formTitle: {
-    marginBottom: '0.8rem'
-  }
+  field: {
+    width: '15rem',
+    marginBottom: '1rem',
+  },
 });
 
 interface Values {
@@ -42,7 +43,7 @@ export const CreateTaskForm: React.FC<Props> = ({ onSubmit, error }) => {
         initialValues={{
           name: '',
           description: '',
-          dueDate: moment()
+          dueDate: moment(),
         }}
         onSubmit={values => {
           onSubmit(values);
@@ -50,10 +51,7 @@ export const CreateTaskForm: React.FC<Props> = ({ onSubmit, error }) => {
       >
         {() => (
           <Form className={classes.form}>
-            <Typography className={classes.formTitle} variant="h4">
-              New Task
-            </Typography>
-            {error && <Error error={error} />}
+            {error && <Error error={error}/>}
             <div>
               <Field
                 name="name"
@@ -61,6 +59,7 @@ export const CreateTaskForm: React.FC<Props> = ({ onSubmit, error }) => {
                 placeholder="Task Name"
                 label="Task Name"
                 component={MyField}
+                className={classes.field}
                 required
               />
             </div>
@@ -72,6 +71,7 @@ export const CreateTaskForm: React.FC<Props> = ({ onSubmit, error }) => {
                 label="Task Description"
                 multiline={true}
                 component={MyField}
+                className={classes.field}
                 rows={4}
                 rowsMax={8}
               />
@@ -80,10 +80,12 @@ export const CreateTaskForm: React.FC<Props> = ({ onSubmit, error }) => {
               <Field name="dueDate">
                 {({ field, form }: { field: any; form: any }) => (
                   <DatePicker
-                    format="D.M.YYYY"
+                    disableToolbar
+                    format="DD.MM.YYYY"
                     label="Due To"
                     name={field.name}
                     value={field.value}
+                    className={classes.field}
                     onChange={value =>
                       form.setFieldValue('dueDate', value, true)
                     }

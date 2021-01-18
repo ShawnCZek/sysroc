@@ -54,7 +54,6 @@ const Project = styled.div`
     justify-content: flex-end;
     align-items: stretch;
     margin: 1rem 0;
-    padding-right: 5rem;
   }
 `;
 

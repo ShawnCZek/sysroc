@@ -1,33 +1,9 @@
 import React from 'react';
 import Modal from '@material-ui/core/Modal';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { CreateTaskForm } from './CreateTaskForm';
 import { ProjectTasksDocument, useCreateTaskMutation } from '../../generated/graphql';
 import { useSnackbar } from 'notistack';
-
-function getModalStyle() {
-  const top = 50;
-  const left = 50;
-
-  return {
-    top: `${top}%`,
-    left: `${left}%`,
-    transform: `translate(-${top}%, -${left}%)`
-  };
-}
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    paper: {
-      position: 'absolute',
-      width: 400,
-      backgroundColor: theme.palette.background.paper,
-      border: '2px solid #000',
-      boxShadow: theme.shadows[5],
-      padding: theme.spacing(2, 4, 3)
-    }
-  })
-);
+import { ModalBody } from '../Layout/Modal/ModalBody';
 
 const GET_PROJECT = ProjectTasksDocument;
 
@@ -43,8 +19,7 @@ export const CreateTaskModal: React.FC<Props> = ({
   project
 }) => {
   const { enqueueSnackbar } = useSnackbar();
-  const classes = useStyles();
-  const [modalStyle] = React.useState(getModalStyle);
+
   const [createTask, { error }] = useCreateTaskMutation({
     update(cache, result) {
       try {
@@ -68,14 +43,14 @@ export const CreateTaskModal: React.FC<Props> = ({
 
   return (
     <Modal
-      aria-labelledby="new project"
-      aria-describedby="modal with form to create new project"
+      aria-labelledby="new task"
+      aria-describedby="modal with form to create a new project task"
       open={open}
       onClose={handleClose}
     >
-      <div style={modalStyle} className={classes.paper}>
-        <h2 id="new-project-modal-title">New Task</h2>
-        <p id="new-project-modal-description">Get the work done.</p>
+      <ModalBody>
+        <h2>New Task</h2>
+        <p>Get the work done.</p>
         <CreateTaskForm
           error={error}
           onSubmit={async ({ name, description, dueDate }) => {
@@ -84,7 +59,7 @@ export const CreateTaskModal: React.FC<Props> = ({
             });
           }}
         />
-      </div>
+      </ModalBody>
     </Modal>
   );
 };
