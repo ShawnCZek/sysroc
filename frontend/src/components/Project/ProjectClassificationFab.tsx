@@ -19,7 +19,7 @@ export const ProjectClassificationFab: React.FC<Props> = ({ projectId, classific
   const handleModalOpen = () => setModalOpen(true);
   const handleModalClose = () => setModalOpen(false);
 
-  if (loading || !data?.projectDetails.isAuthor || !canManageProject) return null;
+  if (loading || (!data?.projectDetails.isAuthor && !canManageProject)) return null;
 
   return (
     <>
