@@ -139,6 +139,13 @@ export const ClassificationList: React.FC<Props> = ({ userId }) => {
               </Item>
             </div>
           ))}
+          { (!data?.classifications || data.classifications.length === 0) && (
+            <div className="flex">
+              <Item>
+                There is no classification meeting your criteria.
+              </Item>
+            </div>
+          ) }
         </List>
       </Paper>
       {canManageClassification && (
