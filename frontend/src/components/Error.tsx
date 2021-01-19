@@ -34,7 +34,7 @@ export const Error: React.FC<Props> = ({ error }) => {
         <ErrorStyles key={i}>
           <p data-test="graphql-error">
             <strong>Whooops!</strong>
-            {error.message.replace('GraphQL error: ', '')}
+            {error.message.replace(/GraphQL Error: |ThrottlerException: /, '')}
           </p>
         </ErrorStyles>
       </NoSsr>
@@ -45,7 +45,7 @@ export const Error: React.FC<Props> = ({ error }) => {
       <ErrorStyles>
         <p data-test="graphql-error">
           <strong>Whooops!</strong>
-          {error.message.replace('GraphQL error: ', '')}
+          {error.message.replace(/GraphQL Error: |ThrottlerException: /, '')}
         </p>
       </ErrorStyles>
     </NoSsr>
