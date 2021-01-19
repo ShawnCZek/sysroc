@@ -31,17 +31,19 @@ export const UpdateTaskModal: React.FC<Props> = ({
           variables: { id: projectId }
         });
 
-        const index = project.tasks.findIndex(
+        const tasks = project.tasks.slice();
+
+        const index = tasks.findIndex(
           (task: any) => task.id === result.data?.updateTask.id
         );
 
-        project.tasks[index] = result.data?.updateTask;
+        tasks[index] = result.data?.updateTask;
 
         cache.writeQuery({
           query: GET_PROJECT,
           variables: { id: projectId },
           data: {
-            project: project
+            project: { ...project, tasks },
           }
         });
 
