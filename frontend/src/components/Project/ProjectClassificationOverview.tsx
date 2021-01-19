@@ -48,6 +48,13 @@ export const ProjectClassificationOverview: React.FC<Props> = ({ open, handleClo
               </Item>
             </div>
           )) }
+          { classification.length === 0 && (
+            <div className="flex">
+              <Item>
+                This project has no classification.
+              </Item>
+            </div>
+          ) }
         </List>
       </Paper>
     </ModalBody>
