@@ -87,8 +87,11 @@ export const SingleProject: React.FC<Props> = props => {
     setSelectedTaskId(0);
   };
 
+  const tasks: ITask[] = data?.project.tasks ? data.project.tasks.slice() : [];
+  tasks.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+
   const tasksByMonth: { [key: string]: ITask[] } = {};
-  for (const task of data?.project.tasks ?? []) {
+  for (const task of tasks) {
     const key: string = moment(task.dueDate).format('MMMM YYYY');
     if (tasksByMonth[key] === undefined) {
       tasksByMonth[key] = [];
