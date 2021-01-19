@@ -100,7 +100,7 @@ export const SingleProject: React.FC<Props> = props => {
 
   const tasksByMonth: { [key: string]: ITask[] } = {};
   for (const task of data?.project.tasks ?? []) {
-    const key: string = moment(task.dueDate).format('MM. YYYY');
+    const key: string = moment(task.dueDate).format('MMMM YYYY');
     if (tasksByMonth[key] === undefined) {
       tasksByMonth[key] = [];
     }
