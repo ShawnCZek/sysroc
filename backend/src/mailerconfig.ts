@@ -5,7 +5,7 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 
-const environment = process.env.NODE_ENV || 'development';
+const environment = process.env.NODE_ENV || '';
 const data: any = dotenv.parse(fs.readFileSync(`${environment}.env`));
 // You can also make a singleton service that load and expose the .env file content.
 // ...

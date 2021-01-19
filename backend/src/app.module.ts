@@ -2,6 +2,7 @@ import { CACHE_MANAGER, CacheModule, Inject, Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { GroupsModule } from './groups/groups.module';
 import { ConfigModule } from './config/config.module';
+import { ConfigService } from './config/config.service';
 import { ActiveDirectoryModule } from './active-directory/active-directory.module';
 import { UsersModule } from './users/users.module';
 import { Cache } from 'cache-manager';
@@ -16,17 +17,21 @@ import { InvitationsModule } from './invitations/invitations.module';
 
 @Module({
   imports: [
-    GraphQLModule.forRoot({
-      autoSchemaFile: 'schema.gql',
-      cors: {
-        origin: 'http://localhost:3000',
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        preflightContinue: true,
-        optionsSuccessStatus: 204,
-        credentials: true,
-      },
-      installSubscriptionHandlers: true,
-      context: ({ req, res }) => ({ req, res }),
+    GraphQLModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        autoSchemaFile: 'schema.gql',
+        cors: {
+          origin: configService.get('APP_URL'),
+          methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+          preflightContinue: true,
+          optionsSuccessStatus: 204,
+          credentials: true,
+        },
+        installSubscriptionHandlers: true,
+        context: ({ req, res }) => ({ req, res }),
+      }),
+      inject: [ConfigService],
     }),
     CacheModule.register(),
     GroupsModule,
