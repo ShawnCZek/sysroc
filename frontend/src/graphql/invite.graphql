@@ -1,5 +1,14 @@
 mutation Invite($email: String!, $projectId: ID!) {
   invite(input: { email: $email, project: $projectId }) {
     id
+    user {
+      id
+      name
+    }
+    invited {
+      id
+      name
+    }
+    createdAt
   }
 }

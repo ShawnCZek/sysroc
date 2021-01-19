@@ -962,7 +962,14 @@ export type InviteMutation = (
   { __typename?: 'Mutation' }
   & { invite: (
     { __typename?: 'InvitationDto' }
-    & Pick<InvitationDto, 'id'>
+    & Pick<InvitationDto, 'id' | 'createdAt'>
+    & { user: (
+      { __typename?: 'BaseUserDto' }
+      & Pick<BaseUserDto, 'id' | 'name'>
+    ), invited: (
+      { __typename?: 'BaseUserDto' }
+      & Pick<BaseUserDto, 'id' | 'name'>
+    ) }
   ) }
 );
 
@@ -2256,6 +2263,15 @@ export const InviteDocument = gql`
     mutation Invite($email: String!, $projectId: ID!) {
   invite(input: {email: $email, project: $projectId}) {
     id
+    user {
+      id
+      name
+    }
+    invited {
+      id
+      name
+    }
+    createdAt
   }
 }
     `;

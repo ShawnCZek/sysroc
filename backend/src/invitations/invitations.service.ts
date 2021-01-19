@@ -28,7 +28,7 @@ export class InvitationsService {
 
   async getOne(invitationId: number): Promise<InvitationDto> {
     const invitation = await this.invitationRepository.findOne(invitationId, {
-      relations: ['project', 'project.users', 'invited', 'invited.roles', 'invited.roles.permissions'],
+      relations: ['project', 'project.users', 'invited', 'user', 'invited.roles', 'invited.roles.permissions'],
     });
 
     if (!invitation) {

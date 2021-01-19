@@ -29,6 +29,11 @@ export const ProjectInvitationsList: React.FC<Props> = ({ projectId }) => {
           variables: { projectId },
         });
 
+        cache.evict({
+          fieldName: 'invitations',
+          broadcast: false,
+        });
+
         cache.writeQuery({
           query: InvitationsDocument,
           variables: { projectId },

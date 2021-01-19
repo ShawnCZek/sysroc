@@ -1,7 +1,7 @@
 import React from 'react';
 import { InviteForm } from './InviteForm';
 import { useSnackbar } from 'notistack';
-import { useInviteMutation, useProjectDetailsQuery } from '../../generated/graphql';
+import { InvitationsDocument, useInviteMutation, useProjectDetailsQuery } from '../../generated/graphql';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
 
@@ -16,9 +16,28 @@ export const ProjectInvite: React.FC<Props> = ({ handleClose, projectId }) => {
   const { data, loading } = useProjectDetailsQuery({ variables: { id: projectId } });
   const [invite, { error }] = useInviteMutation({
     update(cache, { data }) {
-      if (data?.invite) {
+      try {
+        const cacheRes: any = cache.readQuery({
+          query: InvitationsDocument,
+          variables: { projectId },
+        });
+
+        const invitations = [...cacheRes.invitations, data];
+
+        cache.writeQuery({
+          query: InvitationsDocument,
+          variables: { projectId },
+          data: {
+            invitations: invitations,
+          },
+        });
+
         enqueueSnackbar('The user has been successfully invited to your project!', { variant: 'success' });
         handleClose();
+      } catch (error) {
+        if (error instanceof Error) {
+          enqueueSnackbar(error.message, { variant: 'error' });
+        }
       }
     }
   });
