@@ -1,26 +1,20 @@
 import moment from 'moment';
 import styled from 'styled-components';
 import React, { useState } from 'react';
-import {
-  ClassificationDto,
-  ProjectDto,
-  useMeQuery,
-  useProjectDetailsQuery,
-  useProjectQuery,
-} from '../generated/graphql';
+import { ClassificationDto, ProjectDto, useProjectDetailsQuery, useProjectQuery } from '../generated/graphql';
 import { RouteComponentProps, useHistory } from 'react-router';
 import { Fab, Typography } from '@material-ui/core';
 import { TasksList } from '../components/Task/TasksList';
 import { CreateTaskModal } from '../components/Task/CreateTaskModal';
 import { ITask } from '../components/Task/Task';
 import { UpdateTaskModal } from '../components/Task/UpdateTaskModal';
-import { ProjectClassificationOverview } from '../components/Project/ProjectClassificationOverview';
 import { ClaimProjectFab } from '../components/Project/ClaimProjectFab';
 import { useHasPermissions } from '../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../generated/permissions';
 import { InviteButton } from '../components/Invitation/InviteButton';
 import { ComponentLoading } from '../components/ComponentLoading';
 import { UpdateProjectButton } from '../components/Project/UpdateProjectButton';
+import { ProjectClassificationFab } from '../components/Project/ProjectClassificationFab';
 
 const ProjectControls = styled.div`
   display: flex;
@@ -74,16 +68,13 @@ export const SingleProject: React.FC<Props> = props => {
 
   const history = useHistory();
 
-  const [classOverviewOpen, setClassOverviewOpen] = useState(false);
   const [upTaskModalOpen, setUpTaskModalOpen] = useState(false);
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<number>(0);
 
-  const { data: meData, loading: meLoading } = useMeQuery();
   const { data, loading } = useProjectQuery({ variables: { id: projectId } });
-  const { loading: detailsLoading } = useProjectDetailsQuery({ variables: { id: projectId } });
+  const { data: details, loading: detailsLoading } = useProjectDetailsQuery({ variables: { id: projectId } });
 
-  const isAuthor = data?.project?.users?.some(author => author.id === meData?.me?.user?.id);
   const canManageOwnProject = useHasPermissions(PERMISSIONS.PROJECTS_CREATE);
   const canManageProject = useHasPermissions(PERMISSIONS.PROJECTS_MANAGE);
 
@@ -96,8 +87,6 @@ export const SingleProject: React.FC<Props> = props => {
     setSelectedTaskId(0);
   };
 
-  const handleClassOverviewClose = () => setClassOverviewOpen(false);
-
   const tasksByMonth: { [key: string]: ITask[] } = {};
   for (const task of data?.project.tasks ?? []) {
     const key: string = moment(task.dueDate).format('MMMM YYYY');
@@ -108,7 +97,7 @@ export const SingleProject: React.FC<Props> = props => {
     tasksByMonth[key].push(task);
   }
 
-  if (loading || meLoading || detailsLoading) return <ComponentLoading />;
+  if (loading || detailsLoading) return <ComponentLoading />;
 
   return (
     <>
@@ -123,36 +112,28 @@ export const SingleProject: React.FC<Props> = props => {
           >
             Back
           </Fab>
-          { (canManageProject || isAuthor) && (
-            <>
-              { data?.project && <UpdateProjectButton project={data.project as ProjectDto} /> }
-              { data?.project && <InviteButton projectId={parseInt(data.project.id)} /> }
-
-              <Fab
-                color="primary"
-                variant="extended"
-                onClick={() => {
-                  setClassOverviewOpen(true);
-                }}
-              >
-                Classification
-              </Fab>
-            </>
-          ) }
-          { data && (
+          { data?.project && <UpdateProjectButton project={data.project as ProjectDto} /> }
+          { data?.project && <InviteButton projectId={parseInt(data.project.id)} /> }
+          { data?.project &&
+            <ProjectClassificationFab
+              projectId={parseInt(data.project.id)}
+              classification={data.project.classifications as ClassificationDto[]}
+            />
+          }
+          { data?.project &&
             <ClaimProjectFab
               projectId={parseInt(data.project.id)}
               hasSupervisor={data.project.supervisor !== null}
-              supervisorId={data?.project.supervisor ? parseInt(data.project.supervisor.id) : null}
+              supervisorId={data.project.supervisor ? parseInt(data.project.supervisor.id) : null}
             />
-          )}
+          }
         </Actions>
       </ProjectControls>
       {data ? (
         <Project>
           <Typography variant="h4">{data.project.name}</Typography>
           <Typography variant="h5">{data.project.description}</Typography>
-          { (canManageProject || (canManageOwnProject && isAuthor)) &&
+          { (canManageProject || (canManageOwnProject && details?.projectDetails.isAuthor)) &&
             <div className="add-task-btn">
               <Fab
                 color="secondary"
@@ -183,15 +164,6 @@ export const SingleProject: React.FC<Props> = props => {
       ) : (
         <div>There is no project with ID {projectId}</div>
       )}
-      { data && (
-        <>
-          <ProjectClassificationOverview
-            open={classOverviewOpen}
-            handleClose={handleClassOverviewClose}
-            classification={data?.project.classifications as ClassificationDto[]}
-          />
-        </>
-      ) }
       <CreateTaskModal
         open={createTaskOpen}
         handleClose={handleCreateTaskClose}
