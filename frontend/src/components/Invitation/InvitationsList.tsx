@@ -149,7 +149,7 @@ export const InvitationsList: React.FC = () => {
             { (!data?.myInvitations || data.myInvitations.length === 0) && (
               <div className="flex">
                 <Item>
-                  There are no invitations.
+                  There are no invitations to other projects.
                 </Item>
               </div>
             ) }

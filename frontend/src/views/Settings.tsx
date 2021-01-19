@@ -25,9 +25,11 @@ export const Settings: React.FC = () => {
             query: MeDocument,
             data: {
               me: result.data.updateProfile,
-            }
+            },
           });
         }
+
+        enqueueSnackbar('Your profile has been successfully updated.', { variant: 'success' });
       } catch (e) {
         if (e instanceof Error) {
           enqueueSnackbar(e.message, { variant: 'error' });
