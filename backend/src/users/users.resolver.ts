@@ -247,7 +247,7 @@ export class UsersResolver {
       dn: response.user.dn,
     };
 
-    await this.cacheManager.set(registerToken, JSON.stringify(registerUserDto), ttl);
+    await this.cacheManager.set(registerToken, JSON.stringify(registerUserDto), { ttl });
 
     return {
       accessToken: null,
