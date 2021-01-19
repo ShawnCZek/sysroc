@@ -33,15 +33,16 @@ export const RolesList: React.FC = () => {
         if (result.data?.deleteRole) {
           const { roles }: any = cache.readQuery({ query: RolesDocument });
 
-          const index = roles.findIndex(
+          const modifiedRoles = roles.slice();
+          const index = modifiedRoles.findIndex(
             (role: any) => role.id === result.data?.deleteRole.id
           );
 
-          delete roles[index];
+          delete modifiedRoles[index];
 
           cache.writeQuery<RolesQuery>({
             query: RolesDocument,
-            data: { roles },
+            data: { roles: modifiedRoles },
           });
 
           enqueueSnackbar('Successfully deleted the role!', { variant: 'success' });
