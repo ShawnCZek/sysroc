@@ -10,6 +10,7 @@ import { DeleteClassificationDialog } from './DeleteClassificationDialog';
 import { useSnackbar } from 'notistack';
 import { UpdateClassificationModal } from './UpdateClassificationModal';
 import { UserLink } from '../UserLink';
+import { ProjectLink } from '../ProjectLink';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
 
@@ -97,7 +98,7 @@ export const ClassificationList: React.FC<Props> = ({ userId }) => {
                 <div>{classification.note}</div>
               </Item>
               <Item>
-                <div>{classification.project.name}</div>
+                <div><ProjectLink id={classification.project.id} name={classification.project.name} /></div>
               </Item>
               <Item>
                 <div><UserLink id={classification.user.id} name={classification.user.name}/></div>
