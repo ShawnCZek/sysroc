@@ -19,7 +19,7 @@ export class Classification {
   @Column({ nullable: false, type: 'int' })
   projectId: number;
 
-  @ManyToOne(type => Project, project => project.classifications)
+  @ManyToOne(type => Project, project => project.classifications, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })
   project: Project;
 

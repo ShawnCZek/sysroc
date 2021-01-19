@@ -21,6 +21,6 @@ export class Task {
   @Column({ nullable: false, default: false })
   completed: boolean;
 
-  @ManyToOne(type => Project, project => project.tasks)
+  @ManyToOne(type => Project, project => project.tasks, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
   project: Project;
 }
