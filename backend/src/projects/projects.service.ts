@@ -43,7 +43,7 @@ export class ProjectsService {
       .leftJoinAndSelect('project.users', 'users')
       .leftJoinAndSelect('project.supervisor', 'supervisor')
       .leftJoinAndSelect('project.tasks', 'tasks')
-      .addOrderBy('tasks.createdAt');
+      .addOrderBy('tasks.createdAt', 'DESC');
 
     if (filter.name && filter.name !== '') {
       query.andWhere('LOWER(project.name) like :name', { name: `%${filter.name}%` });
@@ -67,6 +67,7 @@ export class ProjectsService {
     user: UserDto,
   ): Promise<ProjectDto> {
     const project = await this.projectRepository.findOne({ id: projectId }, { relations: ['owner', 'users', 'supervisor'] });
+
     if (!project) {
       throw new NotFoundException('Project couldn\'t be found.');
     }
@@ -76,7 +77,8 @@ export class ProjectsService {
     }
 
     const res = await this.projectRepository.delete({ id: projectId });
-    if (res.affected < 1) {
+
+    if (!res || res.affected < 1) {
       throw new InternalServerErrorException('There has been an error during deleting the project.');
     }
 
@@ -93,7 +95,7 @@ export class ProjectsService {
       .leftJoinAndSelect('project.tasks', 'tasks')
       .leftJoinAndSelect('project.classifications', 'classifications')
       .leftJoinAndSelect('classifications.user', 'teacher')
-      .addOrderBy('tasks.createdAt', 'ASC' )
+      .addOrderBy('tasks.dueDate', 'ASC' )
       .addOrderBy('users.id', 'ASC')
       .getOneOrFail();
   }
