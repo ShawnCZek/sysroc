@@ -36,6 +36,7 @@ export const ProjectClassificationFab: React.FC<Props> = ({ projectId, classific
         open={modalOpen}
         handleClose={handleModalClose}
         classification={classification}
+        projectId={projectId}
       />
     </>
   );

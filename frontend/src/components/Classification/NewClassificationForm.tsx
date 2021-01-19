@@ -32,11 +32,12 @@ interface Props {
   onSubmit: (values: Values) => void;
   error: ApolloError | any;
   userId?: string;
+  projectId?: number;
 }
 
-export const NewClassificationForm: React.FC<Props> = ({ onSubmit, error, userId }) => {
+export const NewClassificationForm: React.FC<Props> = ({ onSubmit, error, userId, projectId }) => {
   const classes = useStyles();
-  const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>('');
+  const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>(projectId ? projectId.toString() : '');
   const [projectError, setProjectError] = useState('');
 
   const handleAutocompleteChange = (project: ProjectDto | null) => {
@@ -54,7 +55,7 @@ export const NewClassificationForm: React.FC<Props> = ({ onSubmit, error, userId
         }
 
         setProjectError('');
-        onSubmit({ ...values, project: selectedProjectId });
+        onSubmit({ ...values, project: projectId ? projectId.toString() : selectedProjectId });
       }}
     >
       {() => (
@@ -72,21 +73,23 @@ export const NewClassificationForm: React.FC<Props> = ({ onSubmit, error, userId
               required
             />
           </div>
-          <div>
-            <Field
-              name="project"
-              type="number"
-              placeholder="Select Project"
-              label="Project"
-            >
-              {() => (
-                <div style={{ marginTop: 10 }}>
-                  {projectError && <div style={{ color: 'red' }}>{projectError}</div>}
-                  <ProjectAutocomplete userId={userId} handleChange={handleAutocompleteChange} />
-                </div>
-              )}
-            </Field>
-          </div>
+          { !projectId &&
+            <div>
+              <Field
+                name="project"
+                type="number"
+                placeholder="Select Project"
+                label="Project"
+              >
+                {() => (
+                  <div style={{ marginTop: 10 }}>
+                    {projectError && <div style={{ color: 'red' }}>{projectError}</div>}
+                    <ProjectAutocomplete userId={userId} handleChange={handleAutocompleteChange} />
+                  </div>
+                )}
+              </Field>
+            </div>
+          }
           <div>
             <Field
               name="note"

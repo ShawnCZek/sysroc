@@ -3,18 +3,19 @@ import Modal from '@material-ui/core/Modal';
 import { ModalBody } from '../Layout/Modal/ModalBody';
 import { useSnackbar } from 'notistack';
 import { NewClassificationForm } from './NewClassificationForm';
-import { useCreateClassificationMutation } from '../../generated/graphql';
+import { useCreateClassificationMutation, useMeQuery } from '../../generated/graphql';
 
 interface Props {
   open: boolean;
   handleClose: () => void;
-  userId?: string;
+  projectId?: number;
 }
 
-export const NewClassificationModal: React.FC<Props> = ({ open, handleClose, userId }) => {
+export const NewClassificationModal: React.FC<Props> = ({ open, handleClose, projectId }) => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const [createClassification, { client }] = useCreateClassificationMutation({
+  const me = useMeQuery();
+  const [createClassification, { error, client }] = useCreateClassificationMutation({
     async update(cache, result) {
       if (!result.data?.createClassification) {
         enqueueSnackbar('An error occurred while adding classification.', { variant: 'error' });
@@ -27,6 +28,8 @@ export const NewClassificationModal: React.FC<Props> = ({ open, handleClose, use
     },
   });
 
+  if (me.loading || !me.data?.me) return null;
+
   return (
     <Modal
       aria-labelledby="new project"
@@ -38,11 +41,12 @@ export const NewClassificationModal: React.FC<Props> = ({ open, handleClose, use
         <h2>New Classification</h2>
         <p>Select and mark project</p>
         <NewClassificationForm
-          error=''
-          userId={userId}
+          error={error}
+          userId={me.data.me.user?.id}
+          projectId={projectId}
           onSubmit={async ({ mark, note, project }) => {
             await createClassification({
-              variables: { mark, note, project: parseInt(project), user: parseInt(userId ?? '0') },
+              variables: { mark, note, project: parseInt(project), user: parseInt(me.data!.me!.user!.id) },
             });
           }}
         />
