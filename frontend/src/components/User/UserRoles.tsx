@@ -41,7 +41,7 @@ export const UserRoles: React.FC<Props> = ({
   return (
     <FormGroup>
       { rolesData?.roles &&
-        rolesData.roles.filter(role => (!role.permissions.map(permission => permission.slug).includes(PERMISSIONS.PROJECTS_CLAIM) || canManageTeachers) && (!role.permissions.map(permission => permission.slug).includes(PERMISSIONS.PROJECTS_CREATE) || canManageStudents)).map(role => (
+        rolesData.roles.filter(role => (!role.permissions.map(permission => permission.slug).includes(PERMISSIONS.PROJECTS_CLAIM) || canManageTeachers) && (!role.permissions.map(permission => permission.slug).includes(PERMISSIONS.PROJECTS_CREATE) || canManageStudents) && !role.admin).map(role => (
         <FormControlLabel
           key={role.id}
           control={
