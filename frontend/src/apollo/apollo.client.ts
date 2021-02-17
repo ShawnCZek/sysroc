@@ -1,9 +1,10 @@
 import jwtDecode from 'jwt-decode';
 import { getAccessToken, setAccessToken } from '../auth/accessToken';
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, Observable } from '@apollo/client';
+import { ApolloClient, ApolloLink, InMemoryCache, Observable } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { Config } from '../config/config';
 import { TokenRefreshLink } from 'apollo-link-token-refresh';
+import { createUploadLink } from 'apollo-upload-client';
 
 const cache = new InMemoryCache({});
 
@@ -50,11 +51,7 @@ export default new ApolloClient({
 
         try {
           const { exp } = jwtDecode(token);
-          if (Date.now() >= exp * 1000) {
-            return false;
-          } else {
-            return true;
-          }
+          return Date.now() < exp * 1000;
         } catch {
           return false;
         }
@@ -78,7 +75,7 @@ export default new ApolloClient({
       console.log(networkError);
     }),
     requestLink,
-    new HttpLink({
+    createUploadLink({
       uri: Config.backendGraphqlUrl,
       credentials: 'include'
     })
