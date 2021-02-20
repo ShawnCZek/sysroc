@@ -3,10 +3,12 @@ import moment from 'moment';
 import styled from 'styled-components';
 import grey from '@material-ui/core/colors/grey';
 import humanFileSize from '../../utils/humanFileSize';
-import { UploadDto, UploadType } from '../../generated/graphql';
+import { UploadDto, UploadType, useProjectDetailsQuery } from '../../generated/graphql';
 import { Assessment, CloudDownload, Code, Delete, Description, PresentToAll } from '@material-ui/icons';
 import { Fab, Link, Typography } from '@material-ui/core';
 import { Config } from '../../config/config';
+import { useHasPermissions } from '../../hooks/hasPermissions.hook';
+import { PERMISSIONS } from '../../generated/permissions';
 
 export const UploadStyles = styled.div`
   padding: 1rem 1.4rem;
@@ -50,11 +52,18 @@ export const UploadStyles = styled.div`
 `;
 
 interface Props {
+  projectId: number;
   upload: UploadDto;
   onSelectDelete: (uploadId: number) => void;
 }
 
-export const Upload: React.FC<Props> = ({ upload, onSelectDelete }) => {
+export const Upload: React.FC<Props> = ({ projectId, upload, onSelectDelete }) => {
+  const { data: details, loading: detailsLoading } = useProjectDetailsQuery({ variables: { id: projectId } });
+
+  const canManageProjects = useHasPermissions(PERMISSIONS.PROJECTS_MANAGE);
+
+  if (detailsLoading || !details?.projectDetails) return null;
+
   return (
     <UploadStyles>
       <div className="upload-icon">
@@ -76,13 +85,15 @@ export const Upload: React.FC<Props> = ({ upload, onSelectDelete }) => {
             <CloudDownload />
           </Fab>
         </Link>
-        <Fab
-          color="secondary"
-          variant="extended"
-          onClick={() => onSelectDelete(parseInt(upload.id))}
-        >
-          <Delete />
-        </Fab>
+        { (details.projectDetails.isAuthor || canManageProjects) && (
+          <Fab
+            color="secondary"
+            variant="extended"
+            onClick={() => onSelectDelete(parseInt(upload.id))}
+          >
+            <Delete />
+          </Fab>
+        ) }
       </div>
     </UploadStyles>
   );

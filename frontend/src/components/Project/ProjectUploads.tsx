@@ -50,7 +50,7 @@ export const ProjectUploads: React.FC<Props> = ({ projectId, uploads, projectFil
             valueText={`${humanFileSize(details.projectDetails.size, false, 2)} / ${humanFileSize(details.projectDetails.maxSize, false, 2)}`}
           />
         </ProgressWrapper>
-        <UploadsList uploads={uploads} />
+        <UploadsList projectId={projectId} uploads={uploads} />
       </ProjectUploadsList>
     </ProjectUploadsWrapper>
   );

@@ -13,10 +13,11 @@ const useStyles = makeStyles({
 });
 
 interface Props {
+  projectId: number;
   uploads: UploadDto[];
 }
 
-export const UploadsList: React.FC<Props> = ({ uploads }) => {
+export const UploadsList: React.FC<Props> = ({ projectId, uploads }) => {
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -85,6 +86,7 @@ export const UploadsList: React.FC<Props> = ({ uploads }) => {
         { uploads.map(upload => (
           <Upload
             key={upload.id}
+            projectId={projectId}
             upload={upload}
             onSelectDelete={onSelectDelete}
           />

@@ -15,6 +15,8 @@ import { ComponentLoading } from '../ComponentLoading';
 import { Form, Formik } from 'formik';
 import { useSnackbar } from 'notistack';
 import { UploadDetails } from './UploadDetails';
+import { useHasPermissions } from '../../hooks/hasPermissions.hook';
+import { PERMISSIONS } from '../../generated/permissions';
 
 const useStyles = makeStyles({
   buttonWrapper: {
@@ -124,7 +126,40 @@ export const UploadForm: React.FC<Props> = ({ projectId, uploads, projectFiles }
   const analysis = uploads.find(upload => upload.id === projectFiles?.analysis?.id);
   const project = uploads.find(upload => upload.id === projectFiles?.project?.id);
 
+  const canManageProjects = useHasPermissions(PERMISSIONS.PROJECTS_MANAGE);
+
   if (detailsLoading || !details?.projectDetails) return <ComponentLoading />;
+
+  if (!details.projectDetails.isAuthor && !canManageProjects) {
+    return (
+      <div className={classes.buttonWrapper}>
+        <div className={classes.uploadBox}>
+          <Typography variant="h6">
+            Documentation
+          </Typography>
+          <UploadDetails color="primary" upload={documentation} />
+        </div>
+        <div className={classes.uploadBox}>
+          <Typography variant="h6">
+            Presentation
+          </Typography>
+          <UploadDetails color="secondary" upload={presentation} />
+        </div>
+        <div className={classes.uploadBox}>
+          <Typography variant="h6">
+            Analysis
+          </Typography>
+          <UploadDetails upload={analysis} />
+        </div>
+        <div className={classes.uploadBox}>
+          <Typography variant="h6">
+            Project
+          </Typography>
+          <UploadDetails color="primary" upload={project} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Formik
