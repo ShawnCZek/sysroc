@@ -3,6 +3,7 @@ import { User } from '../../users/entities/users.entity';
 import { Task } from '../../tasks/entities/tasks.entity';
 import { Classification } from '../../classification/entities/classification.entity';
 import { Invitation } from '../../invitations/entities/invitations.entity';
+import { Upload } from '../../uploads/entities/uploads.entity';
 
 @Entity()
 export class Project {
@@ -32,6 +33,9 @@ export class Project {
 
   @OneToMany(type => Invitation, invitation => invitation.project)
   invitations: Invitation[];
+
+  @OneToMany(type => Upload, upload => upload.project)
+  uploads: Upload[];
 
   @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
   readonly createdAt: Date;

@@ -14,6 +14,8 @@ export type Scalars = {
   Float: number;
   /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: any;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 export type AdUser = {
@@ -160,9 +162,11 @@ export type Mutation = {
   deleteRole: RoleDto;
   createProject: ProjectDto;
   updateProject: ProjectDto;
+  uploadProjectFiles: ProjectDto;
   claimProject: ProjectDto;
   deleteProject: ProjectDto;
   deleteProjectAuthor: ProjectDto;
+  deleteUpload: UploadDto;
   createTask: TaskDto;
   deleteTask: TaskDto;
   updateTask: TaskDto;
@@ -240,6 +244,12 @@ export type MutationUpdateProjectArgs = {
 };
 
 
+export type MutationUploadProjectFilesArgs = {
+  input: UploadProjectFilesDto;
+  projectId: Scalars['Float'];
+};
+
+
 export type MutationClaimProjectArgs = {
   filter: ProjectsFilter;
 };
@@ -252,6 +262,11 @@ export type MutationDeleteProjectArgs = {
 
 export type MutationDeleteProjectAuthorArgs = {
   input: RemoveAuthorDto;
+};
+
+
+export type MutationDeleteUploadArgs = {
+  uploadId: Scalars['Float'];
 };
 
 
@@ -336,6 +351,8 @@ export type PermissionStateDto = {
 
 export type ProjectDetailsDto = {
   __typename?: 'ProjectDetailsDto';
+  size: Scalars['Float'];
+  maxSize: Scalars['Float'];
   isOwner: Scalars['Boolean'];
   isAuthor: Scalars['Boolean'];
 };
@@ -350,7 +367,17 @@ export type ProjectDto = {
   supervisor?: Maybe<UserDto>;
   tasks: Array<TaskDto>;
   classifications: Array<ClassificationDto>;
+  uploads: Array<UploadDto>;
+  projectFiles?: Maybe<ProjectFilesDto>;
   createdAt: Scalars['DateTime'];
+};
+
+export type ProjectFilesDto = {
+  __typename?: 'ProjectFilesDto';
+  documentation?: Maybe<UploadDto>;
+  presentation?: Maybe<UploadDto>;
+  analysis?: Maybe<UploadDto>;
+  project?: Maybe<UploadDto>;
 };
 
 export type ProjectsFilter = {
@@ -528,6 +555,37 @@ export type UpdateUserDto = {
   roleSlugs?: Maybe<Array<Scalars['String']>>;
   groups?: Maybe<Array<Scalars['Float']>>;
 };
+
+
+export type UploadDto = {
+  __typename?: 'UploadDto';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  token: Scalars['String'];
+  mimetype: Scalars['String'];
+  size: Scalars['Float'];
+  type: UploadType;
+  typeName: Scalars['String'];
+  project: ProjectDto;
+  createdAt: Scalars['DateTime'];
+};
+
+export type UploadProjectFilesDto = {
+  documentation?: Maybe<Scalars['Upload']>;
+  presentation?: Maybe<Scalars['Upload']>;
+  analysis?: Maybe<Scalars['Upload']>;
+  project?: Maybe<Scalars['Upload']>;
+};
+
+/** Type of an uploaded file attached to a project. */
+export enum UploadType {
+  /** The default type which is not categorized. */
+  Any = 'Any',
+  Documentation = 'Documentation',
+  Presentation = 'Presentation',
+  Analysis = 'Analysis',
+  Project = 'Project'
+}
 
 export type UserAuthDto = {
   __typename?: 'UserAuthDto';
@@ -905,6 +963,42 @@ export type DeleteTaskMutation = (
   ) }
 );
 
+export type DeleteUploadMutationVariables = Exact<{
+  uploadId: Scalars['Float'];
+}>;
+
+
+export type DeleteUploadMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteUpload: (
+    { __typename?: 'UploadDto' }
+    & Pick<UploadDto, 'id' | 'size'>
+    & { project: (
+      { __typename?: 'ProjectDto' }
+      & Pick<ProjectDto, 'id'>
+      & { uploads: Array<(
+        { __typename?: 'UploadDto' }
+        & Pick<UploadDto, 'id' | 'name' | 'token' | 'size' | 'typeName' | 'createdAt'>
+      )>, projectFiles?: Maybe<(
+        { __typename?: 'ProjectFilesDto' }
+        & { documentation?: Maybe<(
+          { __typename?: 'UploadDto' }
+          & Pick<UploadDto, 'id'>
+        )>, presentation?: Maybe<(
+          { __typename?: 'UploadDto' }
+          & Pick<UploadDto, 'id'>
+        )>, analysis?: Maybe<(
+          { __typename?: 'UploadDto' }
+          & Pick<UploadDto, 'id'>
+        )>, project?: Maybe<(
+          { __typename?: 'UploadDto' }
+          & Pick<UploadDto, 'id'>
+        )> }
+      )> }
+    ) }
+  ) }
+);
+
 export type DeleteUserMutationVariables = Exact<{
   id: Scalars['Float'];
 }>;
@@ -1076,6 +1170,24 @@ export type ProjectQuery = (
         { __typename?: 'UserDto' }
         & Pick<UserDto, 'id' | 'name'>
       ) }
+    )>, uploads: Array<(
+      { __typename?: 'UploadDto' }
+      & Pick<UploadDto, 'id' | 'name' | 'token' | 'size' | 'type' | 'typeName' | 'createdAt'>
+    )>, projectFiles?: Maybe<(
+      { __typename?: 'ProjectFilesDto' }
+      & { documentation?: Maybe<(
+        { __typename?: 'UploadDto' }
+        & Pick<UploadDto, 'id'>
+      )>, presentation?: Maybe<(
+        { __typename?: 'UploadDto' }
+        & Pick<UploadDto, 'id'>
+      )>, analysis?: Maybe<(
+        { __typename?: 'UploadDto' }
+        & Pick<UploadDto, 'id'>
+      )>, project?: Maybe<(
+        { __typename?: 'UploadDto' }
+        & Pick<UploadDto, 'id'>
+      )> }
     )>, owner: (
       { __typename?: 'UserDto' }
       & Pick<UserDto, 'id' | 'name'>
@@ -1098,7 +1210,7 @@ export type ProjectDetailsQuery = (
   { __typename?: 'Query' }
   & { projectDetails: (
     { __typename?: 'ProjectDetailsDto' }
-    & Pick<ProjectDetailsDto, 'isOwner' | 'isAuthor'>
+    & Pick<ProjectDetailsDto, 'size' | 'maxSize' | 'isOwner' | 'isAuthor'>
   ) }
 );
 
@@ -1363,6 +1475,42 @@ export type UpdateUserMutation = (
     )>, roles: Array<(
       { __typename?: 'RoleDto' }
       & Pick<RoleDto, 'id' | 'name' | 'slug' | 'system' | 'admin'>
+    )> }
+  ) }
+);
+
+export type UploadProjectFilesMutationVariables = Exact<{
+  documentation?: Maybe<Scalars['Upload']>;
+  presentation?: Maybe<Scalars['Upload']>;
+  analysis?: Maybe<Scalars['Upload']>;
+  project?: Maybe<Scalars['Upload']>;
+  projectId: Scalars['Float'];
+}>;
+
+
+export type UploadProjectFilesMutation = (
+  { __typename?: 'Mutation' }
+  & { uploadProjectFiles: (
+    { __typename?: 'ProjectDto' }
+    & Pick<ProjectDto, 'id'>
+    & { uploads: Array<(
+      { __typename?: 'UploadDto' }
+      & Pick<UploadDto, 'id' | 'name' | 'token' | 'size' | 'typeName' | 'createdAt'>
+    )>, projectFiles?: Maybe<(
+      { __typename?: 'ProjectFilesDto' }
+      & { documentation?: Maybe<(
+        { __typename?: 'UploadDto' }
+        & Pick<UploadDto, 'id'>
+      )>, presentation?: Maybe<(
+        { __typename?: 'UploadDto' }
+        & Pick<UploadDto, 'id'>
+      )>, analysis?: Maybe<(
+        { __typename?: 'UploadDto' }
+        & Pick<UploadDto, 'id'>
+      )>, project?: Maybe<(
+        { __typename?: 'UploadDto' }
+        & Pick<UploadDto, 'id'>
+      )> }
     )> }
   ) }
 );
@@ -2149,6 +2297,64 @@ export function useDeleteTaskMutation(baseOptions?: Apollo.MutationHookOptions<D
 export type DeleteTaskMutationHookResult = ReturnType<typeof useDeleteTaskMutation>;
 export type DeleteTaskMutationResult = Apollo.MutationResult<DeleteTaskMutation>;
 export type DeleteTaskMutationOptions = Apollo.BaseMutationOptions<DeleteTaskMutation, DeleteTaskMutationVariables>;
+export const DeleteUploadDocument = gql`
+    mutation DeleteUpload($uploadId: Float!) {
+  deleteUpload(uploadId: $uploadId) {
+    id
+    size
+    project {
+      id
+      uploads {
+        id
+        name
+        token
+        size
+        typeName
+        createdAt
+      }
+      projectFiles {
+        documentation {
+          id
+        }
+        presentation {
+          id
+        }
+        analysis {
+          id
+        }
+        project {
+          id
+        }
+      }
+    }
+  }
+}
+    `;
+export type DeleteUploadMutationFn = Apollo.MutationFunction<DeleteUploadMutation, DeleteUploadMutationVariables>;
+
+/**
+ * __useDeleteUploadMutation__
+ *
+ * To run a mutation, you first call `useDeleteUploadMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteUploadMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteUploadMutation, { data, loading, error }] = useDeleteUploadMutation({
+ *   variables: {
+ *      uploadId: // value for 'uploadId'
+ *   },
+ * });
+ */
+export function useDeleteUploadMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUploadMutation, DeleteUploadMutationVariables>) {
+        return Apollo.useMutation<DeleteUploadMutation, DeleteUploadMutationVariables>(DeleteUploadDocument, baseOptions);
+      }
+export type DeleteUploadMutationHookResult = ReturnType<typeof useDeleteUploadMutation>;
+export type DeleteUploadMutationResult = Apollo.MutationResult<DeleteUploadMutation>;
+export type DeleteUploadMutationOptions = Apollo.BaseMutationOptions<DeleteUploadMutation, DeleteUploadMutationVariables>;
 export const DeleteUserDocument = gql`
     mutation DeleteUser($id: Float!) {
   deleteUser(userId: $id) {
@@ -2545,6 +2751,29 @@ export const ProjectDocument = gql`
         name
       }
     }
+    uploads {
+      id
+      name
+      token
+      size
+      type
+      typeName
+      createdAt
+    }
+    projectFiles {
+      documentation {
+        id
+      }
+      presentation {
+        id
+      }
+      analysis {
+        id
+      }
+      project {
+        id
+      }
+    }
     owner {
       id
       name
@@ -2589,6 +2818,8 @@ export type ProjectQueryResult = Apollo.QueryResult<ProjectQuery, ProjectQueryVa
 export const ProjectDetailsDocument = gql`
     query ProjectDetails($id: Float!) {
   projectDetails(projectId: $id) {
+    size
+    maxSize
     isOwner
     isAuthor
   }
@@ -3196,6 +3427,64 @@ export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
 export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
 export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
+export const UploadProjectFilesDocument = gql`
+    mutation UploadProjectFiles($documentation: Upload, $presentation: Upload, $analysis: Upload, $project: Upload, $projectId: Float!) {
+  uploadProjectFiles(input: {documentation: $documentation, presentation: $presentation, analysis: $analysis, project: $project}, projectId: $projectId) {
+    id
+    uploads {
+      id
+      name
+      token
+      size
+      typeName
+      createdAt
+    }
+    projectFiles {
+      documentation {
+        id
+      }
+      presentation {
+        id
+      }
+      analysis {
+        id
+      }
+      project {
+        id
+      }
+    }
+  }
+}
+    `;
+export type UploadProjectFilesMutationFn = Apollo.MutationFunction<UploadProjectFilesMutation, UploadProjectFilesMutationVariables>;
+
+/**
+ * __useUploadProjectFilesMutation__
+ *
+ * To run a mutation, you first call `useUploadProjectFilesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadProjectFilesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadProjectFilesMutation, { data, loading, error }] = useUploadProjectFilesMutation({
+ *   variables: {
+ *      documentation: // value for 'documentation'
+ *      presentation: // value for 'presentation'
+ *      analysis: // value for 'analysis'
+ *      project: // value for 'project'
+ *      projectId: // value for 'projectId'
+ *   },
+ * });
+ */
+export function useUploadProjectFilesMutation(baseOptions?: Apollo.MutationHookOptions<UploadProjectFilesMutation, UploadProjectFilesMutationVariables>) {
+        return Apollo.useMutation<UploadProjectFilesMutation, UploadProjectFilesMutationVariables>(UploadProjectFilesDocument, baseOptions);
+      }
+export type UploadProjectFilesMutationHookResult = ReturnType<typeof useUploadProjectFilesMutation>;
+export type UploadProjectFilesMutationResult = Apollo.MutationResult<UploadProjectFilesMutation>;
+export type UploadProjectFilesMutationOptions = Apollo.BaseMutationOptions<UploadProjectFilesMutation, UploadProjectFilesMutationVariables>;
 export const UserDocument = gql`
     query User($id: Float!) {
   user(filter: {id: $id}) {

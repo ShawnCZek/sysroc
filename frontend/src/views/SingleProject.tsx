@@ -1,8 +1,14 @@
 import moment from 'moment';
 import styled from 'styled-components';
 import React, { useState } from 'react';
-import { ClassificationDto, ProjectDto, useProjectDetailsQuery, useProjectQuery } from '../generated/graphql';
-import { RouteComponentProps, useHistory } from 'react-router';
+import {
+  ClassificationDto,
+  ProjectDto,
+  UploadDto,
+  useProjectDetailsQuery,
+  useProjectQuery,
+} from '../generated/graphql';
+import { RouteComponentProps } from 'react-router';
 import { Fab, Typography } from '@material-ui/core';
 import { TasksList } from '../components/Task/TasksList';
 import { CreateTaskModal } from '../components/Task/CreateTaskModal';
@@ -15,6 +21,8 @@ import { InviteButton } from '../components/Invitation/InviteButton';
 import { ComponentLoading } from '../components/ComponentLoading';
 import { UpdateProjectButton } from '../components/Project/UpdateProjectButton';
 import { ProjectClassificationFab } from '../components/Project/ProjectClassificationFab';
+import { ProjectUploads } from '../components/Project/ProjectUploads';
+import { BackButton } from '../components/Layout/Button/BackButton';
 
 const ProjectControls = styled.div`
   display: flex;
@@ -66,8 +74,6 @@ interface Props extends RouteComponentProps<{
 export const SingleProject: React.FC<Props> = props => {
   const projectId = parseInt(props.match.params.projectId);
 
-  const history = useHistory();
-
   const [upTaskModalOpen, setUpTaskModalOpen] = useState(false);
   const [createTaskOpen, setCreateTaskOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<number>(0);
@@ -106,15 +112,7 @@ export const SingleProject: React.FC<Props> = props => {
     <>
       <ProjectControls>
         <Actions>
-          <Fab
-            color="primary"
-            variant="extended"
-            onClick={() => {
-              history.goBack();
-            }}
-          >
-            Back
-          </Fab>
+          <BackButton />
           { data?.project && <UpdateProjectButton project={data.project as ProjectDto} /> }
           { data?.project && <InviteButton projectId={parseInt(data.project.id)} /> }
           { data?.project &&
@@ -136,6 +134,11 @@ export const SingleProject: React.FC<Props> = props => {
         <Project>
           <Typography variant="h4">{data.project.name}</Typography>
           <Typography variant="h5">{data.project.description}</Typography>
+          <ProjectUploads
+            projectId={parseInt(data.project.id)}
+            uploads={data.project.uploads as UploadDto[]}
+            projectFiles={data.project.projectFiles}
+          />
           { (canManageProject || (canManageOwnProject && details?.projectDetails.isAuthor)) &&
             <div className="add-task-btn">
               <Fab

@@ -6,7 +6,7 @@ interface Props {
   authors: Array<Pick<BaseUserDto, 'id' | 'name'>>;
 }
 
-export const ProjectsAuthors: React.FC<Props> = ({ authors }) => {
+export const ProjectAuthors: React.FC<Props> = ({ authors }) => {
   return (
     <>
       { authors.map(author => (

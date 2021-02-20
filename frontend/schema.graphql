@@ -59,6 +59,7 @@ type Mutation {
   deleteProjectAuthor(input: RemoveAuthorDto!): ProjectDto!
   deleteRole(roleId: Float!): RoleDto!
   deleteTask(filter: TasksFilter!): TaskDto!
+  deleteUpload(uploadId: Float!): UploadDto!
   deleteUser(userId: Float!): UserDto!
   invite(input: InviteDto!): InvitationDto!
   logout: Boolean!
@@ -70,6 +71,7 @@ type Mutation {
   updateRole(filter: RolesFilter!, input: UpdateRoleDto!): RoleDto!
   updateTask(filter: TasksFilter!, updates: UpdateTaskDto!): TaskDto!
   updateUser(filter: UsersFilter!, input: UpdateUserDto!): UserDto!
+  uploadProjectFiles(input: UploadProjectFilesDto!, projectId: Float!): ProjectDto!
 }
 
 type PasswordResetDto {
@@ -94,6 +96,8 @@ type PermissionStateDto {
 type ProjectDetailsDto {
   isAuthor: Boolean!
   isOwner: Boolean!
+  maxSize: Float!
+  size: Float!
 }
 
 type ProjectDto {
@@ -103,9 +107,18 @@ type ProjectDto {
   id: ID!
   name: String!
   owner: UserDto!
+  projectFiles: ProjectFilesDto
   supervisor: UserDto
   tasks: [TaskDto!]!
+  uploads: [UploadDto!]!
   users: [UserDto!]!
+}
+
+type ProjectFilesDto {
+  analysis: UploadDto
+  documentation: UploadDto
+  presentation: UploadDto
+  project: UploadDto
 }
 
 type Query {
@@ -147,6 +160,18 @@ type TaskDto {
   project: ProjectDto!
 }
 
+type UploadDto {
+  createdAt: DateTime!
+  id: ID!
+  mimetype: String!
+  name: String!
+  project: ProjectDto!
+  size: Float!
+  token: String!
+  type: UploadType!
+  typeName: String!
+}
+
 type UserAuthDto {
   accessToken: String
   registerToken: String
@@ -169,6 +194,16 @@ type UserDto {
 type UserTempDto {
   email: String!
   name: String!
+}
+
+"Type of an uploaded file attached to a project."
+enum UploadType {
+  Analysis
+  "The default type which is not categorized."
+  Any
+  Documentation
+  Presentation
+  Project
 }
 
 input AllRolesFilter {
@@ -202,10 +237,10 @@ input BaseUsersFilter {
 }
 
 input ClassificationsFilter {
-  fromDate: DateTime = "2020-12-17T16:20:14.328Z"
+  fromDate: DateTime = "2021-01-20T16:23:27.826Z"
   id: Float
   projects: [Float!] = []
-  toDate: DateTime = "2021-01-17T16:20:14.328Z"
+  toDate: DateTime = "2021-02-20T16:23:27.826Z"
   users: [Float!] = []
 }
 
@@ -326,6 +361,13 @@ input UpdateUserDto {
   roleSlugs: [String!]
 }
 
+input UploadProjectFilesDto {
+  analysis: Upload
+  documentation: Upload
+  presentation: Upload
+  project: Upload
+}
+
 input UserAuthInputDto {
   email: String!
   password: String!
@@ -341,3 +383,6 @@ input UsersFilter {
 
 "A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format."
 scalar DateTime
+
+"The `Upload` scalar type represents a file upload."
+scalar Upload

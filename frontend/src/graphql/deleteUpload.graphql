@@ -1,0 +1,23 @@
+mutation DeleteUpload($uploadId: Float!) {
+  deleteUpload(uploadId: $uploadId) {
+    id
+    size
+    project {
+      id
+      uploads {
+        id
+        name
+        token
+        size
+        typeName
+        createdAt
+      }
+      projectFiles {
+        documentation { id }
+        presentation { id }
+        analysis { id }
+        project { id }
+      }
+    }
+  }
+}

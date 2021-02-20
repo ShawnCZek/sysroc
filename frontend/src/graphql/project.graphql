@@ -22,6 +22,21 @@ query Project($id: Float!) {
         name
       }
     }
+    uploads {
+      id
+      name
+      token
+      size
+      type
+      typeName
+      createdAt
+    }
+    projectFiles {
+      documentation { id }
+      presentation { id }
+      analysis { id }
+      project { id }
+    }
     owner {
       id
       name

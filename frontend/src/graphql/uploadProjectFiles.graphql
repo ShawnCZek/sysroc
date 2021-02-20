@@ -1,0 +1,33 @@
+mutation UploadProjectFiles(
+  $documentation: Upload
+  $presentation: Upload
+  $analysis: Upload
+  $project: Upload
+  $projectId: Float!
+) {
+  uploadProjectFiles(
+    input: {
+      documentation: $documentation
+      presentation: $presentation
+      analysis: $analysis
+      project: $project
+    }
+    projectId: $projectId
+  ) {
+    id
+    uploads {
+      id
+      name
+      token
+      size
+      typeName
+      createdAt
+    }
+    projectFiles {
+      documentation { id }
+      presentation { id }
+      analysis { id }
+      project { id }
+    }
+  }
+}

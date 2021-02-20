@@ -14,6 +14,11 @@ import { UsersService } from '../users/users.service';
 import { PERMISSIONS } from '../permissions/permissions';
 import { RemoveAuthorDto } from './dto/remove-author.dto';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { UploadProjectFilesDto } from './dto/upload-project-files.dto';
+import { UploadsService } from '../uploads/uploads.service';
+import { ProjectFilesDto } from './dto/project-files.dto';
+import { UploadDto } from '../uploads/dto/upload.dto';
+import { UploadType } from '../uploads/dto/upload-type.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -21,6 +26,7 @@ export class ProjectsService {
     @InjectRepository(Project) private readonly projectRepository: Repository<Project>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly usersService: UsersService,
+    private readonly uploadsService: UploadsService,
   ) {}
 
   async create(
@@ -76,6 +82,9 @@ export class ProjectsService {
       throw new UnauthorizedException('Missing permissions for deleting this project');
     }
 
+    // Delete manually all data connected to the project
+    await this.uploadsService.deleteMany(projectId, user);
+
     const res = await this.projectRepository.delete({ id: projectId });
 
     if (!res || res.affected < 1) {
@@ -85,8 +94,8 @@ export class ProjectsService {
     return project;
   }
 
-  getOne(projectId: number): Promise<ProjectDto> {
-    return this.projectRepository
+  async getOne(projectId: number): Promise<ProjectDto> {
+    const project = await this.projectRepository
       .createQueryBuilder('project')
       .where('project.id = :id', { id: projectId })
       .leftJoinAndSelect('project.owner', 'owner')
@@ -95,9 +104,31 @@ export class ProjectsService {
       .leftJoinAndSelect('project.tasks', 'tasks')
       .leftJoinAndSelect('project.classifications', 'classifications')
       .leftJoinAndSelect('classifications.user', 'teacher')
+      .leftJoinAndSelect('project.uploads', 'uploads')
       .addOrderBy('tasks.dueDate', 'ASC' )
       .addOrderBy('users.id', 'ASC')
       .getOneOrFail();
+
+    return this.toProjectDto(project);
+  }
+
+  toProjectDto(project: Project): ProjectDto {
+    const uploads = project.uploads
+      .map(upload => this.uploadsService.toUploadDto(upload, project))
+      .sort((a: UploadDto, b: UploadDto) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    const projectFiles: ProjectFilesDto = {
+      documentation: uploads.find(upload => upload.type === UploadType.Documentation),
+      presentation: uploads.find(upload => upload.type === UploadType.Presentation),
+      analysis: uploads.find(upload => upload.type === UploadType.Analysis),
+      project: uploads.find(upload => upload.type === UploadType.Project),
+    };
+
+    return {
+      ...project,
+      uploads,
+      projectFiles,
+    };
   }
 
   async getDetails(
@@ -111,6 +142,8 @@ export class ProjectsService {
     }
 
     return {
+      size: await this.uploadsService.getProjectSize(projectId),
+      maxSize: this.uploadsService.getMaxProjectSize(),
       isOwner: this.isOwner(project, user),
       isAuthor: this.isAuthor(project, user),
     };
@@ -146,6 +179,37 @@ export class ProjectsService {
     }
 
     return this.projectRepository.findOne(filter.id, { relations: ['owner', 'users', 'supervisor'] });
+  }
+
+  async uploadFiles(
+    projectId: number,
+    files: UploadProjectFilesDto,
+    user: UserDto,
+  ): Promise<ProjectDto> {
+    const project = await this.projectRepository.findOne(projectId, { relations: ['owner', 'users'] });
+    if (!project) {
+      throw new NotFoundException('Could not find the project!');
+    }
+
+    if (!this.isAuthor(project, user) && !this.usersService.hasPermissions(user, PERMISSIONS.PROJECTS_MANAGE)) {
+      throw new UnauthorizedException('Missing permissions to manage project files.');
+    }
+
+    if (files.documentation) {
+      await this.uploadsService.createFile(await files.documentation, UploadType.Documentation, project);
+    }
+    if (files.presentation) {
+      await this.uploadsService.createFile(await files.presentation, UploadType.Presentation, project);
+    }
+    if (files.analysis) {
+      await this.uploadsService.createFile(await files.analysis, UploadType.Analysis, project);
+    }
+    if (files.project) {
+      await this.uploadsService.createFile(await files.project, UploadType.Project, project);
+    }
+
+    const updatedProject = await this.projectRepository.findOne(projectId, { relations: ['uploads'] });
+    return this.toProjectDto(updatedProject);
   }
 
   async claim(

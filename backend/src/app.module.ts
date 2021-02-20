@@ -14,6 +14,8 @@ import { ClassificationModule } from './classification/classification.module';
 import { MailerModule } from './mailer/mailer.module';
 import { PasswordResetModule } from './password-reset/password-reset.module';
 import { InvitationsModule } from './invitations/invitations.module';
+import { GraphQLUpload } from 'apollo-server-express';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -28,6 +30,7 @@ import { InvitationsModule } from './invitations/invitations.module';
           optionsSuccessStatus: 204,
           credentials: true,
         },
+        resolvers: { Upload: GraphQLUpload },
         installSubscriptionHandlers: true,
         context: ({ req, res }) => ({ req, res }),
       }),
@@ -46,6 +49,7 @@ import { InvitationsModule } from './invitations/invitations.module';
     ClassificationModule,
     PasswordResetModule,
     InvitationsModule,
+    UploadsModule,
   ],
 })
 export class AppModule {

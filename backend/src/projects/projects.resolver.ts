@@ -13,6 +13,7 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { UsersService } from '../users/users.service';
 import { ProjectDetailsDto } from './dto/project-details.dto';
 import { RemoveAuthorDto } from './dto/remove-author.dto';
+import { UploadProjectFilesDto } from './dto/upload-project-files.dto';
 
 @Resolver('Projects')
 export class ProjectsResolver {
@@ -73,6 +74,17 @@ export class ProjectsResolver {
     @Args('updates') updates: UpdateProjectDto,
   ): Promise<ProjectDto> {
     return this.projectsService.updateOne(filter, updates, user);
+  }
+
+  @Mutation(() => ProjectDto)
+  @UseGuards(GqlAuthGuard)
+  @HasPermissions(PERMISSIONS.PROJECTS_CREATE)
+  uploadProjectFiles(
+    @CurrentUser() user: UserDto,
+    @Args('projectId') projectId: number,
+    @Args('input') input: UploadProjectFilesDto,
+  ): Promise<ProjectDto> {
+    return this.projectsService.uploadFiles(projectId, input, user);
   }
 
   @Mutation(() => ProjectDto)

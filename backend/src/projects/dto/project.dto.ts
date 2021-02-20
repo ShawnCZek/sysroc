@@ -2,6 +2,8 @@ import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { UserDto } from '../../users/dto/user.dto';
 import { TaskDto } from '../../tasks/dto/task.dto';
 import { ClassificationDto } from '../../classification/dto/classification.dto';
+import { UploadDto } from '../../uploads/dto/upload.dto';
+import { ProjectFilesDto } from './project-files.dto';
 
 @ObjectType()
 export class ProjectDto {
@@ -28,6 +30,12 @@ export class ProjectDto {
 
   @Field(type => [ClassificationDto], { defaultValue: [] })
   readonly classifications: ClassificationDto[];
+
+  @Field(type => [UploadDto], { defaultValue: [] })
+  readonly uploads: UploadDto[];
+
+  @Field(type => ProjectFilesDto, { nullable: true })
+  readonly projectFiles?: ProjectFilesDto;
 
   @Field(type => Date)
   readonly createdAt: Date;

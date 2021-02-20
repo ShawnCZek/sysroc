@@ -16,7 +16,7 @@ import { UserLink } from '../UserLink';
 import { useSnackbar } from 'notistack';
 import { AcceptInvitationAlert } from './AcceptInvitationAlert';
 import { DeleteInvitationAlert } from './DeleteInvitationAlert';
-import { ProjectsAuthors } from '../Project/ProjectsAuthors';
+import { ProjectAuthors } from '../Project/ProjectAuthors';
 import { ComponentLoading } from '../ComponentLoading';
 
 export const InvitationsList: React.FC = () => {
@@ -111,7 +111,7 @@ export const InvitationsList: React.FC = () => {
                 </Item>
                 <Item>
                   <div>
-                    <ProjectsAuthors authors={invitation.project.users} />
+                    <ProjectAuthors authors={invitation.project.users} />
                   </div>
                 </Item>
                 <Item>

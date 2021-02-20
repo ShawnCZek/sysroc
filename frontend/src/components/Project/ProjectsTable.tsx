@@ -10,7 +10,7 @@ import { Item } from '../Layout/Item';
 import { UserLink } from '../UserLink';
 import { Fab } from '@material-ui/core';
 import { DeleteProjectAlert } from './DeleteProjectAlert';
-import { ProjectsAuthors } from './ProjectsAuthors';
+import { ProjectAuthors } from './ProjectAuthors';
 import { ProjectsQuery, useDeleteProjectMutation, useMeQuery } from '../../generated/graphql';
 import { useHasPermissions } from '../../hooks/hasPermissions.hook';
 import { PERMISSIONS } from '../../generated/permissions';
@@ -82,7 +82,7 @@ export const ProjectsTable: React.FC<Props> = ({ projects }) => {
                 </Item>
                 <Item>
                   <div>
-                    <ProjectsAuthors authors={project.users} />
+                    <ProjectAuthors authors={project.users} />
                   </div>
                 </Item>
                 <Item>

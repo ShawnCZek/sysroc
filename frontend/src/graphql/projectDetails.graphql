@@ -1,5 +1,7 @@
 query ProjectDetails($id: Float!) {
   projectDetails(projectId: $id) {
+    size
+    maxSize
     isOwner
     isAuthor
   }

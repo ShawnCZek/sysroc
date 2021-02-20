@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import client from './apollo/apollo.client';
-import { setAccessToken } from './auth/accessToken';
+import { getAccessToken, setAccessToken } from './auth/accessToken';
 import { Routes } from './routes/Routes';
 import { Config } from './config/config';
 import { SnackbarProvider } from 'notistack';
@@ -11,6 +11,8 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (getAccessToken().length > 0) return;
+
     fetch(`${Config.backendApiUrl}/auth/refresh_token`, {
       method: 'POST',
       credentials: 'include'
